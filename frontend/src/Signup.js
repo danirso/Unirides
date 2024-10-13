@@ -9,7 +9,7 @@ function Signup() {
           className="mx-auto"
           style={{ maxWidth: "400px", marginTop: "50px" }}
         >
-          <div className="form-group">
+          <div className="form-group mb-3">
             <label htmlFor="inputEmail">Endereço de email</label>
             <input
               type="email"
@@ -22,7 +22,7 @@ function Signup() {
               Nunca compartilharemos seu email com ninguém.
             </small>
           </div>
-          <div className="form-group">
+          <div className="form-group mb-3">
             <label htmlFor="inputPassword">Senha</label>
             <input
               type="password"
@@ -31,7 +31,7 @@ function Signup() {
               placeholder="Senha"
             />
           </div>
-          <div className="form-group">
+          <div className="form-group mb-3">
             <label htmlFor="inputPassword">Confirme a Senha</label>
             <input
               type="password"
@@ -40,7 +40,7 @@ function Signup() {
               placeholder="Confirme a sua senha"
             />
           </div>
-          <div className="form-group">
+          <div className="form-group mb-3">
             <label htmlFor="inputNumeroCeular">N° Celular</label>
             <input
               type="numeroCelular"
@@ -49,7 +49,7 @@ function Signup() {
               placeholder="Numero do seu Celular"
             />
           </div>
-          <div className="form-group">
+          <div className="form-group mb-3">
             <label htmlFor="inputRA">RA</label>
             <input
               type="RA"
@@ -58,7 +58,10 @@ function Signup() {
               placeholder="Seu RA"
             />
           </div>
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="btn btn-success w-100 align-items-center mb-3"
+          >
             Cadastrar-se
           </button>
           <p>
