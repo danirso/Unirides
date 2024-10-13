@@ -4,9 +4,6 @@ services:
     container_name: caronas-app
     ports:
       - "3000:3000"
-    volumes:
-      - ./backend:/app/backend
-      - ./frontend:/app/frontend
     environment:
       - NODE_ENV=development
     depends_on:

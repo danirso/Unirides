@@ -1,10 +1,14 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const port = 3000;
 
-// Definir uma rota básica
-app.get('/', (req, res) => {
-  res.send('Bem-vindo ao sistema de caronas!');
+// Servir os arquivos estáticos do build do React
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Rota coringa para servir o index.html do React
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Iniciar o servidor
