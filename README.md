@@ -1,6 +1,6 @@
 # sistema-de-carona
 
-pra testar o docker:
+pra acessar o sistema:
 - clone o repositório
 - rode o comando:
 ``docker compose up -d --build``
