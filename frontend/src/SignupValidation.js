@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 function Validation(values) {
   let errors = {};
   const email_pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,10 +34,8 @@ function Validation(values) {
     errors.ra =
       "O RA deve começar com números de '00' a '24' e ter exatamente 8 dígitos.";
   }
-  
+
   return errors;
 }
-
-
 
 export default Validation;

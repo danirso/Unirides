@@ -26,6 +26,26 @@ function Signup() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrors(Validation(values));
+    const validationErrors = Validation(values)
+
+ if (Object.keys(validationErrors).length === 0) {
+    // Enviar os dados para o backend
+    fetch('/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(values) // Enviar os dados do formulário como JSON
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Usuário cadastrado:', data);
+        // Aqui você pode redirecionar ou exibir uma mensagem de sucesso
+      })
+      .catch(error => {
+        console.error('Erro ao cadastrar:', error);
+      });
+    }
   };
 
   return (

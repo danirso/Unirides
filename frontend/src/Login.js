@@ -11,13 +11,9 @@ function Login() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  // Evento que atualiza os valores dos inputs
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setValues({
-      ...values,
-      [name]: value,
-    });
+  
+  const handleInput = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   // Evento ao submeter o formulário
@@ -51,7 +47,7 @@ function Login() {
               placeholder="Insira seu Email"
               className="form-control rounded-0"
               value={values.email}
-              onChange={handleInputChange}
+              onChange={handleInput}
             />
             {errors.email && (
               <span className="text-danger">{errors.email}</span>
@@ -67,7 +63,7 @@ function Login() {
               placeholder="Insira sua Senha"
               className="form-control rounded-0"
               value={values.password}
-              onChange={handleInputChange}
+              onChange={handleInput}
             />
             {errors.password && (
               <span className="text-danger">{errors.password}</span>
