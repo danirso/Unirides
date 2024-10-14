@@ -10,12 +10,17 @@ function Signup() {
     confirmPassword: "",
     celular: "",
     ra: "",
+    role: 0, // Valor inicial para passageiro
   });
 
   const [errors, setErrors] = useState({});
 
   const handleInput = (e) => {
-    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setValues((prev) => ({ 
+      ...prev, 
+      [name]: name === "role" ? Number(value) : value 
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -27,7 +32,6 @@ function Signup() {
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
       <div className="bg-white p-3 rounded w-25">
         <form
-          action=""
           className="mx-auto"
           style={{ maxWidth: "400px", marginTop: "50px" }}
           onSubmit={handleSubmit}
@@ -39,15 +43,14 @@ function Signup() {
               name="name"
               className="form-control"
               id="inputName"
-              aria-describedby="nameHelp"
               placeholder="Seu Nome"
               value={values.name}
               onChange={handleInput}
             />
-            {errors.name && (
-              <small className="text-danger">{errors.name}</small>
-            )}
+            {errors.name && <small className="text-danger">{errors.name}</small>}
           </div>
+          
+          {/* Campo de email */}
           <div className="form-group mb-3">
             <label htmlFor="inputEmail">Endereço de email</label>
             <input
@@ -55,15 +58,14 @@ function Signup() {
               name="email"
               className="form-control"
               id="inputEmail"
-              aria-describedby="emailHelp"
               placeholder="Coloque o seu email"
               value={values.email}
               onChange={handleInput}
             />
-            {errors.email && (
-              <small className="text-danger">{errors.email}</small>
-            )}
+            {errors.email && <small className="text-danger">{errors.email}</small>}
           </div>
+          
+          {/* Campo de senha */}
           <div className="form-group mb-3">
             <label htmlFor="inputPassword">Senha</label>
             <input
@@ -75,10 +77,10 @@ function Signup() {
               value={values.password}
               onChange={handleInput}
             />
-            {errors.password && (
-              <small className="text-danger">{errors.password}</small>
-            )}
+            {errors.password && <small className="text-danger">{errors.password}</small>}
           </div>
+
+          {/* Confirmação de senha */}
           <div className="form-group mb-3">
             <label htmlFor="confirmPassword">Confirme a Senha</label>
             <input
@@ -90,10 +92,10 @@ function Signup() {
               value={values.confirmPassword}
               onChange={handleInput}
             />
-            {errors.confirmPassword && (
-              <small className="text-danger">{errors.confirmPassword}</small>
-            )}
+            {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
           </div>
+
+          {/* Número de celular */}
           <div className="form-group mb-3">
             <label htmlFor="inputNumeroCeular">N° Celular</label>
             <input
@@ -105,10 +107,10 @@ function Signup() {
               value={values.celular}
               onChange={handleInput}
             />
-            {errors.celular && (
-              <small className="text-danger">{errors.celular}</small>
-            )}
+            {errors.celular && <small className="text-danger">{errors.celular}</small>}
           </div>
+
+          {/* RA */}
           <div className="form-group mb-3">
             <label htmlFor="inputRA">RA</label>
             <input
@@ -122,6 +124,23 @@ function Signup() {
             />
             {errors.ra && <small className="text-danger">{errors.ra}</small>}
           </div>
+
+          {/* Função */}
+          <div className="form-group mb-3">
+            <label htmlFor="role">Função</label>
+            <select
+              name="role"
+              className="form-control"
+              id="role"
+              value={values.role}
+              onChange={handleInput}
+            >
+              <option value={0}>Passageiro</option>
+              <option value={1}>Motorista</option>
+            </select>
+            {errors.role && <small className="text-danger">{errors.role}</small>}
+          </div>
+
           <button
             type="submit"
             className="btn btn-success w-100 align-items-center mb-3"
