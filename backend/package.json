@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "./node_modules/.bin/sequelize db:migrate && node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,6 +15,11 @@
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "mysql": "^2.18.1",
-    "nodemon": "^3.1.7"
+    "mysql2": "^3.11.3",
+    "nodemon": "^3.1.7",
+    "sequelize": "^6.37.4"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.2"
   }
 }
