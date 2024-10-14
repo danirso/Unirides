@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Validation from "./LoginValidation";
 
 function Login() {
@@ -9,6 +9,7 @@ function Login() {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   // Evento que atualiza os valores dos inputs
   const handleInputChange = (e) => {
@@ -32,15 +33,14 @@ function Login() {
     } else {
       // Se não houver erros, prosseguir com o login (simulação ou envio ao backend)
       console.log("Login efetuado com sucesso!");
+      navigate("/passageiro"); // Redireciona para o Dashboard (rota /passageiro)
     }
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
       <div className="bg-white p-3 rounded w-25">
-        <form action=""onSubmit={handleSubmit}>
-          {" "}
-          {/* Evento onSubmit */}
+        <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email">
               <strong>Email</strong>
@@ -51,7 +51,7 @@ function Login() {
               placeholder="Insira seu Email"
               className="form-control rounded-0"
               value={values.email}
-              onChange={handleInputChange} // Evento onChange
+              onChange={handleInputChange}
             />
             {errors.email && (
               <span className="text-danger">{errors.email}</span>
@@ -67,7 +67,7 @@ function Login() {
               placeholder="Insira sua Senha"
               className="form-control rounded-0"
               value={values.password}
-              onChange={handleInputChange} // Evento onChange
+              onChange={handleInputChange}
             />
             {errors.password && (
               <span className="text-danger">{errors.password}</span>
