@@ -20,7 +20,6 @@ RUN npm run build
 
 # Volte para o backend e sirva os arquivos estáticos do frontend
 WORKDIR /app/backend
-RUN mkdir -p public && cp -r /app/frontend/build/* public/
 
 # Exponha a porta do Node.js
 EXPOSE 3000
