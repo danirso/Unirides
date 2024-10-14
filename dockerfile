@@ -1,28 +1,18 @@
 # Use uma imagem oficial do Node.js como base
 FROM node:latest
 
-# Diretório de trabalho para o backend
-WORKDIR /app/backend
 
-# Copie e instale as dependências do backend
-COPY backend/package*.json ./
-RUN npm install
+WORKDIR /app
 
-# Copie o código do backend
-COPY backend/ .
 
-# Build do frontend
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ .
-RUN npm run build
+COPY entrypoint.sh /app/
 
-# Volte para o backend e sirva os arquivos estáticos do frontend
-WORKDIR /app/backend
 
-# Exponha a porta do Node.js
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 3000
 
-# Iniciar o backend
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+
 CMD ["npm", "start"]
