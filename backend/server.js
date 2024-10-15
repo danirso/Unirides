@@ -13,7 +13,7 @@ app.get('/api/caronas', async (req, res) => {
     const caronas = await Carona.findAll({
       include: [
         { model: Usuario, as: 'passageiro', attributes: ['nome'] },
-        { model: Usuario, as: 'motorista', attributes: ['nome'] },
+        { model: Usuario, as: 'motorista', attributes: ['nome'] }, // Pegando o nome do motorista
       ],
     });
     res.json(caronas); // Enviar as caronas como resposta JSON
