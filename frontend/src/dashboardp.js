@@ -45,7 +45,7 @@ function Dashboard() {
             <div key={carona.id} className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
-                <p className="card-text">Horário: {new Date(carona.horario).toLocaleString()}</p>
+                <p className="card-text">Horário: {new Date(carona.horario).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
                 <p className="card-text">Motorista: {carona.motorista.nome}</p> {/* Exibe o nome do motorista */}
                 <button className="btn btn-success">Solicitar Carona</button>
               </div>

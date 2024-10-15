@@ -23,6 +23,35 @@ app.get('/api/caronas', async (req, res) => {
   }
 });
 
+// Rota de API para cadastro de usuário
+app.post('/signup', async (req, res) => {
+  const { name, email, password, celular, ra, role } = req.body;
+
+  try {
+    // Verificar se o usuário já existe
+    const existingUser = await Usuario.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Usuário já existe com este email' });
+    }
+
+    // Criar novo usuário (sem criptografia de senha)
+    const newUser = await Usuario.create({
+      nome: name,
+      email,
+      senha: password, // Senha sem criptografia
+      celular,
+      ra,
+      role, // 0: passageiro, 1: motorista
+    });
+
+    // Retornar sucesso
+    res.status(201).json({ message: 'Usuário cadastrado com sucesso!', user: newUser });
+  } catch (error) {
+    console.error('Erro ao cadastrar usuário:', error);
+    res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+  }
+});
+
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
 
