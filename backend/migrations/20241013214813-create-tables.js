@@ -2,8 +2,8 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Criar tabela Usuarios
-    await queryInterface.createTable('Usuarios', {
+    // Criar tabela Passageiros
+    await queryInterface.createTable('Passageiros', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -23,10 +23,36 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      role: {
-        type: Sequelize.TINYINT,
-        allowNull: false,
-        defaultValue: 0
+      createdAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      }
+    });
+
+    // Criar tabela Motoristas
+    await queryInterface.createTable('Motoristas', {
+      id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
+      nome: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      ra: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      celular: {
+        type: Sequelize.STRING
+      },
+      email: {
+        type: Sequelize.STRING
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -48,7 +74,7 @@ module.exports = {
       id_passageiro: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Usuarios',
+          model: 'Passageiros',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -57,7 +83,7 @@ module.exports = {
       id_motorista: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Usuarios',
+          model: 'Motoristas',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -83,6 +109,7 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     // Deletar as tabelas
     await queryInterface.dropTable('Caronas');
-    await queryInterface.dropTable('Usuarios');
+    await queryInterface.dropTable('Motoristas');
+    await queryInterface.dropTable('Passageiros');
   }
 };
