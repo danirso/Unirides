@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 function Dashboard() {
   const [usuario, setUsuario] = useState({
-    name: 'Magas',
-    email: 'magas@magas.com',
-    celular: 'xxxxxxxxx',
+    name: '',
+    email: '',
+    celular: '',
   });
 
   // Estado para armazenar as caronas vindas do backend
@@ -13,6 +13,12 @@ function Dashboard() {
 
   // Buscar caronas do backend quando o componente for montado
   useEffect(() => {
+    // Recupera os dados do usuário do localStorage
+    const userData = localStorage.getItem('usuario');
+    if (userData) {
+      setUsuario(JSON.parse(userData));  // Atualiza o estado com os dados do usuário
+    }
+
     fetch('http://localhost:3000/api/caronas')  // URL da API
       .then((response) => response.json())      // Parseia o JSON da resposta
       .then((data) => setCaronas(data))         // Atualiza o estado com as caronas
@@ -44,9 +50,9 @@ function Dashboard() {
           caronas.map((carona) => (
             <div key={carona.id} className="card mb-3">
               <div className="card-body">
-                <h5 className="card-title">{carona.destino}</h5>
-                <p className="card-text">Horário: {new Date(carona.horario).toLocaleString()}</p>
-                <p className="card-text">Partida: {carona.partida}</p>
+                <h5 className="card-title">Destino: {carona.destino}</h5>
+                <p className="card-text">Horário: {new Date(carona.horario).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
+                <p className="card-text">Motorista: {carona.motorista.nome}</p> {/* Exibe o nome do motorista */}
                 <button className="btn btn-success">Solicitar Carona</button>
               </div>
             </div>

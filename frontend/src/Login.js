@@ -11,13 +11,9 @@ function Login() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  // Evento que atualiza os valores dos inputs
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setValues({
-      ...values,
-      [name]: value,
-    });
+  
+  const handleInput = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   // Evento ao submeter o formulário
@@ -31,7 +27,16 @@ function Login() {
       // Se houver erros, armazena-os no estado
       setErrors(validationErrors);
     } else {
-      // Se não houver erros, prosseguir com o login (simulação ou envio ao backend)
+      // Simulação de login bem-sucedido
+      const user = {
+        name: "Nome do Usuário",
+        email: values.email,
+        celular: "123-456-7890",
+      };
+      
+      // Salva os dados do usuário no localStorage
+      localStorage.setItem('usuario', JSON.stringify(user));
+  
       console.log("Login efetuado com sucesso!");
       navigate("/passageiro"); // Redireciona para o Dashboard (rota /passageiro)
     }
@@ -40,6 +45,9 @@ function Login() {
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
       <div className="bg-white p-3 rounded w-25">
+      <h2 className="text-center mb-4">Sistema de Caronas</h2>
+      <h5 className="text-center mb-4">Seja bem-vindo!</h5>
+      <h6 className="text-center mb-4">Faça o login ou crie uma conta!</h6>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email">
@@ -51,7 +59,7 @@ function Login() {
               placeholder="Insira seu Email"
               className="form-control rounded-0"
               value={values.email}
-              onChange={handleInputChange}
+              onChange={handleInput}
             />
             {errors.email && (
               <span className="text-danger">{errors.email}</span>
@@ -67,7 +75,7 @@ function Login() {
               placeholder="Insira sua Senha"
               className="form-control rounded-0"
               value={values.password}
-              onChange={handleInputChange}
+              onChange={handleInput}
             />
             {errors.password && (
               <span className="text-danger">{errors.password}</span>

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import Validation from "./SignupValidation"; 
+import { Link, useNavigate } from "react-router-dom";
+import Validation from "./SignupValidation";
 
 function Signup() {
   const [values, setValues] = useState({
-    name: "",
+    nome: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -14,43 +14,80 @@ function Signup() {
   });
 
   const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState(""); // Estado para mensagens
+  const navigate = useNavigate(); // Hook para redirecionamento
 
   const handleInput = (e) => {
-    const { name, value } = e.target;
-    setValues((prev) => ({ 
-      ...prev, 
-      [name]: name === "role" ? Number(value) : value 
+    const { name, value } = e.target; // Mudança aqui
+    setValues((prev) => ({
+      ...prev,
+      [name]: name === "role" ? Number(value) : value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors(Validation(values));
+
+    // Validação dos campos
+    const validationErrors = Validation(values);
+    setErrors(validationErrors);
+
+    // Se não houver erros, prosseguir com o cadastro
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        // Enviando os dados para o backend
+        const response = await fetch("/api/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        });
+
+        // Verifica se a resposta é válida
+        if (!response.ok) {
+          throw new Error("Falha no cadastro"); // Lança um erro caso a resposta não seja 'ok'
+        }
+
+        const data = await response.json();
+        console.log("Usuário cadastrado:", data);
+
+        // Exibe mensagem de sucesso e redireciona
+        setMessage("Cadastro realizado com sucesso!");
+        navigate("/passageiro"); // Redireciona para a página de passageiro
+      } catch (error) {
+        console.error("Erro ao cadastrar:", error);
+        setMessage("Erro ao realizar cadastro. Tente novamente.");
+      }
+    }
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
       <div className="bg-white p-3 rounded w-25">
+      <h2 className="text-center mb-4">CADASTRO !</h2>
+
         <form
           className="mx-auto"
           style={{ maxWidth: "400px", marginTop: "50px" }}
           onSubmit={handleSubmit}
         >
           <div className="form-group mb-3">
-            <label htmlFor="inputName">Nome</label>
+            <label htmlFor="inputNome">Nome</label>
             <input
               type="text"
-              name="name"
+              name="nome"
               className="form-control"
-              id="inputName"
+              id="inputNome"
               placeholder="Seu Nome"
-              value={values.name}
+              value={values.nome}
               onChange={handleInput}
             />
-            {errors.name && <small className="text-danger">{errors.name}</small>}
+            {errors.nome && (
+              <small className="text-danger">{errors.nome}</small>
+            )}
           </div>
-          
-          {/* Campo de email */}
+
           <div className="form-group mb-3">
             <label htmlFor="inputEmail">Endereço de email</label>
             <input
@@ -62,10 +99,11 @@ function Signup() {
               value={values.email}
               onChange={handleInput}
             />
-            {errors.email && <small className="text-danger">{errors.email}</small>}
+            {errors.email && (
+              <small className="text-danger">{errors.email}</small>
+            )}
           </div>
-          
-          {/* Campo de senha */}
+
           <div className="form-group mb-3">
             <label htmlFor="inputPassword">Senha</label>
             <input
@@ -77,10 +115,11 @@ function Signup() {
               value={values.password}
               onChange={handleInput}
             />
-            {errors.password && <small className="text-danger">{errors.password}</small>}
+            {errors.password && (
+              <small className="text-danger">{errors.password}</small>
+            )}
           </div>
 
-          {/* Confirmação de senha */}
           <div className="form-group mb-3">
             <label htmlFor="confirmPassword">Confirme a Senha</label>
             <input
@@ -92,10 +131,11 @@ function Signup() {
               value={values.confirmPassword}
               onChange={handleInput}
             />
-            {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
+            {errors.confirmPassword && (
+              <small className="text-danger">{errors.confirmPassword}</small>
+            )}
           </div>
 
-          {/* Número de celular */}
           <div className="form-group mb-3">
             <label htmlFor="inputNumeroCeular">N° Celular</label>
             <input
@@ -107,10 +147,11 @@ function Signup() {
               value={values.celular}
               onChange={handleInput}
             />
-            {errors.celular && <small className="text-danger">{errors.celular}</small>}
+            {errors.celular && (
+              <small className="text-danger">{errors.celular}</small>
+            )}
           </div>
 
-          {/* RA */}
           <div className="form-group mb-3">
             <label htmlFor="inputRA">RA</label>
             <input
@@ -125,7 +166,6 @@ function Signup() {
             {errors.ra && <small className="text-danger">{errors.ra}</small>}
           </div>
 
-          {/* Função */}
           <div className="form-group mb-3">
             <label htmlFor="role">Função</label>
             <select
@@ -138,7 +178,9 @@ function Signup() {
               <option value={0}>Passageiro</option>
               <option value={1}>Motorista</option>
             </select>
-            {errors.role && <small className="text-danger">{errors.role}</small>}
+            {errors.role && (
+              <small className="text-danger">{errors.role}</small>
+            )}
           </div>
 
           <button
