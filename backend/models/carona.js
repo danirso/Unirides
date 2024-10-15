@@ -32,8 +32,8 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Carona.associate = (models) => {
-    Carona.belongsTo(models.Usuario, { as: 'Passageiro', foreignKey: 'id_passageiro' });
-    Carona.belongsTo(models.Usuario, { as: 'Motorista', foreignKey: 'id_motorista' });
+    Carona.belongsTo(models.Usuario, { as: 'passageiro', foreignKey: 'id_passageiro' });
+    Carona.belongsTo(models.Usuario, { as: 'motorista', foreignKey: 'id_motorista' });
   };
 
   return Carona;
