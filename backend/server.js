@@ -11,9 +11,9 @@ app.use(express.json());
 app.get('/api/caronas', async (req, res) => {
   try {
     const caronas = await Carona.findAll({
+      where: { id_passageiro: null }, // Apenas caronas sem passageiro
       include: [
-        { model: Usuario, as: 'passageiro', attributes: ['nome'] },
-        { model: Usuario, as: 'motorista', attributes: ['nome'] }, // Pegando o nome do motorista
+        { model: Usuario, as: 'motorista', attributes: ['nome'] }, // Pega o nome do motorista
       ],
     });
     res.json(caronas); // Enviar as caronas como resposta JSON
@@ -23,25 +23,92 @@ app.get('/api/caronas', async (req, res) => {
   }
 });
 
-app.post('/api/signup', async (req, res) => {
-  try {
-    console.log(req.body); // Para verificar os dados recebidos
-    const { nome, email, celular, ra, role } = req.body;
+// Rota para solicitar uma carona
+app.put('/api/caronas/:id/solicitar', async (req, res) => {
+  const { id } = req.params;
+  const { id_passageiro } = req.body;
 
-    // Criar um novo usuário usando o modelo Usuario
-    const novoUsuario = await Usuario.create({
-      nome,
+  try {
+    // Buscar a carona pelo ID
+    const carona = await Carona.findByPk(id);
+    if (!carona) {
+      return res.status(404).json({ error: 'Carona não encontrada' });
+    }
+
+    // Verificar se a carona já tem um passageiro
+    if (carona.id_passageiro !== null) {
+      return res.status(400).json({ error: 'Carona já tem um passageiro' });
+    }
+
+    // Atualizar a carona com o ID do passageiro
+    carona.id_passageiro = id_passageiro;
+    await carona.save();
+
+    res.json({ message: 'Carona solicitada com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao solicitar carona:', error);
+    res.status(500).json({ error: 'Erro ao solicitar carona' });
+  }
+});
+
+// Rota de API para cadastro de usuário
+app.post('/signup', async (req, res) => {
+  const { name, email, password, celular, ra, role } = req.body;
+
+  try {
+    // Verificar se o usuário já existe
+    const existingUser = await Usuario.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Usuário já existe com este email' });
+    }
+
+    // Criar novo usuário (sem criptografia de senha)
+    const newUser = await Usuario.create({
+      nome: name,
       email,
+      senha: password, // Senha sem criptografia
       celular,
       ra,
-      password,
-      role,
+      role, // 0: passageiro, 1: motorista
     });
 
-    res.status(201).json(novoUsuario); // Retornar o novo usuário como resposta
+    // Retornar sucesso
+    res.status(201).json({ message: 'Usuário cadastrado com sucesso!', user: newUser });
   } catch (error) {
     console.error('Erro ao cadastrar usuário:', error);
-    res.status(500).json({ message: 'Erro ao cadastrar usuário' });
+    res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+  }
+});
+
+// Rota de API para login
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Verificar se o email existe no banco de dados
+    const usuario = await Usuario.findOne({ where: { email } });
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuário não encontrado!' });
+    }
+
+    // Verificar se a senha fornecida está correta
+    if (usuario.senha !== password) {
+      return res.status(401).json({ error: 'Senha incorreta!' });
+    }
+
+    // Se o login for bem-sucedido, enviar dados do usuário
+    res.json({
+      message: 'Login bem-sucedido!',
+      user: {
+        id: usuario.id,
+        nome: usuario.nome,
+        role: usuario.role,
+      },
+    });
+  } catch (error) {
+    console.error('Erro ao realizar login:', error);
+    res.status(500).json({ error: 'Erro interno no servidor!' });
   }
 });
 

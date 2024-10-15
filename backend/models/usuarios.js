@@ -1,4 +1,3 @@
-// models/usuario.js
 module.exports = (sequelize, DataTypes) => {
   const Usuario = sequelize.define('Usuario', {
     id: {
@@ -15,19 +14,22 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     celular: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: false // Garantindo que o celular seja obrigatório
     },
     senha: {
       type: DataTypes.STRING,
       allowNull: false
     },
     email: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true // Adicionando unique para evitar emails duplicados
     },
     role: {
       type: DataTypes.TINYINT,
       allowNull: false,
-      defaultValue: 0
+      defaultValue: 0 // 0 = passageiro, 1 = motorista
     }
   }, {
     tableName: 'Usuarios',
