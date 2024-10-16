@@ -39,7 +39,8 @@ module.exports = {
       { id_passageiro: passageiroIds[1], id_motorista: motoristaIds[1], destino: 'Centro', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
       { id_passageiro: passageiroIds[2], id_motorista: motoristaIds[2], destino: 'Shops', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
       { id_passageiro: passageiroIds[3], id_motorista: motoristaIds[3], destino: 'Nova Granada', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
-      { id_passageiro: passageiroIds[4], id_motorista: motoristaIds[4], destino: 'Salto', horario: new Date(), createdAt: new Date(), updatedAt: new Date() }
+      { id_passageiro: passageiroIds[4], id_motorista: motoristaIds[4], destino: 'Salto', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
+      { id_passageiro: null, id_motorista: motoristaIds[1], destino: 'Campus Universitário', horario: new Date(), createdAt: new Date(), updatedAt: new Date() }
     ], {});
   },
 

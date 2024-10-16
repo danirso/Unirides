@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Validation from "./SignupValidation"; 
 
 function Signup() {
@@ -12,7 +12,7 @@ function Signup() {
     ra: "",
     role: 0, // Valor inicial para passageiro
   });
-
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
   const handleInput = (e) => {
@@ -43,7 +43,7 @@ function Signup() {
             console.error('Erro:', data.error);
           } else {
             console.log('Usuário cadastrado:', data);
-            // Aqui você pode redirecionar ou exibir uma mensagem de sucesso
+            navigate("/login");
           }
         })
         .catch(error => {

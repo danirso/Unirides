@@ -3,18 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const navigate = useNavigate();
-
-  // Estado para armazenar os dados do usuário logado
   const [usuario, setUsuario] = useState({
     name: '',
     email: '',
     celular: '',
   });
-
-  // Estado para armazenar as caronas vindas do backend
   const [caronas, setCaronas] = useState([]);
+  const [minhasCaronas, setMinhasCaronas] = useState([]); // Caronas do passageiro
 
-  // Buscar o usuário logado do localStorage (ou sessionStorage)
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
@@ -23,19 +19,26 @@ function Dashboard() {
         email: user.email,
         celular: user.celular,
       });
+      fetchMinhasCaronas(user.id); // Buscar caronas do passageiro
     } else {
-      // Redirecionar para login se o usuário não estiver logado
       navigate('/login');
     }
   }, [navigate]);
 
-  // Buscar caronas do backend quando o componente for montado
   useEffect(() => {
-    fetch('http://localhost:3000/api/caronas')  // URL da API para buscar caronas disponíveis
-      .then((response) => response.json())      // Parseia o JSON da resposta
-      .then((data) => setCaronas(data))         // Atualiza o estado com as caronas
+    fetch('http://localhost:3000/api/caronas')
+      .then((response) => response.json())
+      .then((data) => setCaronas(data))
       .catch((error) => console.error('Erro ao buscar caronas:', error));
   }, []);
+
+  // Função para buscar caronas do passageiro
+  const fetchMinhasCaronas = (idPassageiro) => {
+    fetch(`http://localhost:3000/api/caronas/minhas?id_passageiro=${idPassageiro}`)
+      .then((response) => response.json())
+      .then((data) => setMinhasCaronas(data))
+      .catch((error) => console.error('Erro ao buscar minhas caronas:', error));
+  };
 
   // Função para solicitar uma carona
   const solicitarCarona = (caronaId) => {
@@ -51,7 +54,8 @@ function Dashboard() {
       .then((response) => {
         if (response.ok) {
           alert('Carona solicitada com sucesso!');
-          setCaronas(caronas.filter((carona) => carona.id !== caronaId)); // Remove a carona da lista
+          setCaronas(caronas.filter((carona) => carona.id !== caronaId));
+          fetchMinhasCaronas(usuario.id); // Atualizar caronas do passageiro
         } else {
           alert('Erro ao solicitar carona.');
         }
@@ -59,9 +63,32 @@ function Dashboard() {
       .catch((error) => console.error('Erro ao solicitar carona:', error));
   };
 
+  // Função para sair de uma carona
+  const sairDaCarona = (caronaId) => {
+    fetch(`http://localhost:3000/api/caronas/${caronaId}/sair`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id_passageiro: null, // Define o id_passageiro como null para remover o passageiro
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          alert('Você saiu da carona com sucesso!');
+          setMinhasCaronas(minhasCaronas.filter((carona) => carona.id !== caronaId));
+        } else {
+          alert('Erro ao sair da carona.');
+        }
+      })
+      .catch((error) => console.error('Erro ao sair da carona:', error));
+  };
+  
+
   const handleLogout = () => {
-    localStorage.removeItem('user'); // Remove os dados do usuário do localStorage
-    navigate('/login'); // Redireciona para a página de login
+    localStorage.removeItem('user');
+    navigate('/login');
   };
 
   return (
@@ -73,16 +100,12 @@ function Dashboard() {
         </Link>
       </div>
 
-      {/* Seção do perfil do usuário */}
       <div className="mb-4">
         <p><strong>Email:</strong> {usuario.email}</p>
         <p><strong>Celular:</strong> {usuario.celular}</p>
-        <Link to="/perfil" className="btn btn-primary mb-3">
-          Ver Perfil Completo
-        </Link>
+        <Link to="/perfil" className="btn btn-primary mb-3">Ver Perfil Completo</Link>
       </div>
 
-      {/* Seção de caronas disponíveis */}
       <div className="mb-4">
         <h3>Caronas Disponíveis</h3>
         {caronas.length > 0 ? (
@@ -90,8 +113,8 @@ function Dashboard() {
             <div key={carona.id} className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
-                <p className="card-text">Horário: {new Date(carona.horario).toLocaleString()}</p>
-                <p className="card-text">Motorista: {carona.motorista.nome}</p> {/* Exibe o nome do motorista */}
+                <p className="card-text">Horário: {new Date(carona.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})}</p>
+                <p className="card-text">Motorista: {carona.motorista.nome}</p>
                 <button className="btn btn-success" onClick={() => solicitarCarona(carona.id)}>
                   Solicitar Carona
                 </button>
@@ -100,6 +123,26 @@ function Dashboard() {
           ))
         ) : (
           <p>Não há caronas disponíveis no momento.</p>
+        )}
+      </div>
+
+      <div className="mb-4">
+        <h3>Minhas Caronas</h3>
+        {minhasCaronas.length > 0 ? (
+          minhasCaronas.map((carona) => (
+            <div key={carona.id} className="card mb-3">
+              <div className="card-body">
+                <h5 className="card-title">Destino: {carona.destino}</h5>
+                <p className="card-text">Horário: {new Date(carona.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})}</p>
+                <p className="card-text">Motorista: {carona.motorista.nome}</p>
+                <button className="btn btn-danger" onClick={() => sairDaCarona(carona.id)}>
+                  Sair da Carona
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>Você não está em nenhuma carona no momento.</p>
         )}
       </div>
     </div>
