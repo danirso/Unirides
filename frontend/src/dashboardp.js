@@ -8,12 +8,11 @@ function Dashboard() {
     celular: '',
   });
 
-  // Estado para armazenar as caronas vindas do backend
-  const [caronas, setCaronas] = useState([]);
+  const [caronas, setCaronas] = useState([]);   // Estado para armazenar as caronas
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para a barra de pesquisa
 
   // Buscar caronas do backend quando o componente for montado
   useEffect(() => {
-    // Recupera os dados do usuário do localStorage
     const userData = localStorage.getItem('usuario');
     if (userData) {
       setUsuario(JSON.parse(userData));  // Atualiza o estado com os dados do usuário
@@ -24,6 +23,19 @@ function Dashboard() {
       .then((data) => setCaronas(data))         // Atualiza o estado com as caronas
       .catch((error) => console.error('Erro ao buscar caronas:', error));
   }, []);
+
+  // Função que atualiza o termo de busca
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value); // Atualiza o termo de busca conforme o usuário digita
+  };
+
+  // Filtra as caronas com base no termo de busca
+  const filteredCaronas = caronas.filter((carona) => {
+    return (
+      carona.destino.toLowerCase().includes(searchTerm.toLowerCase()) || // Filtra por destino
+      carona.motorista.nome.toLowerCase().includes(searchTerm.toLowerCase()) // Filtra por nome do motorista
+    );
+  });
 
   return (
     <div className="container mt-5">
@@ -43,11 +55,22 @@ function Dashboard() {
         </Link>
       </div>
 
+      {/* Barra de pesquisa */}
+      <div className="mb-4">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Buscar carona por destino ou motorista"
+          value={searchTerm}
+          onChange={handleSearchChange} // Atualiza o estado da busca
+        />
+      </div>
+
       {/* Seção de caronas disponíveis */}
       <div className="mb-4">
         <h3>Caronas Disponíveis</h3>
-        {caronas.length > 0 ? (
-          caronas.map((carona) => (
+        {filteredCaronas.length > 0 ? (
+          filteredCaronas.map((carona) => (
             <div key={carona.id} className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
