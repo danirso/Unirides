@@ -16,7 +16,7 @@ function Validation(values) {
     errors.password = "A senha é obrigatória.";
   } else if (!password_pattern.test(values.password)) {
     errors.password =
-      "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial.";
+      "A senha deve ter pelo menos 8 caracteres.";
   }
 
   // Validação de confirmação de senha

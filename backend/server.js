@@ -13,6 +13,7 @@ app.get('/api/caronas', async (req, res) => {
     const caronas = await Carona.findAll({
       where: { id_passageiro: null },
       include: [
+        { model: Usuario, as: 'passageiro', attributes: ['nome'] },
         { model: Usuario, as: 'motorista', attributes: ['nome'] },
       ],
     });
