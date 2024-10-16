@@ -29,13 +29,12 @@ function Signup() {
     const validationErrors = Validation(values);
   
     if (Object.keys(validationErrors).length === 0) {
-      // Enviar os dados para o backend
       fetch('/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values), // Enviar os dados do formulário como JSON
+        body: JSON.stringify(values),
       })
         .then(response => response.json())
         .then(data => {
@@ -43,7 +42,12 @@ function Signup() {
             console.error('Erro:', data.error);
           } else {
             console.log('Usuário cadastrado:', data);
-            navigate("/login");
+            // Redireciona com base no tipo de usuário
+            if (values.role === 1) {
+              navigate("/carinfo");
+            } else {
+              navigate("/login");
+            }
           }
         })
         .catch(error => {
@@ -52,7 +56,6 @@ function Signup() {
     }
   };
   
-
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
       <div className="bg-white p-3 rounded w-25">

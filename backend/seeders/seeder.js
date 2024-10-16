@@ -42,7 +42,7 @@ module.exports = {
       { id_passageiro: passageiroIds[4], id_motorista: motoristaIds[4], destino: 'Salto', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
       { id_passageiro: null, id_motorista: motoristaIds[1], destino: 'H15', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
       { id_passageiro: null, id_motorista: motoristaIds[3], destino: 'Cambui', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
-      { id_passageiro: null, id_motorista: motoristaIds[5], destino: 'Mansões Santo Antonio', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
+      { id_passageiro: null, id_motorista: motoristaIds[0], destino: 'Mansões Santo Antonio', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
       { id_passageiro: null, id_motorista: motoristaIds[4], destino: 'Valinhos', horario: new Date(), createdAt: new Date(), updatedAt: new Date() },
       { id_passageiro: null, id_motorista: motoristaIds[2], destino: 'Indaiatuba', horario: new Date(), createdAt: new Date(), updatedAt: new Date() }
     ], {});
