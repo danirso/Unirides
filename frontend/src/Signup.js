@@ -65,6 +65,8 @@ function Signup() {
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
       <div className="bg-white p-3 rounded w-25">
+      <h2 className="text-center mb-4">CADASTRO !</h2>
+
         <form
           className="mx-auto"
           style={{ maxWidth: "400px", marginTop: "50px" }}

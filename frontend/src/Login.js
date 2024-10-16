@@ -27,7 +27,16 @@ function Login() {
       // Se houver erros, armazena-os no estado
       setErrors(validationErrors);
     } else {
-      // Se não houver erros, prosseguir com o login (simulação ou envio ao backend)
+      // Simulação de login bem-sucedido
+      const user = {
+        name: "Nome do Usuário",
+        email: values.email,
+        celular: "123-456-7890",
+      };
+      
+      // Salva os dados do usuário no localStorage
+      localStorage.setItem('usuario', JSON.stringify(user));
+  
       console.log("Login efetuado com sucesso!");
       navigate("/passageiro"); // Redireciona para o Dashboard (rota /passageiro)
     }
@@ -36,6 +45,9 @@ function Login() {
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
       <div className="bg-white p-3 rounded w-25">
+      <h2 className="text-center mb-4">Sistema de Caronas</h2>
+      <h5 className="text-center mb-4">Seja bem-vindo!</h5>
+      <h6 className="text-center mb-4">Faça o login ou crie uma conta!</h6>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email">
