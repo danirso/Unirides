@@ -17,7 +17,8 @@ function Validation(values) {
   } else if (!password_pattern.test(values.password)) {
     errors.password =
       "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial.";
-  }
+  } else
+      errors.password = "Senha errada, tente novamente"
 
   return errors;
 }
