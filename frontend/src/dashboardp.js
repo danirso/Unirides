@@ -59,11 +59,16 @@ function Dashboard() {
       .catch((error) => console.error('Erro ao solicitar carona:', error));
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('user'); // Remove os dados do usuário do localStorage
+    navigate('/login'); // Redireciona para a página de login
+  };
+
   return (
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Bem-vindo, {usuario.name}!</h2>
-        <Link to="/" className="btn btn-danger">
+        <Link to="/" className="btn btn-danger" onClick={handleLogout}>
           Logout
         </Link>
       </div>
