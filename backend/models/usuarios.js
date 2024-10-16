@@ -1,6 +1,10 @@
-'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Usuario = sequelize.define('Usuario', {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
     nome: {
       type: DataTypes.STRING,
       allowNull: false
@@ -9,17 +13,28 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    celular: DataTypes.STRING,
-    email: DataTypes.STRING,
+    celular: {
+      type: DataTypes.STRING,
+      allowNull: false // Garantindo que o celular seja obrigatório
+    },
+    senha: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true // Adicionando unique para evitar emails duplicados
+    },
     role: {
       type: DataTypes.TINYINT,
       allowNull: false,
-      defaultValue: 0
+      defaultValue: 0 // 0 = passageiro, 1 = motorista
     }
-  }, {});
+  }, {
+    tableName: 'Usuarios',
+    timestamps: true
+  });
 
-  Usuario.associate = function(models) {
-    // Defina as associações aqui se precisar
-  };
   return Usuario;
 };

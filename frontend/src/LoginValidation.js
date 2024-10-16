@@ -1,8 +1,7 @@
 function Validation(values) {
   let errors = {};
   const email_pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const password_pattern =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const password_pattern = /^[A-Za-z\d@$!%*?&]{8,20}$/;
 
   // Validação de email
   if (!values.email) {
@@ -16,7 +15,7 @@ function Validation(values) {
     errors.password = "A senha é obrigatória.";
   } else if (!password_pattern.test(values.password)) {
     errors.password =
-      "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial.";
+      "A senha deve ter pelo menos 8 caracteres.";
   }
 
   return errors;

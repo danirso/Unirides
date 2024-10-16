@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false
       },
       ra: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER, // RA agora é INTEGER
         allowNull: false
       },
       celular: {
@@ -22,6 +22,10 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING
+      },
+      senha: {
+        type: Sequelize.STRING, // Campo para armazenar a senha criptografada
+        allowNull: false
       },
       role: {
         type: Sequelize.TINYINT,
@@ -46,7 +50,7 @@ module.exports = {
         primaryKey: true
       },
       id_passageiro: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER, // id_passageiro como INTEGER
         references: {
           model: 'Usuarios',
           key: 'id'
@@ -55,7 +59,7 @@ module.exports = {
         onDelete: 'CASCADE'
       },
       id_motorista: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER, // id_motorista como INTEGER
         references: {
           model: 'Usuarios',
           key: 'id'

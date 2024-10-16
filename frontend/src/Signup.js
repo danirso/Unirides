@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Validation from "./SignupValidation"; 
 
 function Signup() {
@@ -12,7 +12,7 @@ function Signup() {
     ra: "",
     role: 0, // Valor inicial para passageiro
   });
-
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
   const handleInput = (e) => {
@@ -26,27 +26,32 @@ function Signup() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrors(Validation(values));
-    const validationErrors = Validation(values)
-
- if (Object.keys(validationErrors).length === 0) {
-    // Enviar os dados para o backend
-    fetch('/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(values) // Enviar os dados do formulário como JSON
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Usuário cadastrado:', data);
-        // Aqui você pode redirecionar ou exibir uma mensagem de sucesso
+    const validationErrors = Validation(values);
+  
+    if (Object.keys(validationErrors).length === 0) {
+      // Enviar os dados para o backend
+      fetch('/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values), // Enviar os dados do formulário como JSON
       })
-      .catch(error => {
-        console.error('Erro ao cadastrar:', error);
-      });
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            console.error('Erro:', data.error);
+          } else {
+            console.log('Usuário cadastrado:', data);
+            navigate("/login");
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao cadastrar:', error);
+        });
     }
   };
+  
 
   return (
     <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
