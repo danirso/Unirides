@@ -21,7 +21,7 @@ function Signup() {
     const { name, value } = e.target;
     setValues((prev) => ({
       ...prev,
-      [name]: name === "role" ? Number(value) : value.toUpperCase() // Transformando o campo da placa em maiúsculas
+      [name]: name === "role" ? Number(value) : value// Transformando o campo da placa em maiúsculas
     }));
   };
 
@@ -179,10 +179,10 @@ function Signup() {
                 <input
                   type="text"
                   name="placa"
-                  className="form-control text-uppercase" // Classe CSS para tornar maiúsculo
+                  className="form-control"
                   id="inputPlaca"
                   placeholder="Placa do Carro"
-                  value={values.placa}
+                  value={values.placa.toUpperCase()}
                   onChange={handleInput}
                 />
                 {errors.placa && <small className="text-danger">{errors.placa}</small>}
