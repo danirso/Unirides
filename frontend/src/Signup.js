@@ -57,7 +57,7 @@ function Signup() {
   };
   
   return (
-    <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
+    <div className="d-flex justify-content-center align-items-center vh-100" style={{backgroundColor:'#0d1b2a'}}>
       <div className="bg-white p-3 rounded w-25">
         <form
           className="mx-auto"
