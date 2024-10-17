@@ -11,15 +11,17 @@ function Signup() {
     celular: "",
     ra: "",
     role: 0, // Valor inicial para passageiro
+    modeloCarro: "", // Novo campo para o modelo do carro
+    placa: "", // Novo campo para a placa
   });
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
   const handleInput = (e) => {
     const { name, value } = e.target;
-    setValues((prev) => ({ 
-      ...prev, 
-      [name]: name === "role" ? Number(value) : value 
+    setValues((prev) => ({
+      ...prev,
+      [name]: name === "role" ? Number(value) : value// Transformando o campo da placa em maiúsculas
     }));
   };
 
@@ -42,11 +44,10 @@ function Signup() {
             console.error('Erro:', data.error);
           } else {
             console.log('Usuário cadastrado:', data);
-            // Redireciona com base no tipo de usuário
             if (values.role === 1) {
-              navigate("/carinfo");
+              navigate("/motorista");  // Redireciona para dashboardm para motoristas
             } else {
-              navigate("/login");
+              navigate("/passageiro"); // Redireciona para dashboardp para passageiros
             }
           }
         })
@@ -57,15 +58,11 @@ function Signup() {
   };
   
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100" style={{backgroundColor:'#0d1b2a'}}>
-      <div className="bg-white p-3 rounded w-25">
-        <form
-          className="mx-auto"
-          style={{ maxWidth: "400px", marginTop: "50px" }}
-          onSubmit={handleSubmit}
-        >
-          <div className="form-group mb-3">
-            <label htmlFor="inputName">Nome</label>
+    <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: '#0d1b2a' }}>
+      <div className="bg-white p-3 rounded w-100" style={{ maxWidth: '450px', transform: 'scale(0.9)', transformOrigin: 'center' }}>
+        <form className="mx-auto" onSubmit={handleSubmit}>
+          <div className="form-group mb-2">
+            <label htmlFor="inputName">Nome:</label>
             <input
               type="text"
               name="name"
@@ -77,10 +74,9 @@ function Signup() {
             />
             {errors.name && <small className="text-danger">{errors.name}</small>}
           </div>
-          
-          {/* Campo de email */}
-          <div className="form-group mb-3">
-            <label htmlFor="inputEmail">Endereço de email</label>
+
+          <div className="form-group mb-2">
+            <label htmlFor="inputEmail">Endereço de email:</label>
             <input
               type="email"
               name="email"
@@ -92,10 +88,9 @@ function Signup() {
             />
             {errors.email && <small className="text-danger">{errors.email}</small>}
           </div>
-          
-          {/* Campo de senha */}
-          <div className="form-group mb-3">
-            <label htmlFor="inputPassword">Senha</label>
+
+          <div className="form-group mb-2">
+            <label htmlFor="inputPassword">Senha:</label>
             <input
               type="password"
               name="password"
@@ -108,9 +103,8 @@ function Signup() {
             {errors.password && <small className="text-danger">{errors.password}</small>}
           </div>
 
-          {/* Confirmação de senha */}
-          <div className="form-group mb-3">
-            <label htmlFor="confirmPassword">Confirme a Senha</label>
+          <div className="form-group mb-2">
+            <label htmlFor="confirmPassword">Confirme a Senha:</label>
             <input
               type="password"
               name="confirmPassword"
@@ -123,9 +117,8 @@ function Signup() {
             {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
           </div>
 
-          {/* Número de celular */}
-          <div className="form-group mb-3">
-            <label htmlFor="inputNumeroCeular">N° Celular</label>
+          <div className="form-group mb-2">
+            <label htmlFor="inputNumeroCeular">N° Celular:</label>
             <input
               type="text"
               name="celular"
@@ -138,9 +131,8 @@ function Signup() {
             {errors.celular && <small className="text-danger">{errors.celular}</small>}
           </div>
 
-          {/* RA */}
-          <div className="form-group mb-3">
-            <label htmlFor="inputRA">RA</label>
+          <div className="form-group mb-2">
+            <label htmlFor="inputRA">RA:</label>
             <input
               type="text"
               name="ra"
@@ -153,9 +145,8 @@ function Signup() {
             {errors.ra && <small className="text-danger">{errors.ra}</small>}
           </div>
 
-          {/* Função */}
-          <div className="form-group mb-3">
-            <label htmlFor="role">Função</label>
+          <div className="form-group mb-2">
+            <label htmlFor="role">Função:</label>
             <select
               name="role"
               className="form-control"
@@ -169,13 +160,43 @@ function Signup() {
             {errors.role && <small className="text-danger">{errors.role}</small>}
           </div>
 
+          {values.role === 1 && (
+            <>
+              <div className="form-group mb-2">
+                <label htmlFor="inputModeloCarro">Modelo do Carro:</label>
+                <input
+                  type="text"
+                  name="modeloCarro"
+                  className="form-control"
+                  id="inputModeloCarro"
+                  placeholder="Modelo do Carro"
+                  value={values.modeloCarro}
+                  onChange={handleInput}
+                />
+              </div>
+              <div className="form-group mb-2">
+                <label htmlFor="inputPlaca">Placa:</label>
+                <input
+                  type="text"
+                  name="placa"
+                  className="form-control"
+                  id="inputPlaca"
+                  placeholder="Placa do Carro"
+                  value={values.placa.toUpperCase()}
+                  onChange={handleInput}
+                />
+                {errors.placa && <small className="text-danger">{errors.placa}</small>}
+              </div>
+            </>
+          )}
+
           <button
             type="submit"
-            className="btn btn-success w-100 align-items-center mb-3"
+            className="btn btn-success w-100 align-items-center mb-2"
           >
             Cadastrar-se
           </button>
-          <p>
+          <p className="text-center mb-2">
             Já possui uma conta?{" "}
             <Link to="/" className="text-primary">
               Login
