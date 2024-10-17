@@ -21,33 +21,41 @@ function Signup() {
     const { name, value } = e.target;
     setValues((prev) => ({
       ...prev,
-      [name]: name === "role" ? Number(value) : value// Transformando o campo da placa em maiúsculas
+      [name]: name === "role" ? Number(value) : value
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors(Validation(values));
     const validationErrors = Validation(values);
-  
+    setErrors(validationErrors);
+    
     if (Object.keys(validationErrors).length === 0) {
       fetch('/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(values),  // Envia todos os dados incluindo modeloCarro e placa
       })
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            // Se a resposta não for 2xx, exibe a mensagem de erro
+            return response.text().then(errorText => {
+              throw new Error(errorText);
+            });
+          }
+          return response.json();
+        })
         .then(data => {
           if (data.error) {
             console.error('Erro:', data.error);
           } else {
             console.log('Usuário cadastrado:', data);
             if (values.role === 1) {
-              navigate("/motorista");  // Redireciona para dashboardm para motoristas
+              navigate("/motorista");  // Redireciona para dashboard de motoristas
             } else {
-              navigate("/passageiro"); // Redireciona para dashboardp para passageiros
+              navigate("/passageiro"); // Redireciona para dashboard de passageiros
             }
           }
         })
@@ -173,6 +181,7 @@ function Signup() {
                   value={values.modeloCarro}
                   onChange={handleInput}
                 />
+                {errors.modeloCarro && <small className="text-danger">{errors.modeloCarro}</small>}
               </div>
               <div className="form-group mb-2">
                 <label htmlFor="inputPlaca">Placa:</label>

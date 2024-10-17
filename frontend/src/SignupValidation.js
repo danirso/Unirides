@@ -5,11 +5,16 @@ function Validation(values) {
   const ra_pattern = /^(0[0-9]|1[0-9]|2[0-4])\d{6}$/; // RA deve começar com números de '00' a '24' e ter 8 dígitos
   const placa_pattern = /^[a-zA-Z]{3}[0-9][A-Za-z0-9][0-9]{2}$/
 
-  if (!values.placa) {
-      errors.placa = "O numero da placa é obrigatório.";
-  } else if (!placa_pattern.test(values.placa)) {
-      errors.placa = "A placa não é válida.";
+  // Validação para o modelo do carro (apenas para motoristas)
+  if (values.role === 1 && !values.modeloCarro) {
+    errors.modeloCarro = "Modelo do carro é obrigatório";
   }
+
+  // Validação para a placa (apenas para motoristas)
+  if (values.role === 1 && !values.placa) {
+    errors.placa = "Placa do carro é obrigatória";
+  }
+
   // Validação de email
   if (!values.email) {
     errors.email = "O email é obrigatório.";

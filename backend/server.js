@@ -95,31 +95,42 @@ app.put('/api/caronas/:id/sair', async (req, res) => {
 });
 
 
-// Rota de API para cadastro de usuário
-app.post('/signup', async (req, res) => {
-  const { name, email, password, celular, ra, role } = req.body;
+app.post('/signup', (req, res) => {
+  const { name, email, password, celular, ra, role, modeloCarro, placa } = req.body;
+  
+  // Lógica para validar dados e salvar no banco
+  if (role === 1) {  // Motorista
+    // Inserir o usuário na tabela Usuarios
+    const userQuery = 'INSERT INTO Usuarios (name, email, password, celular, ra, role) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(userQuery, [name, email, password, celular, ra, role], (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+      }
+      
+      const userId = result.insertId;  // ID do usuário recém-criado
 
-  try {
-    const existingUser = await Usuario.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Usuário já existe com este email' });
-    }
-
-    const newUser = await Usuario.create({
-      nome: name,
-      email,
-      senha: password,
-      celular,
-      ra,
-      role,
+      // Inserir informações do carro na tabela CarInfo
+      const carQuery = 'INSERT INTO CarInfo (user_id, modeloCarro, placa) VALUES (?, ?, ?)';
+      db.query(carQuery, [userId, modeloCarro, placa], (carErr) => {
+        if (carErr) {
+          return res.status(500).json({ error: 'Erro ao cadastrar informações do carro' });
+        }
+        
+        res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
+      });
     });
-
-    res.status(201).json({ message: 'Usuário cadastrado com sucesso!', user: newUser });
-  } catch (error) {
-    console.error('Erro ao cadastrar usuário:', error);
-    res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+  } else {
+    // Inserir o usuário na tabela Usuarios
+    const userQuery = 'INSERT INTO Usuarios (name, email, password, celular, ra, role) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(userQuery, [name, email, password, celular, ra, role], (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+      }
+      res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
+    });
   }
 });
+
 
 // Rota de API para login
 app.post('/login', async (req, res) => {
