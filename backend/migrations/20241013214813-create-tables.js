@@ -2,8 +2,8 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Criar tabela Usuarios
-    await queryInterface.createTable('Usuarios', {
+    // Criar tabela Passageiros
+    await queryInterface.createTable('Passageiros', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -22,10 +22,6 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING
-      },
-      senha: {
-        type: Sequelize.STRING, // Campo para armazenar a senha criptografada
-        allowNull: false
       },
       role: {
         type: Sequelize.TINYINT,
@@ -52,7 +48,7 @@ module.exports = {
       id_passageiro: {
         type: Sequelize.INTEGER, // id_passageiro como INTEGER
         references: {
-          model: 'Usuarios',
+          model: 'Passageiros',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -61,7 +57,7 @@ module.exports = {
       id_motorista: {
         type: Sequelize.INTEGER, // id_motorista como INTEGER
         references: {
-          model: 'Usuarios',
+          model: 'Motoristas',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -87,6 +83,7 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     // Deletar as tabelas
     await queryInterface.dropTable('Caronas');
-    await queryInterface.dropTable('Usuarios');
+    await queryInterface.dropTable('Motoristas');
+    await queryInterface.dropTable('Passageiros');
   }
 };
