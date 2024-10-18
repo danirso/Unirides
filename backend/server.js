@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const port = 3000;
-const { Carona, Usuario } = require('./models');
+const { Carona, Usuario,CarInfo } = require('./models');
 
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
@@ -95,39 +95,37 @@ app.put('/api/caronas/:id/sair', async (req, res) => {
 });
 
 
-app.post('/signup', (req, res) => {
-  const { name, email, password, celular, ra, role, modeloCarro, placa } = req.body;
-  
-  // Lógica para validar dados e salvar no banco
-  if (role === 1) {  // Motorista
-    // Inserir o usuário na tabela Usuarios
-    const userQuery = 'INSERT INTO Usuarios (name, email, password, celular, ra, role) VALUES (?, ?, ?, ?, ?, ?)';
-    db.query(userQuery, [name, email, password, celular, ra, role], (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
-      }
-      
-      const userId = result.insertId;  // ID do usuário recém-criado
+// Rota de API para cadastro de usuário
+app.post('/signup', async (req, res) => {
+  const { name, email, password, celular, ra, role, modelo, placa } = req.body;
 
-      // Inserir informações do carro na tabela CarInfo
-      const carQuery = 'INSERT INTO CarInfo (user_id, modeloCarro, placa) VALUES (?, ?, ?)';
-      db.query(carQuery, [userId, modeloCarro, placa], (carErr) => {
-        if (carErr) {
-          return res.status(500).json({ error: 'Erro ao cadastrar informações do carro' });
-        }
-        
-        res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
+  try {
+    const existingUser = await Usuario.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Usuário já existe com este email' });
+    }
+
+    const newUser = await Usuario.create({
+      nome: name,
+      email,
+      senha: password,
+      celular,
+      ra,
+      role,
+    });
+
+    if (role === 1) {
+      await CarInfo.create({
+        id_motorista: newUser.id,
+        modelo,
+        placa,
       });
-    });
-  } else {
-    // Inserir o usuário na tabela Usuarios
-    const userQuery = 'INSERT INTO Usuarios (name, email, password, celular, ra, role) VALUES (?, ?, ?, ?, ?, ?)';
-    db.query(userQuery, [name, email, password, celular, ra, role], (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
-      }
-      res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
-    });
+    }
+
+    res.status(201).json({ message: 'Usuário cadastrado com sucesso!', user: newUser });
+  } catch (error) {
+    console.error('Erro ao cadastrar usuário:', error);
+    res.status(500).json({ error: 'Erro ao cadastrar usuário' });
   }
 });
 

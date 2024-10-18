@@ -39,8 +39,13 @@ function Login() {
           } else {
             console.log('Login bem-sucedido:', data);
             localStorage.setItem('user', JSON.stringify(data.user)); // Armazena os dados do usuário no localStorage
-            navigate('/passageiro'); // Redireciona após o login bem-sucedido
           }
+          if (data.user.role == 0) {
+            navigate('/passageiro');
+          }
+          else{
+             navigate('/motorista');
+          } 
         })
         .catch((error) => {
           console.error('Erro ao realizar login:', error);
