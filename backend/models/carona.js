@@ -43,11 +43,11 @@ module.exports = (sequelize, DataTypes) => {
     // Relacionamento com a tabela Usuario para o motorista
     Carona.belongsTo(models.Usuario, { as: 'motorista', foreignKey: 'id_motorista' });
     
-    // Relacionamento com a tabela intermediária PassageirosCaronas
     Carona.belongsToMany(models.Usuario, {
-      through: 'PassageirosCaronas',
-      as: 'passageiros',
-      foreignKey: 'id_carona'
+      through: models.PassageirosCaronas,
+      foreignKey: 'id_carona',      // Chave estrangeira que refere a tabela Carona
+      otherKey: 'id_passageiro',    // Chave estrangeira que refere a tabela Usuario
+      as: 'passageiros'             // Nome da associação
     });
   };
 
