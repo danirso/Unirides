@@ -9,7 +9,7 @@ Saindo da pasta do frontend ou backend: " cd .. "
 
 BACKEND: Para mexer no banco de dados (se tiver algum erro):
     -SEMPRE NA PASTA BACKEND DO CONTAINER : " cd backend "
-    -FAZER MIGRATE: " npx sequelize-cli db migrate *
-    -DESFAZER MIGRATE: * npx sequelize-cli db:migrate: undo *
+    -FAZER MIGRATE: " npx sequelize-cli db migrate "
+    -DESFAZER MIGRATE: " npx sequelize-cli db:migrate:undo "
     -FAZER SEED: " npx sequelize-cli db:seed:all "
-    -DESFAZER SEED: " npx sequelize-cli db: seed: undo "
+    -DESFAZER SEED: " npx sequelize-cli db:seed:undo "

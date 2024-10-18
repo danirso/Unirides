@@ -197,6 +197,46 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.get('/api/historico/:userId/:role', async (req, res) => {
+  const { userId, role } = req.params;
+
+  try {
+    let viagens;
+
+    // Verifica se o usuário é motorista ou passageiro e faz a busca no banco
+    if (role === 'motorista') {
+      viagens = await Carona.findAll({
+        where: { id_motorista: userId },
+        include: [
+          { model: Usuario, as: 'motorista', attributes: ['nome'] },
+          { model: Usuario, as: 'passageiros', attributes: ['nome'], through: { attributes: [] } }
+        ]
+      });
+    } else if (role === 'passageiro') {
+      viagens = await Carona.findAll({
+        include: [
+          { model: Usuario, as: 'motorista', attributes: ['nome'] },
+          {
+            model: Usuario,
+            as: 'passageiros',
+            where: { id: userId },  // Certifique-se de que o userId seja o correto
+            attributes: ['id', 'nome'],
+            through: { attributes: [] }
+          }
+        ]
+      });
+    } else {
+      return res.status(400).json({ error: 'Papel de usuário inválido' });
+    }
+
+    res.json(viagens);
+  } catch (error) {
+    console.error('Erro ao obter o histórico de viagens:', error);
+    res.status(500).json({ error: 'Erro ao obter o histórico de viagens' });
+  }
+});
+
+
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
 
