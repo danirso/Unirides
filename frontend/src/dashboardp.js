@@ -7,6 +7,7 @@ function Dashboard() {
     name: '',
     email: '',
     celular: '',
+    id: ''
   });
   const [caronas, setCaronas] = useState([]);
   const [minhasCaronas, setMinhasCaronas] = useState([]); // Caronas do passageiro
@@ -89,7 +90,7 @@ function Dashboard() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id_passageiro: null, // Define o id_passageiro como null para remover o passageiro
+        id_passageiro: JSON.parse(localStorage.getItem('user')).id,
       }),
     })
       .then((response) => {
@@ -139,8 +140,12 @@ function Dashboard() {
             <div key={carona.id} className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
-                <p className="card-text">Horário: {new Date(carona.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})}</p>
+                <p className="card-text">Partida: {carona.partida}</p> {/* Adicione o campo de partida */}
+                <p className="card-text">Horário: {new Date(carona.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                 <p className="card-text">Motorista: {carona.motorista.nome}</p>
+                <p className="card-text">Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}</p> {/* Adicione vagas */}
+                <p className="card-text">Ar-condicionado: {carona.ar ? 'Sim' : 'Não'}</p> {/* Adicione ar-condicionado */}
+                <p className="card-text">Música: {carona.musica}</p> {/* Adicione música */}
                 <button className="btn btn-success" onClick={() => solicitarCarona(carona.id)}>
                   Solicitar Carona
                 </button>
@@ -152,25 +157,31 @@ function Dashboard() {
         )}
       </div>
 
+
       <div className="mb-4">
-        <h3>Minhas Caronas</h3>
-        {minhasCaronas.length > 0 ? (
-          minhasCaronas.map((carona) => (
-            <div key={carona.id} className="card mb-3">
-              <div className="card-body">
-                <h5 className="card-title">Destino: {carona.destino}</h5>
-                <p className="card-text">Horário: {new Date(carona.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})}</p>
-                <p className="card-text">Motorista: {carona.motorista.nome}</p>
-                <button className="btn btn-danger" onClick={() => sairDaCarona(carona.id)}>
-                  Sair da Carona
-                </button>
-              </div>
+      <h3>Minhas Caronas</h3>
+      {minhasCaronas.length > 0 ? (
+        minhasCaronas.map((carona) => (
+          <div key={carona.id} className="card mb-3">
+            <div className="card-body">
+              <h5 className="card-title">Destino: {carona.destino}</h5>
+              <p className="card-text">Partida: {carona.partida}</p> {/* Adicione o campo de partida */}
+              <p className="card-text">Horário: {new Date(carona.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              <p className="card-text">Motorista: {carona.motorista.nome}</p>
+              <p className="card-text">Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}</p> {/* Adicione vagas */}
+              <p className="card-text">Ar-condicionado: {carona.ar ? 'Sim' : 'Não'}</p> {/* Adicione ar-condicionado */}
+              <p className="card-text">Música: {carona.musica}</p> {/* Adicione música */}
+              <button className="btn btn-danger" onClick={() => sairDaCarona(carona.id)}>
+                Sair da Carona
+              </button>
             </div>
-          ))
-        ) : (
-          <p>Você não está em nenhuma carona no momento.</p>
-        )}
-      </div>
+          </div>
+        ))
+      ) : (
+        <p>Você não está em nenhuma carona no momento.</p>
+      )}
+    </div>
+
     </div>
   );
 }

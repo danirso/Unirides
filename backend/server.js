@@ -2,27 +2,33 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const port = 3000;
-const { Carona, Usuario,CarInfo } = require('./models');
+const { Carona, Usuario,CarInfo,PassageirosCaronas } = require('./models');
+const { Op } = require('sequelize');
+
+
 
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
 
-// Rota de API para buscar caronas disponíveis (sem passageiro)
+// Rota de API para buscar caronas disponíveis
 app.get('/api/caronas', async (req, res) => {
+
   try {
     const caronas = await Carona.findAll({
-      where: { id_passageiro: null },
+      where: { 
+        vagas_disponiveis: { [Op.gt]: 0 }
+      },
       include: [
-        { model: Usuario, as: 'passageiro', attributes: ['nome'] },
         { model: Usuario, as: 'motorista', attributes: ['nome'] },
-      ],
+      ]
     });
     res.json(caronas);
   } catch (error) {
-    console.error('Erro ao buscar caronas:', error);
+    console.error('Erro ao buscar caronas disponíveis:', error);
     res.status(500).send('Erro ao buscar caronas');
   }
 });
+
 
 // Rota para solicitar uma carona
 app.put('/api/caronas/:id/solicitar', async (req, res) => {
@@ -31,15 +37,33 @@ app.put('/api/caronas/:id/solicitar', async (req, res) => {
 
   try {
     const carona = await Carona.findByPk(id);
+
     if (!carona) {
       return res.status(404).json({ error: 'Carona não encontrada' });
     }
 
-    if (carona.id_passageiro !== null) {
-      return res.status(400).json({ error: 'Carona já tem um passageiro' });
+    // Verifica se há vagas disponíveis
+    if (carona.vagas_disponiveis <= 0) {
+      return res.status(400).json({ error: 'Não há vagas disponíveis' });
     }
 
-    carona.id_passageiro = id_passageiro;
+    // Verifica se o passageiro já está na carona
+    const passageiroExistente = await PassageirosCaronas.findOne({
+      where: { id_passageiro, id_carona: id }
+    });
+
+    if (passageiroExistente) {
+      return res.status(400).json({ error: 'Você já está nesta carona' });
+    }
+
+    // Adiciona o passageiro à carona
+    await PassageirosCaronas.create({
+      id_passageiro,
+      id_carona: id
+    });
+
+    // Atualiza as vagas disponíveis
+    carona.vagas_disponiveis -= 1;
     await carona.save();
 
     res.json({ message: 'Carona solicitada com sucesso!' });
@@ -49,17 +73,25 @@ app.put('/api/caronas/:id/solicitar', async (req, res) => {
   }
 });
 
+
 // Rota para buscar as caronas nas quais o passageiro está registrado
 app.get('/api/caronas/minhas', async (req, res) => {
   const { id_passageiro } = req.query;
 
   try {
     const minhasCaronas = await Carona.findAll({
-      where: { id_passageiro },
       include: [
         { model: Usuario, as: 'motorista', attributes: ['nome'] },
-      ],
+        {
+          model: Usuario,
+          as: 'passageiros',
+          where: { id: id_passageiro },
+          attributes: ['id'],
+          through: { attributes: [] }
+        }
+      ]
     });
+
     res.json(minhasCaronas);
   } catch (error) {
     console.error('Erro ao buscar caronas do passageiro:', error);
@@ -67,24 +99,31 @@ app.get('/api/caronas/minhas', async (req, res) => {
   }
 });
 
+
+
 // Rota para o passageiro sair de uma carona
 app.put('/api/caronas/:id/sair', async (req, res) => {
   const { id } = req.params;
-
+  const { id_passageiro } = req.body;
   try {
-    // Buscar a carona pelo ID
     const carona = await Carona.findByPk(id);
     if (!carona) {
       return res.status(404).json({ error: 'Carona não encontrada' });
     }
 
-    // Verificar se o passageiro realmente faz parte da carona
-    if (carona.id_passageiro === null) {
+    const passageiroExistente = await PassageirosCaronas.findOne({
+      where: { id_passageiro, id_carona: id }
+    });
+
+    if (!passageiroExistente) {
       return res.status(400).json({ error: 'Você não está nesta carona' });
     }
 
-    // Remover o passageiro da carona
-    carona.id_passageiro = null;
+    await PassageirosCaronas.destroy({
+      where: { id_passageiro, id_carona: id }
+    });
+
+    carona.vagas_disponiveis += 1;
     await carona.save();
 
     res.json({ message: 'Você saiu da carona com sucesso!' });
@@ -93,7 +132,6 @@ app.put('/api/caronas/:id/sair', async (req, res) => {
     res.status(500).json({ error: 'Erro ao sair da carona' });
   }
 });
-
 
 // Rota de API para cadastro de usuário
 app.post('/signup', async (req, res) => {

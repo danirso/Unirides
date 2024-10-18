@@ -36,5 +36,14 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true
   });
 
+  Usuario.associate = (models) => {
+    
+    Usuario.belongsToMany(models.Carona, {
+      through: models.PassageirosCaronas,
+      foreignKey: 'id_passageiro', // Chave estrangeira que refere a tabela Usuario
+      otherKey: 'id_carona',       // Chave estrangeira que refere a tabela Carona
+      as: 'caronas'                // Nome da associação
+    });
+  };
   return Usuario;
 };
