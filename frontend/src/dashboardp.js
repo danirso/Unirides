@@ -90,7 +90,7 @@ function Dashboard() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id_passageiro: JSON.parse(localStorage.getItem('user')).id, // Define o id_passageiro como null para remover o passageiro
+        id_passageiro: JSON.parse(localStorage.getItem('user')).id,
       }),
     })
       .then((response) => {
