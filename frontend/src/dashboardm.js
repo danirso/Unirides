@@ -24,7 +24,7 @@ function DashboardMotorista() {
 
   // Função para buscar as caronas oferecidas pelo motorista
   const fetchCaronasMotorista = (idMotorista) => {
-    fetch(`http://localhost:3000/api/motorista/${usuario.id}/caronas`)
+    fetch(`http://localhost:3000/api/motorista/${idMotorista}/caronas`)
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
