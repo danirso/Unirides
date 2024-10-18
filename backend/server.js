@@ -5,8 +5,6 @@ const port = 3000;
 const { Carona, Usuario,CarInfo,PassageirosCaronas } = require('./models');
 const { Op } = require('sequelize');
 
-
-
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
 
@@ -29,6 +27,36 @@ app.get('/api/caronas', async (req, res) => {
   }
 });
 
+//
+app.get('/api/motorista/:id/caronas', async (req, res) => {
+  const { id } = req.params;
+  console.log('Requisição recebida para o motorista ID:', id); // Log para verificar o ID recebido
+
+  try {
+    const caronasMotorista = await Carona.findAll({
+      where: { id_motorista: id }, // Certifique-se de que o campo 'id_motorista' está correto
+      include: [
+        { model: Usuario, as: 'motorista', attributes: ['nome'] }, // Inclui o motorista com o alias 'motorista'
+        {
+          model: Usuario,
+          as: 'passageiros',
+          attributes: ['nome'], // Inclui os passageiros com seus nomes
+          through: { attributes: [] } // Exclui atributos extras da tabela de junção
+        }
+      ]
+    });
+
+    if (caronasMotorista.length === 0) {
+      console.log('Nenhuma carona encontrada para o motorista ID:', id); // Log para verificar se há caronas
+      return res.status(404).json({ error: 'Nenhuma carona encontrada para este motorista' });
+    }
+
+    res.json(caronasMotorista);
+  } catch (error) {
+    console.error('Erro ao buscar caronas do motorista:', error);
+    res.status(500).send('Erro ao buscar caronas');
+  }
+});
 
 // Rota para solicitar uma carona
 app.put('/api/caronas/:id/solicitar', async (req, res) => {
@@ -73,7 +101,6 @@ app.put('/api/caronas/:id/solicitar', async (req, res) => {
   }
 });
 
-
 // Rota para buscar as caronas nas quais o passageiro está registrado
 app.get('/api/caronas/minhas', async (req, res) => {
   const { id_passageiro } = req.query;
@@ -98,8 +125,6 @@ app.get('/api/caronas/minhas', async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar caronas do passageiro' });
   }
 });
-
-
 
 // Rota para o passageiro sair de uma carona
 app.put('/api/caronas/:id/sair', async (req, res) => {
@@ -166,7 +191,6 @@ app.post('/signup', async (req, res) => {
     res.status(500).json({ error: 'Erro ao cadastrar usuário' });
   }
 });
-
 
 // Rota de API para login
 app.post('/login', async (req, res) => {

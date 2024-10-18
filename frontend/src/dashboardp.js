@@ -5,8 +5,6 @@ function Dashboard() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState({
     name: '',
-    email: '',
-    celular: '',
     id: ''
   });
   const [caronas, setCaronas] = useState([]);
