@@ -13,6 +13,8 @@ function Validation(values) {
   // Validação para a placa (apenas para motoristas)
   if (values.role === 1 && !values.placa) {
     errors.placa = "Placa do carro é obrigatória";
+  } else if (values.role ==1 && !placa_pattern.test(values.placa)){
+    errors.placa = "A placa não é valida ex:(ABC1D23 ou ABC1234)"
   }
 
   // Validação de email
