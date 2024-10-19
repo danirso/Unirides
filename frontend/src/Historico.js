@@ -33,10 +33,13 @@ function Historico() {
           <div key={viagem.id} className="card mb-3">
             <div className="card-body">
               <h5 className="card-title">
-                Carona com {viagem.motorista.nome} em {new Date(viagem.data).toLocaleDateString()}
+                Carona com {viagem.motorista.nome} em {new Date(viagem.horario).toLocaleDateString()}
               </h5>
               <p className="card-text">Destino: {viagem.destino}</p>
               <p className="card-text">Partida: {viagem.partida}</p>
+              <p className="card-text">
+                Horário: {new Date(viagem.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </p>
             </div>
           </div>
         ))

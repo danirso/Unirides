@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 const port = 3000;
 const { Carona, Usuario,CarInfo,PassageirosCaronas } = require('./models');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 
 
 
@@ -197,42 +197,34 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/api/historico/:userId/:role', async (req, res) => {
-  const { userId, role } = req.params;
+app.get('/api/historico/:userId/passageiro', async (req, res) => {
+  const { userId } = req.params;
 
   try {
-    let viagens;
-
-    // Verifica se o usuário é motorista ou passageiro e faz a busca no banco
-    if (role === 'motorista') {
-      viagens = await Carona.findAll({
-        where: { id_motorista: userId },
-        include: [
-          { model: Usuario, as: 'motorista', attributes: ['nome'] },
-          { model: Usuario, as: 'passageiros', attributes: ['nome'], through: { attributes: [] } }
-        ]
-      });
-    } else if (role === 'passageiro') {
-      viagens = await Carona.findAll({
-        include: [
-          { model: Usuario, as: 'motorista', attributes: ['nome'] },
-          {
-            model: Usuario,
-            as: 'passageiros',
-            where: { id: userId },  // Certifique-se de que o userId seja o correto
-            attributes: ['id', 'nome'],
-            through: { attributes: [] }
-          }
-        ]
-      });
-    } else {
-      return res.status(400).json({ error: 'Papel de usuário inválido' });
-    }
+    const viagens = await Carona.findAll({
+      where:{
+        horario:{ [Op.lt]: new Date()}
+      },
+      include: [
+        { 
+          model: Usuario, 
+          as: 'motorista', 
+          attributes: ['nome'] 
+        },
+        {
+          model: Usuario,
+          as: 'passageiros',
+          where: { id: userId }, // Apenas as caronas em que o usuário foi passageiro
+          attributes: ['id', 'nome'],
+          through: { attributes: [] } // Não queremos dados do relacionamento, só queremos a relação
+        },
+      ]
+    });
 
     res.json(viagens);
   } catch (error) {
-    console.error('Erro ao obter o histórico de viagens:', error);
-    res.status(500).json({ error: 'Erro ao obter o histórico de viagens' });
+    console.error('Erro ao obter o histórico de caronas:', error);
+    res.status(500).json({ error: 'Erro ao obter o histórico de caronas' });
   }
 });
 
