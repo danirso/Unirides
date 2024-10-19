@@ -58,6 +58,38 @@ app.get('/api/motorista/:id/caronas', async (req, res) => {
   }
 });
 
+// Rota para o motorista criar uma nova carona
+app.post('/api/motorista/:id/caronas', async (req, res) => {
+  const { id } = req.params; // ID do motorista
+  const { destino, horario, partida, vagas,ar,musica } = req.body; // Dados da carona
+
+  try {
+    // Verifica se o usuário é um motorista
+    const motorista = await Usuario.findOne({ where: { id, role: 1 } });
+    if (!motorista) {
+      return res.status(400).json({ error: 'Usuário não é um motorista' });
+    }
+
+    // Cria a carona
+    const novaCarona = await Carona.create({
+      id_motorista: id,
+      destino,
+      horario,
+      partida,
+      vagas,
+      vagas_disponiveis: vagas,
+      ar,
+      musica
+    });
+
+    res.status(201).json({ message: 'Carona criada com sucesso!', carona: novaCarona });
+  } catch (error) {
+    console.error('Erro ao criar carona:', error);
+    res.status(500).json({ error: 'Erro ao criar carona' });
+  }
+});
+
+
 // Rota para solicitar uma carona
 app.put('/api/caronas/:id/solicitar', async (req, res) => {
   const { id } = req.params;
