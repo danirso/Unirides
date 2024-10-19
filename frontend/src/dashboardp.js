@@ -4,10 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 function Dashboard() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState({
-    name: "",
-    email: "",
-    celular: "",
-    id: "",
+    name: '',
+    id: ''
   });
   const [caronas, setCaronas] = useState([]);
   const [minhasCaronas, setMinhasCaronas] = useState([]); // Caronas do passageiro
