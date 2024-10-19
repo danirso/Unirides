@@ -2,28 +2,41 @@ import React, { useState, useEffect } from 'react';
 
 function Historico() {
   const [historico, setHistorico] = useState([]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      fetchHistorico(user.id);
+    const loggedUser = JSON.parse(localStorage.getItem('user'));
+    if (loggedUser) {
+      setUser(loggedUser);
+      fetchHistorico(loggedUser.id,loggedUser.role);
     } else {
       alert('Usuário não está logado.');
     }
   }, []);
 
-  const fetchHistorico = (idPassageiro) => {
-    console.log('ID do passageiro:', idPassageiro);  // Verificar se o ID está correto
-  
-    fetch(`http://localhost:3000/api/historico/${idPassageiro}/passageiro`)
+  const fetchHistorico = (id,role) => {
+    console.log('ID do usuario:', id);  // Verificar se o ID está correto
+    if(role == 0)
+    {
+    fetch(`http://localhost:3000/api/historico/${id}/passageiro`)
       .then((response) => response.json())
       .then((data) => {
         console.log('Dados recebidos do histórico:', data);  // Log para verificar os dados
         setHistorico(data);
       })
       .catch((error) => console.error('Erro ao buscar histórico:', error));
+    } 
+    else
+    {
+      fetch(`http://localhost:3000/api/historico/${id}/motorista`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Dados recebidos do histórico:', data);  // Log para verificar os dados
+        setHistorico(data);
+      })
+      .catch((error) => console.error('Erro ao buscar histórico:', error));
+    }
   };
-  
 
   return (
     <div className="container mt-5">
@@ -33,11 +46,15 @@ function Historico() {
           <div key={viagem.id} className="card mb-3">
             <div className="card-body">
               <h5 className="card-title">
-                Carona com {viagem.motorista.nome} em {new Date(viagem.horario).toLocaleDateString()}
+                {user.role === 0 ? (
+                  `Carona com ${viagem.motorista.nome} em ${new Date(viagem.horario).toLocaleDateString()}`
+                ) : (
+                  `Carona em ${new Date(viagem.horario).toLocaleDateString()}`
+                )}
               </h5>
-              <p className="card-text">Destino: {viagem.destino}</p>
-              <p className="card-text">Partida: {viagem.partida}</p>
               <p className="card-text">
+                Destino: {viagem.destino}<br/>
+                Partida: {viagem.partida}<br/>
                 Horário: {new Date(viagem.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>

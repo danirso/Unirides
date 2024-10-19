@@ -270,9 +270,9 @@ app.get('/api/historico/:userId/passageiro', async (req, res) => {
         {
           model: Usuario,
           as: 'passageiros',
-          where: { id: userId }, // Apenas as caronas em que o usuário foi passageiro
+          where: { id: userId }, 
           attributes: ['id', 'nome'],
-          through: { attributes: [] } // Não queremos dados do relacionamento, só queremos a relação
+          through: { attributes: [] } 
         },
       ]
     });
@@ -284,6 +284,30 @@ app.get('/api/historico/:userId/passageiro', async (req, res) => {
   }
 });
 
+app.get('/api/historico/:userId/motorista', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const viagens = await Carona.findAll({
+      where:{
+        horario:{ [Op.lt]: new Date()}
+      },
+      include: [
+        {
+          model: Usuario,
+          as: 'motorista',
+          where: { id: userId }, 
+          attributes: [],
+        },
+      ]
+    });
+
+    res.json(viagens);
+  } catch (error) {
+    console.error('Erro ao obter o histórico de caronas:', error);
+    res.status(500).json({ error: 'Erro ao obter o histórico de caronas' });
+  }
+});
 
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));

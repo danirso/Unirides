@@ -10,6 +10,7 @@ function Dashboard() {
   const [caronas, setCaronas] = useState([]);
   const [minhasCaronas, setMinhasCaronas] = useState([]); // Caronas do passageiro
   const [searchTerm, setSearchTerm] = useState(""); // Estado para a barra de pesquisa
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
@@ -146,26 +147,23 @@ function Dashboard() {
             <div key={carona.id} className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
-                <p className="card-text">Partida: {carona.partida}</p>{" "}
-                {/* Adicione o campo de partida */}
                 <p className="card-text">
+                  Partida: {carona.partida}
+                  <br />
                   Horário:{" "}
                   {new Date(carona.horario).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                </p>
-                <p className="card-text">Motorista: {carona.motorista.nome}</p>
-                <p className="card-text">
+                  <br />
+                  Motorista: {carona.motorista.nome}
+                  <br />
                   Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
-                </p>{" "}
-                {/* Adicione vagas */}
-                <p className="card-text">
+                  <br />
                   Ar-condicionado: {carona.ar ? "Sim" : "Não"}
-                </p>{" "}
-                {/* Adicione ar-condicionado */}
-                <p className="card-text">Música: {carona.musica}</p>{" "}
-                {/* Adicione música */}
+                  <br />
+                  Música: {carona.musica}
+                </p>
                 <button
                   className="btn btn-success"
                   onClick={() => solicitarCarona(carona.id)}
@@ -187,26 +185,23 @@ function Dashboard() {
             <div key={carona.id} className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
-                <p className="card-text">Partida: {carona.partida}</p>{" "}
-                {/* Adicione o campo de partida */}
                 <p className="card-text">
+                  Partida: {carona.partida}
+                  <br />
                   Horário:{" "}
                   {new Date(carona.horario).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                </p>
-                <p className="card-text">Motorista: {carona.motorista.nome}</p>
-                <p className="card-text">
+                  <br />
+                  Motorista: {carona.motorista.nome}
+                  <br />
                   Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
-                </p>{" "}
-                {/* Adicione vagas */}
-                <p className="card-text">
+                  <br />
                   Ar-condicionado: {carona.ar ? "Sim" : "Não"}
-                </p>{" "}
-                {/* Adicione ar-condicionado */}
-                <p className="card-text">Música: {carona.musica}</p>{" "}
-                {/* Adicione música */}
+                  <br />
+                  Música: {carona.musica}
+                </p>
                 <button
                   className="btn btn-danger"
                   onClick={() => sairDaCarona(carona.id)}

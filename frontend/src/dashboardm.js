@@ -118,8 +118,9 @@ function DashboardMotorista() {
         </Link>
       </div>
 
-      <div className="mb-4">
-        <Link to="/perfil" className="btn btn-primary mb-3">Ver Perfil Completo</Link>
+      <div className="d-flex mb-4">
+        <Link to="/perfil" className="btn btn-primary mr-2">Ver Perfil Completo</Link>
+        <Link to="/historico" className="btn btn-info">Ver Histórico</Link>
       </div>
 
       <div className="mb-4">
