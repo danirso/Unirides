@@ -97,7 +97,23 @@ function DashboardMotorista() {
       })
       .catch((error) => console.error("Erro ao criar carona:", error));
   };
-
+  const cancelarCarona = (caronaId) => {
+    fetch(`http://localhost:3000/api/caronas/${caronaId}/cancelar`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          alert("Carona cancelada!");
+          setCaronas(caronas.filter((carona) => carona.id !== caronaId));
+        } else {
+          alert("Erro ao cancelar a carona");
+        }
+      })
+      .catch((error) => console.error("Erro em cancelar a carona:", error));
+  };
   const handleCancel = () => {
     setMostrarFormulario(false);
     setNovaCarona({
@@ -153,6 +169,12 @@ function DashboardMotorista() {
                   <br />
                   Música: {carona.musica}
                 </p>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => cancelarCarona(carona.id)}
+                >
+                  Cancelar Carona
+                </button>
               </div>
             </div>
           ))
