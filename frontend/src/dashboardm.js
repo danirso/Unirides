@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function DashboardMotorista() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState({
-    name: '',
-    id: ''
+    name: "",
+    id: "",
   });
   const [caronas, setCaronas] = useState([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [novaCarona, setNovaCarona] = useState({
-    partida: '',
-    destino: '',
-    data: '',
-    horario: '',
+    partida: "",
+    destino: "",
+    data: "",
+    horario: "",
     vagas: 1,
-    ar: 'desligado',
-    musica: ''
+    ar: "desligado",
+    musica: "",
   });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.role === 1) {
       setUsuario({
         name: user.nome,
@@ -28,7 +28,7 @@ function DashboardMotorista() {
       });
       fetchCaronasMotorista(user.id);
     } else {
-      navigate('/login');
+      navigate("/login");
     }
   }, [navigate]);
 
@@ -43,17 +43,19 @@ function DashboardMotorista() {
           setCaronas(data); // Definindo as caronas no estado
         }
       })
-      .catch((error) => console.error('Erro ao buscar caronas do motorista:', error));
+      .catch((error) =>
+        console.error("Erro ao buscar caronas do motorista:", error)
+      );
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNovaCarona(prevState => ({ ...prevState, [name]: value }));
+    setNovaCarona((prevState) => ({ ...prevState, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -64,48 +66,48 @@ function DashboardMotorista() {
 
     const caronaData = {
       ...novaCarona,
-      horario: dataHoraCompleta,  // Colocando data e hora juntos no campo 'horario'
+      horario: dataHoraCompleta, // Colocando data e hora juntos no campo 'horario'
     };
 
     // Enviando a nova carona para o backend
     fetch(`http://localhost:3000/api/motorista/${usuario.id}/caronas`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(caronaData),
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.error) {
           console.error(data.error);
         } else {
-          setCaronas([...caronas, data]); // Atualizando a lista de caronas sem recarregar
+          fetchCaronasMotorista(usuario.id);
           setMostrarFormulario(false); // Fechar o formulário
           setNovaCarona({
-            partida: '',
-            destino: '',
-            data: '',
-            horario: '',
+            partida: "",
+            destino: "",
+            data: "",
+            horario: "",
             vagas: 1,
-            ar: 'desligado',
-            musica: ''
+            ar: "desligado",
+            musica: "",
           });
         }
       })
-      .catch((error) => console.error('Erro ao criar carona:', error));
+      .catch((error) => console.error("Erro ao criar carona:", error));
   };
 
   const handleCancel = () => {
     setMostrarFormulario(false);
     setNovaCarona({
-      partida: '',
-      destino: '',
-      data: '',
-      horario: '',
+      partida: "",
+      destino: "",
+      data: "",
+      horario: "",
       vagas: 1,
-      ar: 'desligado',
-      musica: ''
+      ar: "desligado",
+      musica: "",
     });
   };
 
@@ -118,9 +120,13 @@ function DashboardMotorista() {
         </Link>
       </div>
 
-      <div className="d-flex mb-4">
-        <Link to="/perfil" className="btn btn-primary mr-2">Ver Perfil Completo</Link>
-        <Link to="/historico" className="btn btn-info">Ver Histórico</Link>
+      <div className="d-flex align-items-center mb-4">
+        <Link to="/perfil" className="btn btn-primary me-2">
+          Ver Perfil Completo
+        </Link>
+        <Link to="/historico" className="btn btn-info">
+          Ver Histórico
+        </Link>
       </div>
 
       <div className="mb-4">
@@ -130,12 +136,23 @@ function DashboardMotorista() {
             <div key={carona.id} className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
-                <p className="card-text">Local de partida: {carona.partida}<br/>
-                  Data: {new Date(carona.horario).toLocaleDateString()}<br />
-                  Horário: {new Date(carona.horario).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}<br/>
-                  Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}<br/>
-                  Ar-condicionado: {carona.ar ? 'Ligado' : 'Desligado'}<br/>
-                  Música: {carona.musica}</p>
+                <p className="card-text">
+                  Local de partida: {carona.partida}
+                  <br />
+                  Data: {new Date(carona.horario).toLocaleDateString()}
+                  <br />
+                  Horário:{" "}
+                  {new Date(carona.horario).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                  <br />
+                  Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
+                  <br />
+                  Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
+                  <br />
+                  Música: {carona.musica}
+                </p>
               </div>
             </div>
           ))
@@ -146,7 +163,10 @@ function DashboardMotorista() {
 
       <div className="mb-4">
         {!mostrarFormulario && (
-          <button className="btn btn-success" onClick={() => setMostrarFormulario(true)}>
+          <button
+            className="btn btn-success"
+            onClick={() => setMostrarFormulario(true)}
+          >
             Criar Carona
           </button>
         )}
@@ -155,11 +175,25 @@ function DashboardMotorista() {
             <form onSubmit={handleSubmit}>
               <div className="mb-2">
                 <label>Local de Partida:</label>
-                <input type="text" name="partida" value={novaCarona.partida} onChange={handleChange} className="form-control" required />
+                <input
+                  type="text"
+                  name="partida"
+                  value={novaCarona.partida}
+                  onChange={handleChange}
+                  className="form-control"
+                  required
+                />
               </div>
               <div className="mb-2">
                 <label>Local de Destino:</label>
-                <input type="text" name="destino" value={novaCarona.destino} onChange={handleChange} className="form-control" required />
+                <input
+                  type="text"
+                  name="destino"
+                  value={novaCarona.destino}
+                  onChange={handleChange}
+                  className="form-control"
+                  required
+                />
               </div>
               <div className="mb-2">
                 <label>Data:</label>
@@ -168,7 +202,7 @@ function DashboardMotorista() {
                   name="data"
                   value={novaCarona.data}
                   onChange={handleChange}
-                  min={new Date().toISOString().split('T')[0]}
+                  min={new Date().toISOString().split("T")[0]}
                   className="form-control"
                   required
                 />
@@ -186,21 +220,48 @@ function DashboardMotorista() {
               </div>
               <div className="mb-2">
                 <label>Vagas:</label>
-                <input type="number" name="vagas" value={novaCarona.vagas} onChange={handleChange} min="1" className="form-control" required />
+                <input
+                  type="number"
+                  name="vagas"
+                  value={novaCarona.vagas}
+                  onChange={handleChange}
+                  min="1"
+                  className="form-control"
+                  required
+                />
               </div>
               <div className="mb-2">
                 <label>Ar-condicionado:</label>
-                <select name="ar" value={novaCarona.ar} onChange={handleChange} className="form-control">
+                <select
+                  name="ar"
+                  value={novaCarona.ar}
+                  onChange={handleChange}
+                  className="form-control"
+                >
                   <option value="0">Desligado</option>
                   <option value="1">Ligado</option>
                 </select>
               </div>
               <div className="mb-2">
                 <label>Música:</label>
-                <input type="text" name="musica" value={novaCarona.musica} onChange={handleChange} className="form-control" />
+                <input
+                  type="text"
+                  name="musica"
+                  value={novaCarona.musica}
+                  onChange={handleChange}
+                  className="form-control"
+                />
               </div>
-              <button type="submit" className="btn btn-primary">Criar</button>
-              <button type="button" className="btn btn-danger ms-2" onClick={handleCancel}>Cancelar</button>
+              <button type="submit" className="btn btn-primary">
+                Criar
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger ms-2"
+                onClick={handleCancel}
+              >
+                Cancelar
+              </button>
             </form>
           </div>
         )}

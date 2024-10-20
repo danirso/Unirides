@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { json, Link, useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState({
-    name: '',
-    id: ''
+    name: "",
+    id: "",
   });
   const [caronas, setCaronas] = useState([]);
   const [minhasCaronas, setMinhasCaronas] = useState([]); // Caronas do passageiro
@@ -61,20 +61,19 @@ function Dashboard() {
 
   // Função para solicitar uma carona
   const solicitarCarona = (caronaId) => {
+    const idPassageiro = JSON.parse(localStorage.getItem("user")).id;
     fetch(`http://localhost:3000/api/caronas/${caronaId}/solicitar`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        id_passageiro: JSON.parse(localStorage.getItem("user")).id,
-      }),
+      body: JSON.stringify({ id_passageiro: idPassageiro }),
     })
       .then((response) => {
         if (response.ok) {
           alert("Carona solicitada com sucesso!");
           setCaronas(caronas.filter((carona) => carona.id !== caronaId));
-          fetchMinhasCaronas(usuario.id); // Atualizar caronas do passageiro
+          fetchMinhasCaronas(idPassageiro); // Atualizar caronas do passageiro
         } else {
           alert("Erro ao solicitar carona.");
         }
@@ -120,8 +119,8 @@ function Dashboard() {
         </Link>
       </div>
 
-      <div className="d-flex mb-4">
-        <Link to="/perfil" className="btn btn-primary mr-2">
+      <div className="d-flex align-items-center mb-4">
+        <Link to="/perfil" className="btn btn-primary me-2">
           Ver Perfil Completo
         </Link>
         <Link to="/historico" className="btn btn-info">
