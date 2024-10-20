@@ -14,7 +14,8 @@ app.get('/api/caronas', async (req, res) => {
   try {
     const caronas = await Carona.findAll({
       where: { 
-        vagas_disponiveis: { [Op.gt]: 0 }
+        vagas_disponiveis: { [Op.gt]: 0 },
+        horario : { [Op.gte]: new Date() }
       },
       include: [
         { model: Usuario, as: 'motorista', attributes: ['nome'] },
@@ -34,16 +35,10 @@ app.get('/api/motorista/:id/caronas', async (req, res) => {
 
   try {
     const caronasMotorista = await Carona.findAll({
-      where: { id_motorista: id }, 
-      include: [
-        { model: Usuario, as: 'motorista', attributes: ['nome'] },
-        {
-          model: Usuario,
-          as: 'passageiros',
-          attributes: ['nome'],
-          through: { attributes: [] } 
-        }
-      ]
+      where: { 
+        id_motorista: id,
+        horario: {[Op.gte]: new Date()} 
+      }, 
     });
 
     if (caronasMotorista.length === 0) {
