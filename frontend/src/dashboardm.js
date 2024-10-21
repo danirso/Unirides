@@ -155,10 +155,10 @@ function DashboardMotorista() {
                 <p className="card-text">
                   Local de partida: {carona.partida}
                   <br />
-                  Data: {new Date(carona.horario).toLocaleDateString()}
+                  Data: {new Date(carona.horario).toLocaleDateString('pt-BR')}
                   <br />
                   Horário:{" "}
-                  {new Date(carona.horario).toLocaleTimeString([], {
+                  {new Date(carona.horario).toLocaleTimeString('pt-BR', {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}

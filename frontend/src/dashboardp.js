@@ -150,11 +150,13 @@ function Dashboard() {
                   Partida: {carona.partida}
                   <br />
                   Horário:{" "}
-                  {new Date(carona.horario).toLocaleTimeString([], {
+                  {new Date(carona.horario).toLocaleTimeString('pt-BR', {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
                   <br />
+                  Data: {new Date(carona.horario).toLocaleDateString('pt-BR')}
+                  <br/>
                   Motorista: {carona.motorista.nome}
                   <br />
                   Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
@@ -188,7 +190,7 @@ function Dashboard() {
                   Partida: {carona.partida}
                   <br />
                   Horário:{" "}
-                  {new Date(carona.horario).toLocaleTimeString([], {
+                  {new Date(carona.horario).toLocaleTimeString('pt-BR', {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}

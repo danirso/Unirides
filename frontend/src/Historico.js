@@ -58,10 +58,10 @@ function Historico() {
                 {user.role === 0
                   ? `Carona com ${viagem.motorista.nome} em ${new Date(
                       viagem.horario
-                    ).toLocaleDateString()}`
+                    ).toLocaleDateString('pt-BR')}`
                   : `Carona em ${new Date(
                       viagem.horario
-                    ).toLocaleDateString()}`}
+                    ).toLocaleDateString('pt-BR')}`}
               </h5>
               <p className="card-text">
                 Destino: {viagem.destino}
@@ -69,7 +69,7 @@ function Historico() {
                 Partida: {viagem.partida}
                 <br />
                 Horário:{" "}
-                {new Date(viagem.horario).toLocaleTimeString([], {
+                {new Date(viagem.horario).toLocaleTimeString('pt-BR', {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}

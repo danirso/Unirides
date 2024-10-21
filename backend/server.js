@@ -18,12 +18,6 @@ app.get("/api/caronas", async (req, res) => {
       },
       include: [
         { model: Usuario, as: "motorista", attributes: ["nome"] },
-        {
-          model: Usuario,
-          as: "passageiros",
-          where: { id: { [Op.ne]: id_passageiro } }, 
-          required: false, 
-        },
       ],
     });
     res.json(caronas);
