@@ -195,6 +195,8 @@ function Dashboard() {
                     minute: "2-digit",
                   })}
                   <br />
+                  Data: {new Date(carona.horario).toLocaleDateString('pt-BR')}
+                  <br/>
                   Motorista: {carona.motorista.nome}
                   <br />
                   Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}

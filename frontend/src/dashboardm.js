@@ -60,16 +60,16 @@ function DashboardMotorista() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     // Criar o campo de data e horário juntos
-    const dataHoraCompleta = `${novaCarona.data} ${novaCarona.horario}`; // Formatar como 'yyyy-mm-dd hh:mm:ss'
-
+    const dataHoraCompleta = `${novaCarona.data}T${novaCarona.horario}:00`;
+  
     const caronaData = {
       ...novaCarona,
-      horario: dataHoraCompleta, // Colocando data e hora juntos no campo 'horario'
+      horario: new Date(dataHoraCompleta).toISOString(), // Envia sem ajustar o fuso
     };
-
-    // Enviando a nova carona para o backend
+  
+    // Enviar os dados para o backend
     fetch(`http://localhost:3000/api/motorista/${usuario.id}/caronas`, {
       method: "POST",
       headers: {
@@ -83,7 +83,7 @@ function DashboardMotorista() {
           console.error(data.error);
         } else {
           fetchCaronasMotorista(usuario.id);
-          setMostrarFormulario(false); // Fechar o formulário
+          setMostrarFormulario(false);
           setNovaCarona({
             partida: "",
             destino: "",
@@ -97,6 +97,7 @@ function DashboardMotorista() {
       })
       .catch((error) => console.error("Erro ao criar carona:", error));
   };
+  
   const cancelarCarona = (caronaId) => {
     fetch(`http://localhost:3000/api/caronas/${caronaId}/cancelar`, {
       method: "DELETE",
@@ -161,6 +162,7 @@ function DashboardMotorista() {
                   {new Date(carona.horario).toLocaleTimeString('pt-BR', {
                     hour: "2-digit",
                     minute: "2-digit",
+                    timeZone: "America/Sao_Paulo",
                   })}
                   <br />
                   Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
