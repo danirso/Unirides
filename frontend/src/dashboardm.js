@@ -32,7 +32,6 @@ function DashboardMotorista() {
     }
   }, [navigate]);
 
-  // Função para buscar as caronas oferecidas pelo motorista
   const fetchCaronasMotorista = (idMotorista) => {
     fetch(`http://localhost:3000/api/motorista/${idMotorista}/caronas`)
       .then((response) => response.json())
@@ -40,7 +39,7 @@ function DashboardMotorista() {
         if (data.error) {
           console.error(data.error);
         } else {
-          setCaronas(data); // Definindo as caronas no estado
+          setCaronas(data);
         }
       })
       .catch((error) =>
@@ -60,16 +59,11 @@ function DashboardMotorista() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
-    // Criar o campo de data e horário juntos
     const dataHoraCompleta = `${novaCarona.data}T${novaCarona.horario}:00`;
-  
     const caronaData = {
       ...novaCarona,
-      horario: new Date(dataHoraCompleta).toISOString(), // Envia sem ajustar o fuso
+      horario: new Date(dataHoraCompleta).toISOString(),
     };
-  
-    // Enviar os dados para o backend
     fetch(`http://localhost:3000/api/motorista/${usuario.id}/caronas`, {
       method: "POST",
       headers: {
@@ -97,7 +91,7 @@ function DashboardMotorista() {
       })
       .catch((error) => console.error("Erro ao criar carona:", error));
   };
-  
+
   const cancelarCarona = (caronaId) => {
     fetch(`http://localhost:3000/api/caronas/${caronaId}/cancelar`, {
       method: "DELETE",
@@ -115,6 +109,7 @@ function DashboardMotorista() {
       })
       .catch((error) => console.error("Erro em cancelar a carona:", error));
   };
+
   const handleCancel = () => {
     setMostrarFormulario(false);
     setNovaCarona({
@@ -138,7 +133,7 @@ function DashboardMotorista() {
       </div>
 
       <div className="d-flex align-items-center mb-4">
-        <Link to="/perfil" className="btn btn-primary me-2">
+        <Link to="/perfil-motorista" className="btn btn-primary me-2">
           Ver Perfil Completo
         </Link>
         <Link to="/historico" className="btn btn-info">
@@ -150,16 +145,16 @@ function DashboardMotorista() {
         <h3>Caronas que você está oferecendo</h3>
         {caronas.length > 0 ? (
           caronas.map((carona) => (
-            <div key={carona.id} className="card mb-3">
+            <div key={carona.id} className="card mb-3 shadow-sm">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
                 <p className="card-text">
                   Local de partida: {carona.partida}
                   <br />
-                  Data: {new Date(carona.horario).toLocaleDateString('pt-BR')}
+                  Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
                   <br />
                   Horário:{" "}
-                  {new Date(carona.horario).toLocaleTimeString('pt-BR', {
+                  {new Date(carona.horario).toLocaleTimeString("pt-BR", {
                     hour: "2-digit",
                     minute: "2-digit",
                     timeZone: "America/Sao_Paulo",
@@ -195,9 +190,9 @@ function DashboardMotorista() {
           </button>
         )}
         {mostrarFormulario && (
-          <div className="border p-3 mt-3">
+          <div className="border p-3 mt-3 shadow-sm">
             <form onSubmit={handleSubmit}>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label>Local de Partida:</label>
                 <input
                   type="text"
@@ -208,7 +203,7 @@ function DashboardMotorista() {
                   required
                 />
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label>Local de Destino:</label>
                 <input
                   type="text"
@@ -219,7 +214,7 @@ function DashboardMotorista() {
                   required
                 />
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label>Data:</label>
                 <input
                   type="date"
@@ -231,7 +226,7 @@ function DashboardMotorista() {
                   required
                 />
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label>Horário:</label>
                 <input
                   type="time"
@@ -242,7 +237,7 @@ function DashboardMotorista() {
                   required
                 />
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label>Vagas:</label>
                 <input
                   type="number"
@@ -254,7 +249,7 @@ function DashboardMotorista() {
                   required
                 />
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label>Ar-condicionado:</label>
                 <select
                   name="ar"
@@ -266,7 +261,7 @@ function DashboardMotorista() {
                   <option value="1">Ligado</option>
                 </select>
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label>Música:</label>
                 <input
                   type="text"

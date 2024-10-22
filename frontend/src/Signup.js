@@ -11,9 +11,10 @@ function Signup() {
     celular: "",
     ra: "",
     role: 0, 
-    modelo: "",
+    modeloCarro: "", 
     placa: "",
   });
+  
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
@@ -21,7 +22,7 @@ function Signup() {
     const { name, value } = e.target;
     setValues((prev) => ({
       ...prev,
-      [name]: name === "role" ? Number(value) : value// Transformando o campo da placa em maiúsculas
+      [name]: name === "role" ? Number(value) : value
     }));
   };
 
@@ -45,9 +46,9 @@ function Signup() {
           } else {
             console.log('Usuário cadastrado:', data);
             if (values.role === 1) {
-              navigate("/motorista");  // Redireciona para dashboardm para motoristas
+              navigate("/motorista"); 
             } else {
-              navigate("/passageiro"); // Redireciona para dashboardp para passageiros
+              navigate("/passageiro"); 
             }
           }
         })
@@ -56,147 +57,162 @@ function Signup() {
         });
     }
   };
-  
+
+  // Definindo o estilo para os inputs
+  const inputStyle = {
+    padding: '12px',
+    borderRadius: '8px',
+    border: '1px solid #ccc',
+    fontSize: '16px'
+  };
+
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: '#0d1b2a' }}>
-      <div className="bg-white p-3 rounded w-100" style={{ maxWidth: '450px', transform: 'scale(0.9)', transformOrigin: 'center' }}>
-        <form className="mx-auto" onSubmit={handleSubmit}>
-          <div className="form-group mb-2">
-            <label htmlFor="inputName">Nome:</label>
+    <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: '#1A1A2E' }}>
+      
+      {/* Adicionar a logo no canto superior esquerdo */}
+      <img
+        src={`${process.env.PUBLIC_URL}/logo.png`}
+        alt="UniRides logo"
+        style={{
+          position: "absolute", // Posição absoluta para manter no canto
+          top: "20px", // Distância do topo
+          left: "20px", // Distância da esquerda
+          width: "160px", // Ajustar o tamanho conforme necessário
+          zIndex: 10, // Garantir que a logo fique acima do fundo
+        }}
+      />
+
+      <div className="bg-light p-4 rounded" style={{ maxWidth: '450px', width: '100%', boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.2)' }}>
+    
+        <h3 className="text-center mb-4" style={{ color: '#16213E' }}>Crie sua conta</h3>
+        <form onSubmit={handleSubmit}>
+
+          <div className="form-group mb-3">
             <input
               type="text"
               name="name"
               className="form-control"
-              id="inputName"
-              placeholder="Seu Nome"
+              placeholder="Nome Completo"
               value={values.name}
               onChange={handleInput}
+              style={inputStyle} // Aplicar estilo
             />
             {errors.name && <small className="text-danger">{errors.name}</small>}
           </div>
 
-          <div className="form-group mb-2">
-            <label htmlFor="inputEmail">Endereço de email:</label>
+          <div className="form-group mb-3">
             <input
               type="email"
               name="email"
               className="form-control"
-              id="inputEmail"
-              placeholder="Coloque o seu email"
+              placeholder="Email"
               value={values.email}
               onChange={handleInput}
+              style={inputStyle} // Aplicar estilo
             />
             {errors.email && <small className="text-danger">{errors.email}</small>}
           </div>
 
-          <div className="form-group mb-2">
-            <label htmlFor="inputPassword">Senha:</label>
+          <div className="form-group mb-3">
             <input
               type="password"
               name="password"
               className="form-control"
-              id="inputPassword"
               placeholder="Senha"
               value={values.password}
               onChange={handleInput}
+              style={inputStyle} // Aplicar estilo
             />
             {errors.password && <small className="text-danger">{errors.password}</small>}
           </div>
 
-          <div className="form-group mb-2">
-            <label htmlFor="confirmPassword">Confirme a Senha:</label>
+          <div className="form-group mb-3">
             <input
               type="password"
               name="confirmPassword"
               className="form-control"
-              id="confirmPassword"
-              placeholder="Confirme a sua senha"
+              placeholder="Confirme a Senha"
               value={values.confirmPassword}
               onChange={handleInput}
+              style={inputStyle} // Aplicar estilo
             />
             {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
           </div>
 
-          <div className="form-group mb-2">
-            <label htmlFor="inputNumeroCeular">N° Celular:</label>
+          <div className="form-group mb-3">
             <input
               type="text"
               name="celular"
               className="form-control"
-              id="inputNumeroCeular"
-              placeholder="Numero do seu Celular"
+              placeholder="N° Celular"
               value={values.celular}
               onChange={handleInput}
+              style={inputStyle} // Aplicar estilo
             />
             {errors.celular && <small className="text-danger">{errors.celular}</small>}
           </div>
 
-          <div className="form-group mb-2">
-            <label htmlFor="inputRA">RA:</label>
+          <div className="form-group mb-3">
             <input
               type="text"
               name="ra"
               className="form-control"
-              id="inputRA"
-              placeholder="Seu RA"
+              placeholder="RA"
               value={values.ra}
               onChange={handleInput}
+              style={inputStyle} // Aplicar estilo
             />
             {errors.ra && <small className="text-danger">{errors.ra}</small>}
           </div>
 
-          <div className="form-group mb-2">
-            <label htmlFor="role">Função:</label>
+          <div className="form-group mb-3">
             <select
               name="role"
               className="form-control"
-              id="role"
               value={values.role}
               onChange={handleInput}
+              style={inputStyle} // Aplicar estilo
             >
               <option value={0}>Passageiro</option>
               <option value={1}>Motorista</option>
             </select>
-            {errors.role && <small className="text-danger">{errors.role}</small>}
           </div>
 
           {values.role === 1 && (
             <>
-              <div className="form-group mb-2">
-                <label htmlFor="inputModeloCarro">Modelo do Carro:</label>
+              <div className="form-group mb-3">
                 <input
                   type="text"
                   name="modeloCarro"
                   className="form-control"
-                  id="inputModeloCarro"
                   placeholder="Modelo do Carro"
                   value={values.modeloCarro}
                   onChange={handleInput}
+                  style={inputStyle} // Aplicar estilo
                 />
               </div>
-              <div className="form-group mb-2">
-                <label htmlFor="inputPlaca">Placa:</label>
+              <div className="form-group mb-3">
                 <input
                   type="text"
                   name="placa"
                   className="form-control"
-                  id="inputPlaca"
                   placeholder="Placa do Carro"
                   value={values.placa.toUpperCase()}
                   onChange={handleInput}
+                  style={inputStyle} // Aplicar estilo
                 />
-                {errors.placa && <small className="text-danger">{errors.placa}</small>}
               </div>
             </>
           )}
 
           <button
             type="submit"
-            className="btn btn-success w-100 align-items-center mb-2"
+            className="btn btn-primary w-100 mb-3"
+            style={{ backgroundColor: '#16213E', border: 'none', padding: '12px 0', fontWeight: 'bold' }}
           >
             Cadastrar-se
           </button>
-          <p className="text-center mb-2">
+          <p className="text-center mb-0">
             Já possui uma conta?{" "}
             <Link to="/" className="text-primary">
               Login

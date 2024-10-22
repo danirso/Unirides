@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -8,8 +8,14 @@ function Dashboard() {
     id: "",
   });
   const [caronas, setCaronas] = useState([]);
-  const [minhasCaronas, setMinhasCaronas] = useState([]); // Caronas do passageiro
-  const [searchTerm, setSearchTerm] = useState(""); // Estado para a barra de pesquisa
+  const [minhasCaronas, setMinhasCaronas] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedMotorista, setSelectedMotorista] = useState("");
+  const [selectedDestino, setSelectedDestino] = useState("");
+  const [selectedHorario, setSelectedHorario] = useState("");
+  const [arCondicionado, setArCondicionado] = useState(false);
+  const [musica, setMusica] = useState("");
+  const [showFilters, setShowFilters] = useState(false); // Estado para controlar a exibição dos filtros
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -23,43 +29,36 @@ function Dashboard() {
     }
   }, [navigate]);
 
-  // Função que atualiza o termo de busca
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value); // Atualiza o termo de busca conforme o usuário digita
-  };
-
-  // Filtra as caronas com base no termo de busca
+  // Filtra as caronas com base nos filtros
   const filteredCaronas = caronas.filter((carona) => {
+    const matchesMotorista = carona.motorista.nome.toLowerCase().includes(selectedMotorista.toLowerCase());
+    const matchesDestino = carona.destino.toLowerCase().includes(selectedDestino.toLowerCase());
+    const matchesHorario = selectedHorario ? new Date(carona.horario).getHours() === parseInt(selectedHorario) : true;
+    const matchesArCondicionado = arCondicionado ? carona.ar === true : true;
+    const matchesMusica = musica ? carona.musica.toLowerCase().includes(musica.toLowerCase()) : true;
+
     return (
-      carona.destino.toLowerCase().includes(searchTerm.toLowerCase()) || // Filtra por destino
-      carona.motorista.nome.toLowerCase().includes(searchTerm.toLowerCase()) // Filtra por nome do motorista
+      (matchesMotorista || matchesDestino) &&
+      matchesHorario &&
+      matchesArCondicionado &&
+      matchesMusica
     );
   });
 
-  // Buscar caronas do backend quando o componente for montado
   useEffect(() => {
-    const userData = localStorage.getItem("usuario");
-    if (userData) {
-      setUsuario(JSON.parse(userData)); // Atualiza o estado com os dados do usuário
-    }
-
-    fetch("http://localhost:3000/api/caronas") // URL da API
-      .then((response) => response.json()) // Parseia o JSON da resposta
-      .then((data) => setCaronas(data)) // Atualiza o estado com as caronas
+    fetch("http://localhost:3000/api/caronas")
+      .then((response) => response.json())
+      .then((data) => setCaronas(data))
       .catch((error) => console.error("Erro ao buscar caronas:", error));
   }, []);
 
-  // Função para buscar caronas do passageiro
   const fetchMinhasCaronas = (idPassageiro) => {
-    fetch(
-      `http://localhost:3000/api/caronas/minhas?id_passageiro=${idPassageiro}`
-    )
+    fetch(`http://localhost:3000/api/caronas/minhas?id_passageiro=${idPassageiro}`)
       .then((response) => response.json())
       .then((data) => setMinhasCaronas(data))
       .catch((error) => console.error("Erro ao buscar minhas caronas:", error));
   };
 
-  // Função para solicitar uma carona
   const solicitarCarona = (caronaId) => {
     const idPassageiro = JSON.parse(localStorage.getItem("user")).id;
     fetch(`http://localhost:3000/api/caronas/${caronaId}/solicitar`, {
@@ -73,7 +72,7 @@ function Dashboard() {
         if (response.ok) {
           alert("Carona solicitada com sucesso!");
           setCaronas(caronas.filter((carona) => carona.id !== caronaId));
-          fetchMinhasCaronas(idPassageiro); // Atualizar caronas do passageiro
+          fetchMinhasCaronas(idPassageiro);
         } else {
           alert("Erro ao solicitar carona.");
         }
@@ -81,23 +80,18 @@ function Dashboard() {
       .catch((error) => console.error("Erro ao solicitar carona:", error));
   };
 
-  // Função para sair de uma carona
   const sairDaCarona = (caronaId) => {
     fetch(`http://localhost:3000/api/caronas/${caronaId}/sair`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        id_passageiro: JSON.parse(localStorage.getItem("user")).id,
-      }),
+      body: JSON.stringify({ id_passageiro: JSON.parse(localStorage.getItem("user")).id }),
     })
       .then((response) => {
         if (response.ok) {
           alert("Você saiu da carona com sucesso!");
-          setMinhasCaronas(
-            minhasCaronas.filter((carona) => carona.id !== caronaId)
-          );
+          setMinhasCaronas(minhasCaronas.filter((carona) => carona.id !== caronaId));
         } else {
           alert("Erro ao sair da carona.");
         }
@@ -114,13 +108,13 @@ function Dashboard() {
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Bem-vindo, {usuario.name}!</h2>
-        <Link to="/" className="btn btn-danger" onClick={handleLogout}>
+        <button className="btn btn-outline-danger" onClick={handleLogout}>
           Logout
-        </Link>
+        </button>
       </div>
 
       <div className="d-flex align-items-center mb-4">
-        <Link to="/perfil" className="btn btn-primary me-2">
+        <Link to="/perfil-passageiro" className="btn btn-primary me-2">
           Ver Perfil Completo
         </Link>
         <Link to="/historico" className="btn btn-info">
@@ -132,50 +126,89 @@ function Dashboard() {
       <div className="mb-4">
         <input
           type="text"
-          className="form-control"
-          placeholder="Buscar carona por destino ou motorista"
+          className="form-control form-control-lg"
+          placeholder="Pesquisar caronas disponíveis"
           value={searchTerm}
-          onChange={handleSearchChange} // Atualiza o estado da busca
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+
+      {/* Botão para mostrar/ocultar filtros */}
+      <button className="btn btn-outline-secondary mb-2" onClick={() => setShowFilters(!showFilters)}>
+        {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+      </button>
+
+      {/* Filtros */}
+      {showFilters && (
+        <div className="mb-4 border rounded p-3 bg-light shadow-sm">
+          <h4 className="mb-3">Filtros</h4>
+          <div className="mb-2">
+            <label className="form-label">Motorista:</label>
+            <select className="form-select" value={selectedMotorista} onChange={(e) => setSelectedMotorista(e.target.value)}>
+              <option value="">Selecione um motorista</option>
+            </select>
+          </div>
+          <div className="mb-2">
+            <label className="form-label">Destino:</label>
+            <select className="form-select" value={selectedDestino} onChange={(e) => setSelectedDestino(e.target.value)}>
+              <option value="">Selecione um destino</option>
+            </select>
+          </div>
+          <div className="mb-2">
+            <label className="form-label">Horário:</label>
+            <select className="form-select" value={selectedHorario} onChange={(e) => setSelectedHorario(e.target.value)}>
+              <option value="">Selecione uma hora</option>
+              {Array.from({ length: 24 }, (_, i) => (
+                <option key={i} value={i}>
+                  {i}:00
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-check mb-2">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={arCondicionado}
+              onChange={(e) => setArCondicionado(e.target.checked)}
+            />
+            <label className="form-check-label">Ar-condicionado</label>
+          </div>
+          <div className="mb-2">
+            <label className="form-label">Música:</label>
+            <select className="form-select" value={musica} onChange={(e) => setMusica(e.target.value)}>
+              <option value="">Selecione uma preferência musical</option>
+            </select>
+          </div>
+        </div>
+      )}
 
       <div className="mb-4">
         <h3>Caronas Disponíveis</h3>
         {filteredCaronas.length > 0 ? (
           filteredCaronas.map((carona) => (
-            <div key={carona.id} className="card mb-3">
+            <div key={carona.id} className="card mb-3 shadow-sm">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
                 <p className="card-text">
                   Partida: {carona.partida}
                   <br />
-                  Horário:{" "}
-                  {new Date(carona.horario).toLocaleTimeString('pt-BR', {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                   <br />
-                  Data: {new Date(carona.horario).toLocaleDateString('pt-BR')}
-                  <br/>
+                  Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                  <br />
                   Motorista: {carona.motorista.nome}
                   <br />
-                  Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
-                  <br />
-                  Ar-condicionado: {carona.ar ? "Sim" : "Não"}
-                  <br />
-                  Música: {carona.musica}
+                  Vagas disponíveis: {carona.vagas_disponiveis}
                 </p>
-                <button
-                  className="btn btn-success"
-                  onClick={() => solicitarCarona(carona.id)}
-                >
+                <button className="btn btn-success" onClick={() => solicitarCarona(carona.id)}>
                   Solicitar Carona
                 </button>
               </div>
             </div>
           ))
         ) : (
-          <p>Não há caronas disponíveis no momento.</p>
+          <p>Nenhuma carona disponível no momento.</p>
         )}
       </div>
 
@@ -183,32 +216,21 @@ function Dashboard() {
         <h3>Minhas Caronas</h3>
         {minhasCaronas.length > 0 ? (
           minhasCaronas.map((carona) => (
-            <div key={carona.id} className="card mb-3">
+            <div key={carona.id} className="card mb-3 shadow-sm">
               <div className="card-body">
                 <h5 className="card-title">Destino: {carona.destino}</h5>
                 <p className="card-text">
                   Partida: {carona.partida}
                   <br />
-                  Horário:{" "}
-                  {new Date(carona.horario).toLocaleTimeString('pt-BR', {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                   <br />
-                  Data: {new Date(carona.horario).toLocaleDateString('pt-BR')}
-                  <br/>
+                  Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                  <br />
                   Motorista: {carona.motorista.nome}
                   <br />
-                  Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
-                  <br />
-                  Ar-condicionado: {carona.ar ? "Sim" : "Não"}
-                  <br />
-                  Música: {carona.musica}
+                  Vagas disponíveis: {carona.vagas_disponiveis}
                 </p>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => sairDaCarona(carona.id)}
-                >
+                <button className="btn btn-danger" onClick={() => sairDaCarona(carona.id)}>
                   Sair da Carona
                 </button>
               </div>
