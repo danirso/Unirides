@@ -61,7 +61,7 @@ function Login() {
       alt="UniRides logo"
       style={{
       position: "absolute", 
-      top: "15px", 
+      top: "10px", 
       left: "50%", 
       transform: "translateX(-50%)", 
       width: "150px", 
