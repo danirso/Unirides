@@ -56,18 +56,18 @@ function Login() {
         background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
       }}
     >
-      {/* Adicionar a logo no canto superior esquerdo */}
-      <img
-        src={`${process.env.PUBLIC_URL}/logo.png`} // Caminho correto para o logo
-        alt="UniRides logo"
-        style={{
-          position: "absolute", // Posição absoluta para manter no canto
-          top: "20px", // Distância do topo
-          left: "20px", // Distância da esquerda
-          width: "160px", // Ajustar o tamanho conforme necessário
-          zIndex: 10, // Garantir que a logo fique acima do fundo
-        }}
-      />
+    <img
+      src={`${process.env.PUBLIC_URL}/logo.png`}
+      alt="UniRides logo"
+      style={{
+      position: "absolute", 
+      top: "15px", 
+      left: "50%", 
+      transform: "translateX(-50%)", 
+      width: "150px", 
+      zIndex: 10, // Garantir que a logo fique acima do fundo
+  }}
+/>
   
       <div
         className="p-4 rounded shadow-lg"

@@ -68,19 +68,6 @@ function Signup() {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: '#1A1A2E' }}>
-      
-      {/* Adicionar a logo no canto superior esquerdo */}
-      <img
-        src={`${process.env.PUBLIC_URL}/logo.png`}
-        alt="UniRides logo"
-        style={{
-          position: "absolute", // Posição absoluta para manter no canto
-          top: "20px", // Distância do topo
-          left: "20px", // Distância da esquerda
-          width: "160px", // Ajustar o tamanho conforme necessário
-          zIndex: 10, // Garantir que a logo fique acima do fundo
-        }}
-      />
 
       <div className="bg-light p-4 rounded" style={{ maxWidth: '450px', width: '100%', boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.2)' }}>
     
