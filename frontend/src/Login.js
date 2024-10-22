@@ -56,19 +56,19 @@ function Login() {
         background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
       }}
     >
-    <img
-      src={`${process.env.PUBLIC_URL}/logo.png`}
-      alt="UniRides logo"
-      style={{
-      position: "absolute", 
-      top: "10px", 
-      left: "50%", 
-      transform: "translateX(-50%)", 
-      width: "150px", 
-      zIndex: 10, // Garantir que a logo fique acima do fundo
-  }}
-/>
-  
+      <img
+        src={`${process.env.PUBLIC_URL}/logo.png`}
+        alt="UniRides logo"
+        style={{
+          position: "absolute",
+          top: "15px", // Aumentado para espaçar a logo da caixa de login
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "150px",
+          zIndex: 10,
+        }}
+      />
+
       <div
         className="p-4 rounded shadow-lg"
         style={{
@@ -76,6 +76,7 @@ function Login() {
           width: "100%",
           maxWidth: "400px",
           borderRadius: "12px",
+          marginTop: "20px", // Adicionando margem superior para separar do logo
         }}
       >
         <h2 className="text-center mb-4" style={{ color: "#0d1b2a" }}>
@@ -174,7 +175,6 @@ function Login() {
       </div>
     </div>
   );
-  
 }
 
 export default Login;
