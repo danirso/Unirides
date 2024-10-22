@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Validation from "./SignupValidation"; 
+import Validation from "./SignupValidation";
 
 function Signup() {
   const [values, setValues] = useState({
@@ -14,7 +14,7 @@ function Signup() {
     modeloCarro: "", 
     placa: "",
   });
-  
+
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
@@ -22,7 +22,7 @@ function Signup() {
     const { name, value } = e.target;
     setValues((prev) => ({
       ...prev,
-      [name]: name === "role" ? Number(value) : value
+      [name]: name === "role" ? Number(value) : value,
     }));
   };
 
@@ -30,50 +30,71 @@ function Signup() {
     e.preventDefault();
     setErrors(Validation(values));
     const validationErrors = Validation(values);
-  
+
     if (Object.keys(validationErrors).length === 0) {
-      fetch('/signup', {
-        method: 'POST',
+      fetch("/signup", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
       })
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
           if (data.error) {
-            console.error('Erro:', data.error);
+            console.error("Erro:", data.error);
           } else {
-            console.log('Usuário cadastrado:', data);
+            console.log("Usuário cadastrado:", data);
             if (values.role === 1) {
-              navigate("/motorista"); 
+              navigate("/motorista");
             } else {
-              navigate("/passageiro"); 
+              navigate("/passageiro");
             }
           }
         })
-        .catch(error => {
-          console.error('Erro ao cadastrar:', error);
+        .catch((error) => {
+          console.error("Erro ao cadastrar:", error);
         });
     }
   };
 
-  // Definindo o estilo para os inputs
+  // Estilo dos inputs
   const inputStyle = {
-    padding: '12px',
-    borderRadius: '8px',
-    border: '1px solid #ccc',
-    fontSize: '16px'
+    padding: "12px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    fontSize: "16px",
+    width: "100%",
+    boxSizing: "border-box",
+    marginBottom: "15px",
+  };
+
+  // Estilo do container do formulário
+  const formContainerStyle = {
+    maxWidth: "450px",
+    width: "100%",
+    boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)",
+    margin: "0 20px",
+    minHeight: "400px",  // Altura mínima para o formulário
+    maxHeight: "800px",  // Altura máxima para evitar estourar
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",  // Deixa espaço entre os itens
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: '#1A1A2E' }}>
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{
+        minHeight: "100vh",  // Garante que o container sempre ocupe no mínimo 100% da altura da tela
+        backgroundColor: "#1A1A2E",
+        padding: "20px",
+      }}
+    >
+      <div className="form-container bg-light p-4 rounded" style={formContainerStyle}>
+        <h3 className="text-center mb-4" style={{ color: "#16213E" }}>Crie sua conta</h3>
 
-      <div className="bg-light p-4 rounded" style={{ maxWidth: '450px', width: '100%', boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.2)' }}>
-    
-        <h3 className="text-center mb-4" style={{ color: '#16213E' }}>Crie sua conta</h3>
         <form onSubmit={handleSubmit}>
-
           <div className="form-group mb-3">
             <input
               type="text"
@@ -82,7 +103,7 @@ function Signup() {
               placeholder="Nome Completo"
               value={values.name}
               onChange={handleInput}
-              style={inputStyle} // Aplicar estilo
+              style={inputStyle}
             />
             {errors.name && <small className="text-danger">{errors.name}</small>}
           </div>
@@ -95,7 +116,7 @@ function Signup() {
               placeholder="Email"
               value={values.email}
               onChange={handleInput}
-              style={inputStyle} // Aplicar estilo
+              style={inputStyle}
             />
             {errors.email && <small className="text-danger">{errors.email}</small>}
           </div>
@@ -108,7 +129,7 @@ function Signup() {
               placeholder="Senha"
               value={values.password}
               onChange={handleInput}
-              style={inputStyle} // Aplicar estilo
+              style={inputStyle}
             />
             {errors.password && <small className="text-danger">{errors.password}</small>}
           </div>
@@ -121,7 +142,7 @@ function Signup() {
               placeholder="Confirme a Senha"
               value={values.confirmPassword}
               onChange={handleInput}
-              style={inputStyle} // Aplicar estilo
+              style={inputStyle}
             />
             {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
           </div>
@@ -134,7 +155,7 @@ function Signup() {
               placeholder="N° Celular"
               value={values.celular}
               onChange={handleInput}
-              style={inputStyle} // Aplicar estilo
+              style={inputStyle}
             />
             {errors.celular && <small className="text-danger">{errors.celular}</small>}
           </div>
@@ -147,7 +168,7 @@ function Signup() {
               placeholder="RA"
               value={values.ra}
               onChange={handleInput}
-              style={inputStyle} // Aplicar estilo
+              style={inputStyle}
             />
             {errors.ra && <small className="text-danger">{errors.ra}</small>}
           </div>
@@ -158,7 +179,7 @@ function Signup() {
               className="form-control"
               value={values.role}
               onChange={handleInput}
-              style={inputStyle} // Aplicar estilo
+              style={inputStyle}
             >
               <option value={0}>Passageiro</option>
               <option value={1}>Motorista</option>
@@ -166,7 +187,7 @@ function Signup() {
           </div>
 
           {values.role === 1 && (
-            <>
+            <div>
               <div className="form-group mb-3">
                 <input
                   type="text"
@@ -175,7 +196,7 @@ function Signup() {
                   placeholder="Modelo do Carro"
                   value={values.modeloCarro}
                   onChange={handleInput}
-                  style={inputStyle} // Aplicar estilo
+                  style={inputStyle}
                 />
               </div>
               <div className="form-group mb-3">
@@ -186,19 +207,25 @@ function Signup() {
                   placeholder="Placa do Carro"
                   value={values.placa.toUpperCase()}
                   onChange={handleInput}
-                  style={inputStyle} // Aplicar estilo
+                  style={inputStyle}
                 />
               </div>
-            </>
+            </div>
           )}
 
           <button
             type="submit"
             className="btn btn-primary w-100 mb-3"
-            style={{ backgroundColor: '#16213E', border: 'none', padding: '12px 0', fontWeight: 'bold' }}
+            style={{
+              backgroundColor: "#16213E",
+              border: "none",
+              padding: "12px 0",
+              fontWeight: "bold",
+            }}
           >
             Cadastrar-se
           </button>
+
           <p className="text-center mb-0">
             Já possui uma conta?{" "}
             <Link to="/" className="text-primary">

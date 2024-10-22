@@ -61,11 +61,12 @@ function Login() {
         alt="UniRides logo"
         style={{
           position: "absolute",
-          top: "15px", // Aumentado para espaçar a logo da caixa de login
+          top: "30px", // Aumentado para espaçar a logo da caixa de login
           left: "50%",
           transform: "translateX(-50%)",
           width: "150px",
           zIndex: 10,
+          paddingTop: "20px", // Adicionando padding no topo para espaçamento extra
         }}
       />
 
@@ -76,7 +77,7 @@ function Login() {
           width: "100%",
           maxWidth: "400px",
           borderRadius: "12px",
-          marginTop: "20px", // Adicionando margem superior para separar do logo
+          marginTop: "150px", // Ajustando a margem superior
         }}
       >
         <h2 className="text-center mb-4" style={{ color: "#0d1b2a" }}>
