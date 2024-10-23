@@ -47,18 +47,18 @@ module.exports = {
 
     // Adicionar caronas futuras
     await queryInterface.bulkInsert('Caronas', [
-      { id_motorista: motoristaIds[0], partida: 'Paulínia', destino: 'Tupi Paulista', horario: new Date("2024-10-24T15:00:00"), vagas: 4, vagas_disponiveis: 2, ar: 1, musica: 'Rock', createdAt: new Date(), updatedAt: new Date() },
-      { id_motorista: motoristaIds[1], partida: 'Barão Geraldo', destino: 'Centro', horario: new Date("2024-10-25T09:30:00"), vagas: 3, vagas_disponiveis: 1, ar: 0, musica: 'Sertanejo', createdAt: new Date(), updatedAt: new Date() },
-      { id_motorista: motoristaIds[2], partida: 'Shopping', destino: 'Shopping', horario: new Date("2024-10-26T18:00:00"), vagas: 4, vagas_disponiveis: 3, ar: 1, musica: 'Jazz', createdAt: new Date(), updatedAt: new Date() }
+      { id_motorista: motoristaIds[0], partida: 'Paulínia', destino: 'Tupi Paulista', horario: new Date("2024-10-24T18:00:00"), vagas: 4, vagas_disponiveis: 2, ar: 1, musica: 'Rock', createdAt: new Date(), updatedAt: new Date() },
+      { id_motorista: motoristaIds[1], partida: 'Barão Geraldo', destino: 'Centro', horario: new Date("2024-10-25T12:30:00"), vagas: 3, vagas_disponiveis: 1, ar: 0, musica: 'Sertanejo', createdAt: new Date(), updatedAt: new Date() },
+      { id_motorista: motoristaIds[2], partida: 'Shopping', destino: 'Shopping', horario: new Date("2024-10-26T21:00:00"), vagas: 4, vagas_disponiveis: 3, ar: 1, musica: 'Jazz', createdAt: new Date(), updatedAt: new Date() }
     ], {});
 
     // Adicionar caronas passadas para o histórico
     await queryInterface.bulkInsert('Caronas', [
-      { id_motorista: motoristaIds[0], partida: 'Campinas', destino: 'Paulínia', horario: new Date("2024-09-10T08:00:00"), vagas: 4, vagas_disponiveis: 0, ar: 1, musica: 'Rock', createdAt: new Date(), updatedAt: new Date() },
-      { id_motorista: motoristaIds[1], partida: 'São Paulo', destino: 'Barão Geraldo', horario: new Date("2024-09-15T17:00:00"), vagas: 3, vagas_disponiveis: 0, ar: 0, musica: 'Sertanejo', createdAt: new Date(), updatedAt: new Date() },
-      { id_motorista: motoristaIds[2], partida: 'Jundiaí', destino: 'Campinas', horario: new Date("2024-09-20T12:00:00"), vagas: 4, vagas_disponiveis: 1, ar: 1, musica: 'Pop', createdAt: new Date(), updatedAt: new Date() },
-      { id_motorista: motoristaIds[3], partida: 'Nova Odessa', destino: 'Americana', horario: new Date("2024-09-23T07:30:00"), vagas: 2, vagas_disponiveis: 0, ar: 1, musica: 'Clássica', createdAt: new Date(), updatedAt: new Date() },
-      { id_motorista: motoristaIds[4], partida: 'Paulínia', destino: 'Nova Granada', horario: new Date("2024-09-28T10:00:00"), vagas: 4, vagas_disponiveis: 2, ar: 0, musica: 'Hip Hop', createdAt: new Date(), updatedAt: new Date() }
+      { id_motorista: motoristaIds[0], partida: 'Campinas', destino: 'Paulínia', horario: new Date("2024-09-10T11:00:00"), vagas: 4, vagas_disponiveis: 0, ar: 1, musica: 'Rock', createdAt: new Date(), updatedAt: new Date() },
+      { id_motorista: motoristaIds[1], partida: 'São Paulo', destino: 'Barão Geraldo', horario: new Date("2024-09-15T20:00:00"), vagas: 3, vagas_disponiveis: 0, ar: 0, musica: 'Sertanejo', createdAt: new Date(), updatedAt: new Date() },
+      { id_motorista: motoristaIds[2], partida: 'Jundiaí', destino: 'Campinas', horario: new Date("2024-09-20T15:00:00"), vagas: 4, vagas_disponiveis: 1, ar: 1, musica: 'Pop', createdAt: new Date(), updatedAt: new Date() },
+      { id_motorista: motoristaIds[3], partida: 'Nova Odessa', destino: 'Americana', horario: new Date("2024-09-23T10:30:00"), vagas: 2, vagas_disponiveis: 0, ar: 1, musica: 'Clássica', createdAt: new Date(), updatedAt: new Date() },
+      { id_motorista: motoristaIds[4], partida: 'Paulínia', destino: 'Nova Granada', horario: new Date("2024-09-28T13:00:00"), vagas: 4, vagas_disponiveis: 2, ar: 0, musica: 'Hip Hop', createdAt: new Date(), updatedAt: new Date() }
     ], {});
 
     // Recuperar IDs das caronas
