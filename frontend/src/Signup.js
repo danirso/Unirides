@@ -22,7 +22,7 @@ function Signup() {
     const { name, value } = e.target;
     setValues((prev) => ({
       ...prev,
-      [name]: name === "role" ? Number(value) : value,
+      [name]: name === "role" ?Number(value) : value,
     }));
   };
 
@@ -215,7 +215,7 @@ function Signup() {
             type="submit"
             className="btn btn-primary w-100 mb-3"
             style={{
-              backgroundColor: "#16213E",
+              backgroundColor: "#38b000",
               border: "none",
               padding: "12px 0",
               fontWeight: "bold",
