@@ -84,13 +84,11 @@ function Signup() {
 
   return (
     <div
-      className="d-flex justify-content-center align-items-center"
-      style={{
-        minHeight: "100vh",  // Garante que o container sempre ocupe no mínimo 100% da altura da tela
-        backgroundColor: "#1A1A2E",
-        padding: "20px",
-      }}
-    >
+    className="d-flex justify-content-center align-items-center vh-100"
+    style={{
+      background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
+    }}
+  >
       <div className="form-container bg-light p-4 rounded" style={formContainerStyle}>
         <h3 className="text-center mb-4" style={{ color: "#16213E" }}>Crie sua conta</h3>
 
