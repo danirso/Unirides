@@ -110,107 +110,123 @@ function Dashboard() {
       style={{
         background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
         color: "#f7f9fc",
+        minHeight: "100vh",
+        backgroundAttachment: "fixed",
       }}
     >
+      <style>
+        {`
+          body, html {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            background-attachment: fixed;
+          }
+        `}
+      </style>
       <div className="container mt-3">
         {/* Cabeçalho */}
         <div className="row mb-4">
-          <div className="col-12 p-4 rounded" style={{ backgroundColor: "#203a43" }}>
-            <h2>Bem-vindo, {usuario.name}!</h2>
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <Link to="/perfil-passageiro" className="btn btn-primary me-2">
-                  Ver Perfil Completo
-                </Link>
-                <Link to="/historico" className="btn btn-info">
-                  Ver Histórico
-                </Link>
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              <h2>Bem-vindo, {usuario.name}!</h2>
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <Link to="/perfil-passageiro" className="btn btn-primary me-2">
+                    Ver Perfil Completo
+                  </Link>
+                  <Link to="/historico" className="btn btn-info">
+                    Ver Histórico
+                  </Link>
+                </div>
+                <button className="btn btn-outline-danger" onClick={handleLogout}>
+                  Logout
+                </button>
               </div>
-              <button className="btn btn-outline-danger" onClick={handleLogout}>
-                Logout
-              </button>
             </div>
           </div>
         </div>
-
         {/* Barra de Pesquisa e Filtros */}
         <div className="row mb-4">
           <div className="col-12">
-            <input
-              type="text"
-              className="form-control form-control-lg mb-3"
-              placeholder="Pesquisar caronas disponíveis"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button
-              className="btn btn-outline-secondary mb-2"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
-            </button>
-            {showFilters && (
-              <div className="border rounded p-3 mb-4" style={{ backgroundColor: "#2c5364" }}>
-                <h4 className="mb-3">Filtros</h4>
-                <div className="mb-2">
-                  <label className="form-label">Motorista:</label>
-                  <select
-                    className="form-select"
-                    value={selectedMotorista}
-                    onChange={(e) => setSelectedMotorista(e.target.value)}
-                  >
-                    <option value="">Selecione um motorista</option>
-                  </select>
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              <input
+                type="text"
+                className="form-control form-control-lg mb-3"
+                placeholder="Pesquisar caronas disponíveis"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button
+                className="btn btn-secondary mb-2"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+              </button>
+              {showFilters && (
+                <div className="card mb-3 shadow-sm">
+                  <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40 ", color: "#f7f9fc" }}> 
+                    <h4 className="mb-3">Filtros</h4>
+                    <div className="mb-2">
+                      <label className="form-label">Motorista:</label>
+                      <select
+                        className="form-select"
+                        value={selectedMotorista}
+                        onChange={(e) => setSelectedMotorista(e.target.value)}
+                      >
+                        <option value="">Selecione um motorista</option>
+                      </select>
+                    </div>
+                    <div className="mb-2">
+                      <label className="form-label">Destino:</label>
+                      <select
+                        className="form-select"
+                        value={selectedDestino}
+                        onChange={(e) => setSelectedDestino(e.target.value)}
+                      >
+                        <option value="">Selecione um destino</option>
+                      </select>
+                    </div>
+                    <div className="mb-2">
+                      <label className="form-label">Horário:</label>
+                      <select
+                        className="form-select"
+                        value={selectedHorario}
+                        onChange={(e) => setSelectedHorario(e.target.value)}
+                      >
+                        <option value="">Selecione uma hora</option>
+                        {Array.from({ length: 24 }, (_, i) => (
+                          <option key={i} value={i}>
+                            {i}:00
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-check mb-2">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        checked={arCondicionado}
+                        onChange={(e) => setArCondicionado(e.target.checked)}
+                      />
+                      <label className="form-check-label">Ar-condicionado</label>
+                    </div>
+                    <div className="mb-2">
+                      <label className="form-label">Música:</label>
+                      <select
+                        className="form-select"
+                        value={musica}
+                        onChange={(e) => setMusica(e.target.value)}
+                      >
+                        <option value="">Selecione uma preferência musical</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
-                <div className="mb-2">
-                  <label className="form-label">Destino:</label>
-                  <select
-                    className="form-select"
-                    value={selectedDestino}
-                    onChange={(e) => setSelectedDestino(e.target.value)}
-                  >
-                    <option value="">Selecione um destino</option>
-                  </select>
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Horário:</label>
-                  <select
-                    className="form-select"
-                    value={selectedHorario}
-                    onChange={(e) => setSelectedHorario(e.target.value)}
-                  >
-                    <option value="">Selecione uma hora</option>
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <option key={i} value={i}>
-                        {i}:00
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-check mb-2">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={arCondicionado}
-                    onChange={(e) => setArCondicionado(e.target.checked)}
-                  />
-                  <label className="form-check-label">Ar-condicionado</label>
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Música:</label>
-                  <select
-                    className="form-select"
-                    value={musica}
-                    onChange={(e) => setMusica(e.target.value)}
-                  >
-                    <option value="">Selecione uma preferência musical</option>
-                  </select>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-
         {/* Caronas Disponíveis */}
         <div className="row mb-4">
           <div className="col-12">
@@ -219,7 +235,7 @@ function Dashboard() {
               {filteredCaronas.length > 0 ? (
                 filteredCaronas.map((carona) => (
                   <div key={carona.id} className="card mb-3 shadow-sm">
-                    <div className="card-body">
+                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}> 
                       <h5 className="card-title">Destino: {carona.destino}</h5>
                       <p className="card-text">
                         Partida: {carona.partida}
@@ -252,7 +268,6 @@ function Dashboard() {
             </div>
           </div>
         </div>
-
         {/* Minhas Caronas */}
         <div className="row mb-4">
           <div className="col-12">
@@ -260,7 +275,7 @@ function Dashboard() {
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h3>Minhas Caronas</h3>
                 <button
-                  className="btn btn-outline-secondary"
+                  className="btn btn-secondary"
                   onClick={() => setShowMinhasCaronas(!showMinhasCaronas)}
                 >
                   {showMinhasCaronas ? "Ocultar" : "Mostrar"}
@@ -271,7 +286,7 @@ function Dashboard() {
                   {minhasCaronas.length > 0 ? (
                     minhasCaronas.map((carona) => (
                       <div key={carona.id} className="card mb-3 shadow-sm">
-                        <div className="card-body">
+                        <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
                           <h5 className="card-title">Destino: {carona.destino}</h5>
                           <p className="card-text">
                             Partida: {carona.partida}
@@ -308,8 +323,7 @@ function Dashboard() {
         </div>
       </div>
     </div>
-  );
+  );  
 }
-
 
 export default Dashboard;

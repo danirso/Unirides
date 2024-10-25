@@ -124,169 +124,207 @@ function DashboardMotorista() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Bem-vindo, {usuario.name}!</h2>
-        <Link to="/" className="btn btn-danger" onClick={handleLogout}>
-          Logout
-        </Link>
-      </div>
-
-      <div className="d-flex align-items-center mb-4">
-        <Link to="/perfil-motorista" className="btn btn-primary me-2">
-          Ver Perfil Completo
-        </Link>
-        <Link to="/historico" className="btn btn-info">
-          Ver Histórico
-        </Link>
-      </div>
-
-      <div className="mb-4">
-        <h3>Caronas que você está oferecendo</h3>
-        {caronas.length > 0 ? (
-          caronas.map((carona) => (
-            <div key={carona.id} className="card mb-3 shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title">Destino: {carona.destino}</h5>
-                <p className="card-text">
-                  Local de partida: {carona.partida}
-                  <br />
-                  Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
-                  <br />
-                  Horário:{" "}
-                  {new Date(carona.horario).toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    timeZone: "America/Sao_Paulo",
-                  })}
-                  <br />
-                  Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
-                  <br />
-                  Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
-                  <br />
-                  Música: {carona.musica}
-                </p>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => cancelarCarona(carona.id)}
-                >
-                  Cancelar Carona
+    <div
+      className="d-flex flex-column align-items-center vh-100"
+      style={{
+        background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
+        color: "#f7f9fc",
+        minHeight: "100vh",
+        backgroundAttachment: "fixed",
+      }}
+    >
+     <style>
+        {`
+          body, html {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            background-attachment: fixed;
+          }
+        `}
+      </style>
+      <div className="container mt-3">
+        {/* Cabeçalho */}
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              <h2>Bem-vindo, {usuario.name}!</h2>
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <Link to="/perfil-passageiro" className="btn btn-primary me-2">
+                    Ver Perfil Completo
+                  </Link>
+                  <Link to="/historico" className="btn btn-info">
+                    Ver Histórico
+                  </Link>
+                </div>
+                <button className="btn btn-outline-danger" onClick={handleLogout}>
+                  Logout
                 </button>
               </div>
             </div>
-          ))
-        ) : (
-          <p>Você não está oferecendo nenhuma carona no momento.</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        {!mostrarFormulario && (
-          <button
-            className="btn btn-success"
-            onClick={() => setMostrarFormulario(true)}
-          >
-            Criar Carona
-          </button>
-        )}
-        {mostrarFormulario && (
-          <div className="border p-3 mt-3 shadow-sm">
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label>Local de Partida:</label>
-                <input
-                  type="text"
-                  name="partida"
-                  value={novaCarona.partida}
-                  onChange={handleChange}
-                  className="form-control"
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label>Local de Destino:</label>
-                <input
-                  type="text"
-                  name="destino"
-                  value={novaCarona.destino}
-                  onChange={handleChange}
-                  className="form-control"
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label>Data:</label>
-                <input
-                  type="date"
-                  name="data"
-                  value={novaCarona.data}
-                  onChange={handleChange}
-                  min={new Date().toISOString().split("T")[0]}
-                  className="form-control"
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label>Horário:</label>
-                <input
-                  type="time"
-                  name="horario"
-                  value={novaCarona.horario}
-                  onChange={handleChange}
-                  className="form-control"
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label>Vagas:</label>
-                <input
-                  type="number"
-                  name="vagas"
-                  value={novaCarona.vagas}
-                  onChange={handleChange}
-                  min="1"
-                  className="form-control"
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label>Ar-condicionado:</label>
-                <select
-                  name="ar"
-                  value={novaCarona.ar}
-                  onChange={handleChange}
-                  className="form-control"
-                >
-                  <option value="0">Desligado</option>
-                  <option value="1">Ligado</option>
-                </select>
-              </div>
-              <div className="mb-3">
-                <label>Música:</label>
-                <input
-                  type="text"
-                  name="musica"
-                  value={novaCarona.musica}
-                  onChange={handleChange}
-                  className="form-control"
-                />
-              </div>
-              <button type="submit" className="btn btn-primary">
-                Criar
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger ms-2"
-                onClick={handleCancel}
-              >
-                Cancelar
-              </button>
-            </form>
           </div>
-        )}
+        </div>
+        {/* Caronas Oferecidas */}
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              <h3>Caronas que você está oferecendo</h3>
+              {caronas.length > 0 ? (
+                caronas.map((carona) => (
+                  <div key={carona.id} className="card mb-3 shadow-sm">
+                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
+                      <h5 className="card-title">Destino: {carona.destino}</h5>
+                      <p className="card-text">
+                        Local de partida: {carona.partida}
+                        <br />
+                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                        <br />
+                        Horário:{" "}
+                        {new Date(carona.horario).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          timeZone: "America/Sao_Paulo",
+                        })}
+                        <br />
+                        Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
+                        <br />
+                        Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
+                        <br />
+                        Música: {carona.musica}
+                      </p>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => cancelarCarona(carona.id)}
+                      >
+                        Cancelar Carona
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Você não está oferecendo nenhuma carona no momento.</p>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* Criar Carona */}
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+            <h3>Criar Carona</h3>
+              {!mostrarFormulario && (
+                <button
+                  className="btn btn-success"
+                  onClick={() => setMostrarFormulario(true)}
+                >
+                  Criar
+                </button>
+              )}
+              {mostrarFormulario && (
+              <div className="card mb-3 shadow-sm">
+                <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                      <label>Local de Partida:</label>
+                      <input
+                        type="text"
+                        name="partida"
+                        value={novaCarona.partida}
+                        onChange={handleChange}
+                        className="form-control"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label>Local de Destino:</label>
+                      <input
+                        type="text"
+                        name="destino"
+                        value={novaCarona.destino}
+                        onChange={handleChange}
+                        className="form-control"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label>Data:</label>
+                      <input
+                        type="date"
+                        name="data"
+                        value={novaCarona.data}
+                        onChange={handleChange}
+                        min={new Date().toISOString().split("T")[0]}
+                        className="form-control"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label>Horário:</label>
+                      <input
+                        type="time"
+                        name="horario"
+                        value={novaCarona.horario}
+                        onChange={handleChange}
+                        className="form-control"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label>Vagas:</label>
+                      <input
+                        type="number"
+                        name="vagas"
+                        value={novaCarona.vagas}
+                        onChange={handleChange}
+                        min="1"
+                        className="form-control"
+                        required
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label>Ar-condicionado:</label>
+                      <select
+                        name="ar"
+                        value={novaCarona.ar}
+                        onChange={handleChange}
+                        className="form-control"
+                      >
+                        <option value="0">Desligado</option>
+                        <option value="1">Ligado</option>
+                      </select>
+                    </div>
+                    <div className="mb-3">
+                      <label>Música:</label>
+                      <input
+                        type="text"
+                        name="musica"
+                        value={novaCarona.musica}
+                        onChange={handleChange}
+                        className="form-control"
+                      />
+                    </div>
+                    <button type="submit" className="btn btn-primary">
+                      Criar
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger ms-2"
+                      onClick={handleCancel}
+                    >
+                      Cancelar
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+            </div>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </div>   
   );
-}
+} 
 
 export default DashboardMotorista;

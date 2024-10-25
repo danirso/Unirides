@@ -37,51 +37,76 @@ function Historico() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Histórico de Caronas</h2>
-        {user && user.role === 0 ? (
-          <Link to="/passageiro" className="btn btn-danger">
-            Voltar
-          </Link>
-        ) : (
-          <Link to="/motorista" className="btn btn-danger">
-            Voltar
-          </Link>
-        )}
-      </div>
-      {historico.length > 0 ? (
-        historico.map((viagem) => (
-          <div key={viagem.id} className="card mb-3">
-            <div className="card-body">
-              <h5 className="card-title">
-                {user.role === 0
-                  ? `Carona com ${viagem.motorista.nome} em ${new Date(
-                      viagem.horario
-                    ).toLocaleDateString('pt-BR')}`
-                  : `Carona em ${new Date(
-                      viagem.horario
-                    ).toLocaleDateString('pt-BR')}`}
-              </h5>
-              <p className="card-text">
-                Destino: {viagem.destino}
-                <br />
-                Partida: {viagem.partida}
-                <br />
-                Horário:{" "}
-                {new Date(viagem.horario).toLocaleTimeString('pt-BR', {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
+    <div
+      className="d-flex flex-column align-items-center vh-100"
+      style={{
+        background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
+        color: "#f7f9fc",
+        minHeight: "100vh",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <style>
+        {`
+          body, html {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            background-attachment: fixed;
+          }
+        `}
+      </style>
+      <div className="container mt-3">
+        {/* Cabeçalho */}
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              <h2>Histórico de Caronas</h2>
+              <div className="d-flex justify-content-between align-items-center">
+                <Link to={user && user.role === 0 ? "/passageiro" : "/motorista"} className="btn btn-danger">
+                  Voltar
+                </Link>
+              </div>
             </div>
           </div>
-        ))
-      ) : (
-        <p>Você não possui histórico de caronas.</p>
-      )}
+        </div>
+        {/* Lista de Caronas */}
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              {historico.length > 0 ? (
+                historico.map((viagem) => (
+                  <div key={viagem.id} className="card mb-3 shadow-sm" style={{ border: "none" }}>
+                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
+                      <h5 className="card-title">
+                        {user.role === 0
+                          ? `Carona com ${viagem.motorista.nome} em ${new Date(viagem.horario).toLocaleDateString("pt-BR")}`
+                          : `Carona em ${new Date(viagem.horario).toLocaleDateString("pt-BR")}`}
+                      </h5>
+                      <p className="card-text">
+                        Destino: {viagem.destino}
+                        <br />
+                        Partida: {viagem.partida}
+                        <br />
+                        Horário:{" "}
+                        {new Date(viagem.horario).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Você não possui histórico de caronas.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
+  
 }
 
 export default Historico;
