@@ -3,25 +3,24 @@ import { Link, useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState({
-    name: "",
-    id: "",
-  });
+  const [usuario, setUsuario] = useState({ name: "", id: "" });
   const [caronas, setCaronas] = useState([]);
   const [minhasCaronas, setMinhasCaronas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedData, setData] = useState("");
   const [selectedMotorista, setSelectedMotorista] = useState("");
-  const [selectedDestino, setSelectedDestino] = useState("");
   const [selectedHorario, setSelectedHorario] = useState("");
-  const [arCondicionado, setArCondicionado] = useState(false);
+  const [selectArCondicionado, setArCondicionado] = useState("");
   const [musica, setMusica] = useState("");
-  const [showFilters, setShowFilters] = useState(false); // Estado para controlar a exibição dos filtros
+  const [showFilters, setShowFilters] = useState(false);
   const [showMinhasCaronas, setShowMinhasCaronas] = useState(true);
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       setUsuario({
         name: user.nome,
+        id: user.id,
       });
       fetchMinhasCaronas(user.id);
     } else {
@@ -29,16 +28,23 @@ function Dashboard() {
     }
   }, [navigate]);
 
+  const handleArCondicionadoChange = (e) => {
+    setArCondicionado(e.target.value);
+  };
+
   // Filtra as caronas com base nos filtros
   const filteredCaronas = caronas.filter((carona) => {
-    const matchesMotorista = carona.motorista.nome.toLowerCase().includes(selectedMotorista.toLowerCase());
-    const matchesDestino = carona.destino.toLowerCase().includes(selectedDestino.toLowerCase());
-    const matchesHorario = selectedHorario ? new Date(carona.horario).getHours() === parseInt(selectedHorario) : true;
-    const matchesArCondicionado = arCondicionado ? carona.ar === true : true;
+    const matchesDestino = searchTerm ? carona.destino.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+    const matchesMotorista = selectedMotorista ? carona.motorista.nome.toLowerCase().includes(selectedMotorista.toLowerCase()) : true;
+    const matchesData = selectedData ? new Date(carona.data).toISOString().split("T")[0] === selectedData : true; //Precisa arrumar
+    const matchesHorario = selectedHorario ? carona.horario.startsWith(selectedHorario) : true;                //Precisa arrumar
+    const matchesArCondicionado = selectArCondicionado ? carona.ar.toString() === selectArCondicionado : true; //Precisa arrumar
     const matchesMusica = musica ? carona.musica.toLowerCase().includes(musica.toLowerCase()) : true;
 
     return (
-      (matchesMotorista || matchesDestino) &&
+      matchesDestino &&
+      matchesMotorista &&
+      matchesData &&
       matchesHorario &&
       matchesArCondicionado &&
       matchesMusica
@@ -60,7 +66,7 @@ function Dashboard() {
   };
 
   const solicitarCarona = (caronaId) => {
-    const idPassageiro = JSON.parse(localStorage.getItem("user")).id;
+    const idPassageiro = usuario.id;
     fetch(`http://localhost:3000/api/caronas/${caronaId}/solicitar`, {
       method: "PUT",
       headers: {
@@ -86,7 +92,7 @@ function Dashboard() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id_passageiro: JSON.parse(localStorage.getItem("user")).id }),
+      body: JSON.stringify({ id_passageiro: usuario.id }),
     })
       .then((response) => {
         if (response.ok) {
@@ -125,7 +131,6 @@ function Dashboard() {
         `}
       </style>
       <div className="container mt-3">
-        {/* Cabeçalho */}
         <div className="row mb-4">
           <div className="col-12">
             <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
@@ -146,80 +151,77 @@ function Dashboard() {
             </div>
           </div>
         </div>
-        {/* Barra de Pesquisa e Filtros */}
         <div className="row mb-4">
           <div className="col-12">
             <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
               <input
                 type="text"
                 className="form-control form-control-lg mb-3"
-                placeholder="Pesquisar caronas disponíveis"
+                placeholder="Para onde deseja ir?"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <button
                 className="btn btn-secondary mb-2"
-                onClick={() => setShowFilters(!showFilters)}
-              >
+                onClick={() => setShowFilters(!showFilters)}>
                 {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
               </button>
               {showFilters && (
                 <div className="card mb-3 shadow-sm">
-                  <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40 ", color: "#f7f9fc" }}> 
+                  <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40 ", color: "#f7f9fc" }}>
                     <h4 className="mb-3">Filtros</h4>
                     <div className="mb-2">
                       <label className="form-label">Motorista:</label>
-                      <select
-                        className="form-select"
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Digite o motorista"
                         value={selectedMotorista}
                         onChange={(e) => setSelectedMotorista(e.target.value)}
-                      >
-                        <option value="">Selecione um motorista</option>
-                      </select>
+                      />
                     </div>
-                    <div className="mb-2">
-                      <label className="form-label">Destino:</label>
-                      <select
-                        className="form-select"
-                        value={selectedDestino}
-                        onChange={(e) => setSelectedDestino(e.target.value)}
-                      >
-                        <option value="">Selecione um destino</option>
-                      </select>
+                    <div className="mb-3">
+                      <label>Data:</label>
+                      <input
+                        type="date"
+                        name="data"
+                        value={selectedData}
+                        onChange={(e) => setData(e.target.value)}
+                        min={new Date().toISOString().split("T")[0]}
+                        className="form-control"
+                        required
+                      />
                     </div>
                     <div className="mb-2">
                       <label className="form-label">Horário:</label>
-                      <select
-                        className="form-select"
+                      <input
+                        type="time"
+                        className="form-control"
                         value={selectedHorario}
                         onChange={(e) => setSelectedHorario(e.target.value)}
-                      >
-                        <option value="">Selecione uma hora</option>
-                        {Array.from({ length: 24 }, (_, i) => (
-                          <option key={i} value={i}>
-                            {i}:00
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="form-check mb-2">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={arCondicionado}
-                        onChange={(e) => setArCondicionado(e.target.checked)}
                       />
-                      <label className="form-check-label">Ar-condicionado</label>
+                    </div>
+                    <div className="mb-2">
+                      <label className="form-label">Ar-condicionado:</label>
+                      <select
+                        className="form-select"
+                        value={selectArCondicionado}
+                        onChange={handleArCondicionadoChange}
+                      >
+                        <option value="">Selecione</option>
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                      </select>
                     </div>
                     <div className="mb-2">
                       <label className="form-label">Música:</label>
-                      <select
-                        className="form-select"
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Digite o estilo de música"
                         value={musica}
                         onChange={(e) => setMusica(e.target.value)}
-                      >
-                        <option value="">Selecione uma preferência musical</option>
-                      </select>
+                      />
                     </div>
                   </div>
                 </div>
@@ -252,6 +254,8 @@ function Dashboard() {
                         Vagas disponíveis: {carona.vagas_disponiveis}
                         <br />
                         Ar-condicionado: {carona.ar ? "Sim" : "Não"}
+                        <br /> 
+                        Música: {carona.musica}
                       </p>
                       <button
                         className="btn btn-success"
@@ -263,7 +267,7 @@ function Dashboard() {
                   </div>
                 ))
               ) : (
-                <p>Nenhuma carona disponível no momento.</p>
+                <p>Nenhuma carona disponível corresponde a pesquisa feita.</p>
               )}
             </div>
           </div>
@@ -303,6 +307,8 @@ function Dashboard() {
                             Vagas disponíveis: {carona.vagas_disponiveis}
                             <br />
                             Ar-condicionado: {carona.ar ? "Sim" : "Não"}
+                            <br />
+                            Música: {carona.musica}
                           </p>
                           <button
                             className="btn btn-danger"
