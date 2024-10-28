@@ -136,6 +136,9 @@ app.get("/api/caronas/minhas", async (req, res) => {
 
   try {
     const minhasCaronas = await Carona.findAll({
+      where:{
+        horario : {[Op.gte]:new Date()}
+      },
       include: [
         { model: Usuario, as: "motorista", attributes: ["nome"] },
         {
