@@ -196,10 +196,12 @@ function Dashboard() {
                       <label className="form-label">Horário:</label>
                       <input
                         type="time"
-                        className="form-control"
+                        name="horario"
                         value={selectedHorario}
                         onChange={(e) => setSelectedHorario(e.target.value)}
-                      />
+                        className="form-control"
+                        required
+                     />
                     </div>
                     <div className="mb-2">
                       <label className="form-label">Ar-condicionado:</label>
@@ -209,8 +211,8 @@ function Dashboard() {
                         onChange={handleArCondicionadoChange}
                       >
                         <option value="">Selecione</option>
-                        <option value="true">Sim</option>
-                        <option value="false">Não</option>
+                        <option value="1">Ligado</option>
+                        <option value="0">Desligado</option>
                       </select>
                     </div>
                     <div className="mb-2">

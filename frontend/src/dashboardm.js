@@ -15,7 +15,7 @@ function DashboardMotorista() {
     data: "",
     horario: "",
     vagas: 1,
-    ar: false,
+    ar: 0,
     musica: "",
   });
 
@@ -84,7 +84,7 @@ function DashboardMotorista() {
             data: "",
             horario: "",
             vagas: 1,
-            ar: false,
+            ar: 0,
             musica: "",
           });
         }
@@ -118,7 +118,7 @@ function DashboardMotorista() {
       data: "",
       horario: "",
       vagas: 1,
-      ar: false, 
+      ar: 0, 
       musica: "",
     });
   };
