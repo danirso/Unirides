@@ -36,8 +36,8 @@ function Dashboard() {
   const filteredCaronas = caronas.filter((carona) => {
     const matchesDestino = searchTerm ? carona.destino.toLowerCase().includes(searchTerm.toLowerCase()) : true;
     const matchesMotorista = selectedMotorista ? carona.motorista.nome.toLowerCase().includes(selectedMotorista.toLowerCase()) : true;
-    const matchesData = selectedData ? new Date(carona.data).toISOString().split("T")[0] === selectedData : true;
-    const matchesHorario = selectedHorario ? carona.horario.startsWith(selectedHorario) : true;
+    const matchesData = selectedData ? new Date(carona.horario).toISOString().split("T")[0] === selectedData : true;
+    const matchesHorario = selectedHorario ? new Date(carona.horario).toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit",}).startsWith(selectedHorario) : true;
     const matchesArCondicionado = selectArCondicionado ? carona.ar.toString() === selectArCondicionado : true;
     const matchesMusica = musica ? carona.musica.toLowerCase().includes(musica.toLowerCase()) : true;
 
@@ -255,7 +255,7 @@ function Dashboard() {
                         <br />
                         Vagas disponíveis: {carona.vagas_disponiveis}
                         <br />
-                        Ar-condicionado: {carona.ar ? "Sim" : "Não"}
+                        Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
                         <br /> 
                         Música: {carona.musica}
                       </p>
