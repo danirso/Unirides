@@ -149,10 +149,10 @@ function Dashboard() {
               <h2>Bem-vindo, {usuario.name}!</h2>
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <Link to="/perfil-passageiro" className="btn btn-primary me-2">
+                  <Link to="/perfil-passageiro" className="btn btn-outline-success mb-2">
                     Ver Perfil Completo
                   </Link>
-                  <Link to="/historico" className="btn btn-info">
+                  <Link to="/historico" className="btn btn-outline-info mb-2">
                     Ver Histórico
                   </Link>
                 </div>
@@ -174,7 +174,7 @@ function Dashboard() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <button
-                className="btn btn-secondary mb-2"
+                className="btn btn-outline-light mb-2"
                 onClick={() => setShowFilters(!showFilters)}>
                 {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
               </button>
@@ -248,7 +248,7 @@ function Dashboard() {
                       />
                     </div>
                     <button
-                      className="btn btn-info mb-2"
+                      className="btn btn-outline-info"
                       onClick={limparFiltros}>
                       Limpar filtros
                     </button>
@@ -308,7 +308,7 @@ function Dashboard() {
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h3>Minhas Caronas</h3>
                 <button
-                  className="btn btn-secondary"
+                  className="btn btn-outline-light"
                   onClick={() => setShowMinhasCaronas(!showMinhasCaronas)}
                 >
                   {showMinhasCaronas ? "Ocultar" : "Mostrar"}
