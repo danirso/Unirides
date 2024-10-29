@@ -11,6 +11,7 @@ function Dashboard() {
   const [selectedMotorista, setSelectedMotorista] = useState("");
   const [selectedHorario, setSelectedHorario] = useState("");
   const [selectArCondicionado, setArCondicionado] = useState("");
+  const [SelectedPartida, setSelectedPartida] = useState("");
   const [musica, setMusica] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showMinhasCaronas, setShowMinhasCaronas] = useState(true);
@@ -36,14 +37,15 @@ function Dashboard() {
   const filteredCaronas = caronas.filter((carona) => {
     const matchesDestino = searchTerm ? carona.destino.toLowerCase().includes(searchTerm.toLowerCase()) : true;
     const matchesMotorista = selectedMotorista ? carona.motorista.nome.toLowerCase().includes(selectedMotorista.toLowerCase()) : true;
+    const matchesPartida = SelectedPartida ? carona.partida.toLowerCase().includes(SelectedPartida.toLowerCase()) : true;
     const matchesData = selectedData ? new Date(carona.horario).toISOString().split("T")[0] === selectedData : true;
     const matchesHorario = selectedHorario ? new Date(carona.horario).toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit",}).startsWith(selectedHorario) : true;
     const matchesArCondicionado = selectArCondicionado ? carona.ar.toString() === selectArCondicionado : true;
     const matchesMusica = musica ? carona.musica.toLowerCase().includes(musica.toLowerCase()) : true;
-
     return (
       matchesDestino &&
       matchesMotorista &&
+      matchesPartida &&
       matchesData &&
       matchesHorario &&
       matchesArCondicionado &&
@@ -170,6 +172,16 @@ function Dashboard() {
                 <div className="card mb-3 shadow-sm">
                   <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40 ", color: "#f7f9fc" }}>
                     <h4 className="mb-3">Filtros</h4>
+                    <div className="mb-2">
+                      <label className="form-label">Local de partida:</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Digite o local de partida"
+                        value={SelectedPartida}
+                        onChange={(e) => setSelectedPartida(e.target.value)}
+                      />
+                    </div>
                     <div className="mb-2">
                       <label className="form-label">Motorista:</label>
                       <input
