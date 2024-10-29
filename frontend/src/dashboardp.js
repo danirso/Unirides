@@ -53,6 +53,16 @@ function Dashboard() {
     );
   });
 
+  const limparFiltros = () => {
+    setData("");
+    setSelectedHorario("");
+    setArCondicionado("");
+    setSelectedPartida("");
+    setSelectedMotorista("");
+    setMusica("");
+  };
+  
+
   useEffect(() => {
     fetch("http://localhost:3000/api/caronas")
       .then((response) => response.json())
@@ -237,6 +247,11 @@ function Dashboard() {
                         onChange={(e) => setMusica(e.target.value)}
                       />
                     </div>
+                    <button
+                      className="btn btn-info mb-2"
+                      onClick={limparFiltros}>
+                      Limpar filtros
+                    </button>
                   </div>
                 </div>
               )}
@@ -320,7 +335,7 @@ function Dashboard() {
                             <br />
                             Vagas disponíveis: {carona.vagas_disponiveis}
                             <br />
-                            Ar-condicionado: {carona.ar ? "Sim" : "Não"}
+                            Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
                             <br />
                             Música: {carona.musica}
                           </p>
