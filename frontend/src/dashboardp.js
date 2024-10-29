@@ -142,6 +142,7 @@ function Dashboard() {
           }
         `}
       </style>
+      {/* Cabeçalho */}
       <div className="container mt-3">
         <div className="row mb-4">
           <div className="col-12">
@@ -149,10 +150,10 @@ function Dashboard() {
               <h2>Bem-vindo, {usuario.name}!</h2>
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <Link to="/perfil-passageiro" className="btn btn-outline-success mb-2">
+                  <Link to="/perfil-passageiro" className="btn btn-success mb-2">
                     Ver Perfil Completo
                   </Link>
-                  <Link to="/historico" className="btn btn-outline-info mb-2">
+                  <Link to="/historico" className="btn btn-info mb-2">
                     Ver Histórico
                   </Link>
                 </div>
@@ -163,6 +164,7 @@ function Dashboard() {
             </div>
           </div>
         </div>
+        {/* Filtros */}
         <div className="row mb-4">
           <div className="col-12">
             <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
@@ -180,7 +182,7 @@ function Dashboard() {
               </button>
               {showFilters && (
                 <div className="card mb-3 shadow-sm">
-                  <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40 ", color: "#f7f9fc" }}>
+                  <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
                     <h4 className="mb-3">Filtros</h4>
                     <div className="mb-2">
                       <label className="form-label">Local de partida:</label>
@@ -248,7 +250,7 @@ function Dashboard() {
                       />
                     </div>
                     <button
-                      className="btn btn-outline-info"
+                      className="btn btn-info"
                       onClick={limparFiltros}>
                       Limpar filtros
                     </button>

@@ -91,8 +91,18 @@ function Signup() {
         padding: "20px",
       }}
     >
-      <div className="form-container bg-light p-4 rounded" style={formContainerStyle}>
-        <h3 className="text-center mb-4" style={{ color: "#16213E" }}>Crie sua conta</h3>
+      <div
+        className="p-4 rounded shadow-lg"
+        style={{
+          backgroundColor: "#343a40",
+          color: "#f7f9fc",
+          width: "100%",
+          maxWidth: "400px",
+          borderRadius: "12px",
+          marginTop: "150px", 
+        }}
+      >
+        <h3 className="text-center mb-4" style={{ color: "#f7f9fc" }}>Crie sua conta</h3>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-3">

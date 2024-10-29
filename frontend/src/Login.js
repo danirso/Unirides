@@ -66,24 +66,25 @@ function Login() {
           transform: "translateX(-50%)",
           width: "150px",
           zIndex: 10,
-          paddingTop: "20px", // Adicionando padding no topo para espaçamento extra
+          paddingTop: "20px",
         }}
       />
 
       <div
         className="p-4 rounded shadow-lg"
         style={{
-          backgroundColor: "#f7f9fc",
+          backgroundColor: "#343a40",
+          color: "#f7f9fc",
           width: "100%",
           maxWidth: "400px",
           borderRadius: "12px",
-          marginTop: "150px", // Ajustando a margem superior
+          marginTop: "150px", 
         }}
       >
-        <h2 className="text-center mb-4" style={{ color: "#0d1b2a" }}>
+        <h2 className="text-center mb-4" style={{ color: "#f7f9fc" }}>
           Sistema de Caronas
         </h2>
-        <h5 className="text-center mb-3" style={{ color: "#1f3b4d" }}>
+        <h5 className="text-center mb-3" style={{ color: "#f7f9fc" }}>
           Seja bem-vindo!
         </h5>
         <form onSubmit={handleSubmit}>
@@ -160,7 +161,7 @@ function Login() {
             to="/signup"
             className="btn w-100 text-decoration-none"
             style={{
-              backgroundColor: "#f0f4f8",
+              backgroundColor: "#D3D3D3",
               padding: "10px",
               fontWeight: "bold",
               borderRadius: "8px",
