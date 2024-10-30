@@ -150,7 +150,7 @@ function DashboardMotorista() {
             <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
               <h2>Bem-vindo, {usuario.name}!</h2>
               <div className="d-flex justify-content-between align-items-center">
-                <div>
+                <div className="mb-4">
                   <Link to="/perfil-passageiro" className="btn btn-primary me-2">
                     Ver Perfil Completo
                   </Link>
