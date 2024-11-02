@@ -1,32 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function PerfilPassageiro() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [formData, setFormData] = useState({
-    nome: user.nome,
-    email: user.email,
-    celular: user.celular,
-    ra: user.ra,
-  });
+  const [usuario, setUsuario] = useState({ nome: "", id: "", email: "", celular: "", ra: "" });
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user")); 
+
+  useEffect(() => {
+    if (user && user.id) { // Verifica se o user está disponível
+      // Carrega os dados do usuário do backend
+      axios.get(`/api/usuario/${user.id}`)
+        .then(response => {
+          setUsuario(response.data);
+        })
+        .catch(error => {
+          console.error("Erro ao carregar os dados do usuário:", error);
+          alert("Não foi possível carregar os dados do usuário. Tente novamente mais tarde.");
+        });
+    }
+  }, [user]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setUsuario(prevUsuario => ({ ...prevUsuario, [name]: value })); // Atualiza o usuário localmente
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`http://localhost:3000/api/usuario/${user.id}`, formData);
-      alert(response.data.message);
-      localStorage.setItem("user", JSON.stringify(response.data.usuario));
+      await axios.put(`/api/usuario/${user.id}`, usuario); // Atualiza o usuário no backend
+      alert("Informações atualizadas com sucesso!");
       setEditing(false);
+      // Atualize o localStorage para refletir os dados atualizados
+      localStorage.setItem("user", JSON.stringify({ ...user, ...usuario }));
     } catch (error) {
-      console.error("Erro ao atualizar as informações:", error);
-      alert("Erro ao atualizar as informações.");
+      console.error("Erro ao atualizar as informações do usuário:", error);
+      alert("Erro ao atualizar as informações. Tente novamente mais tarde.");
     }
   };
 
@@ -36,20 +47,10 @@ function PerfilPassageiro() {
 
   return (
     <div className="d-flex flex-column align-items-center vh-100" style={{ background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)", color: "#f7f9fc", minHeight: "100vh", backgroundAttachment: "fixed" }}>
-      <style>
-        {`
-          body, html {
-            height: 100%;
-            margin: 0;
-            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-            background-attachment: fixed;
-          }
-        `}
-      </style>
       <div className="container mt-3">
-        <div className="card shadow-sm p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}> 
+        <div className="card shadow-sm p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
           <div className="card-header d-flex justify-content-between align-items-center" style={{ backgroundColor: "#1f3b4d" }}>
-            <h3 className="mb-0" style={{ color: "white" }}>Área do {formData.nome}</h3>
+            <h3 className="mb-0" style={{ color: "white" }}>Área do {user.nome}</h3>
           </div>
           <div className="card-body">
             {editing ? (
@@ -63,8 +64,8 @@ function PerfilPassageiro() {
                       type="text"
                       className="form-control"
                       name="nome"
-                      value={formData.nome}
-                      onChange={handleChange}
+                      value={usuario.nome}
+                      onChange={handleChange} // Adiciona o manipulador onChange
                       style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
@@ -78,8 +79,8 @@ function PerfilPassageiro() {
                       type="email"
                       className="form-control"
                       name="email"
-                      value={formData.email}
-                      onChange={handleChange}
+                      value={usuario.email}
+                      onChange={handleChange} // Adiciona o manipulador onChange
                       style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
@@ -93,8 +94,8 @@ function PerfilPassageiro() {
                       type="text"
                       className="form-control"
                       name="celular"
-                      value={formData.celular}
-                      onChange={handleChange}
+                      value={usuario.celular}
+                      onChange={handleChange} // Adiciona o manipulador onChange
                       style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
@@ -108,8 +109,8 @@ function PerfilPassageiro() {
                       type="text"
                       className="form-control"
                       name="ra"
-                      value={formData.ra}
-                      onChange={handleChange}
+                      value={usuario.ra}
+                      onChange={handleChange} // Adiciona o manipulador onChange
                       style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
@@ -125,10 +126,10 @@ function PerfilPassageiro() {
               </form>
             ) : (
               <div>
-                <p style={{ color: "white" }}><strong>Nome:</strong> {formData.nome}</p>
-                <p style={{ color: "white" }}><strong>Email:</strong> {formData.email}</p>
-                <p style={{ color: "white" }}><strong>Celular:</strong> {formData.celular}</p>
-                <p style={{ color: "white" }}><strong>RA:</strong> {formData.ra}</p>
+                <p style={{ color: "white" }}><strong>Nome:</strong> {usuario.nome}</p>
+                <p style={{ color: "white" }}><strong>Email:</strong> {usuario.email}</p>
+                <p style={{ color: "white" }}><strong>Celular:</strong> {usuario.celular}</p>
+                <p style={{ color: "white" }}><strong>RA:</strong> {usuario.ra}</p>
                 <div className="d-flex justify-content-between">
                   <button className="btn btn-info" onClick={() => setEditing(true)}>
                     Editar Informações

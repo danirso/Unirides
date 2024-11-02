@@ -8,6 +8,9 @@ const { Op, where } = require("sequelize");
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
 
+const usuarioRoutes = require('./routes/usuario');
+
+app.use('/api/usuario', usuarioRoutes);
 
 // Rota de API para buscar caronas disponíveis
 app.get("/api/caronas", async (req, res) => {
@@ -28,7 +31,6 @@ app.get("/api/caronas", async (req, res) => {
   }
 });
 
-//
 app.get("/api/motorista/:id/caronas", async (req, res) => {
   const { id } = req.params;
   console.log("Requisição recebida para o motorista ID:", id);
@@ -42,7 +44,7 @@ app.get("/api/motorista/:id/caronas", async (req, res) => {
     });
 
     if (caronasMotorista.length === 0) {
-      console.log("Nenhuma carona encontrada para o motorista ID:", id); // Log para verificar se há caronas
+      console.log("Nenhuma carona encontrada para o motorista ID:", id);
       return res
         .status(404)
         .json({ error: "Nenhuma carona encontrada para este motorista" });
@@ -57,17 +59,15 @@ app.get("/api/motorista/:id/caronas", async (req, res) => {
 
 // Rota para o motorista criar uma nova carona
 app.post("/api/motorista/:id/caronas", async (req, res) => {
-  const { id } = req.params; // ID do motorista
-  const { destino, horario, partida, vagas, ar, musica } = req.body; // Dados da carona
+  const { id } = req.params;
+  const { destino, horario, partida, vagas, ar, musica } = req.body;
 
   try {
-    // Verifica se o usuário é um motorista
     const motorista = await Usuario.findOne({ where: { id, role: 1 } });
     if (!motorista) {
       return res.status(400).json({ error: "Usuário não é um motorista" });
     }
 
-    // Cria a carona
     const novaCarona = await Carona.create({
       id_motorista: id,
       destino,
@@ -100,12 +100,10 @@ app.put("/api/caronas/:id/solicitar", async (req, res) => {
       return res.status(404).json({ error: "Carona não encontrada" });
     }
 
-    // Verifica se há vagas disponíveis
     if (carona.vagas_disponiveis <= 0) {
       return res.status(400).json({ error: "Não há vagas disponíveis" });
     }
 
-    // Verifica se o passageiro já está na carona
     const passageiroExistente = await PassageirosCaronas.findOne({
       where: { id_passageiro, id_carona: id },
     });
@@ -114,13 +112,11 @@ app.put("/api/caronas/:id/solicitar", async (req, res) => {
       return res.status(400).json({ error: "Você já está nesta carona" });
     }
 
-    // Adiciona o passageiro à carona
     await PassageirosCaronas.create({
       id_passageiro,
       id_carona: id,
     });
 
-    // Atualiza as vagas disponíveis
     carona.vagas_disponiveis -= 1;
     await carona.save();
 
@@ -137,8 +133,8 @@ app.get("/api/caronas/minhas", async (req, res) => {
 
   try {
     const minhasCaronas = await Carona.findAll({
-      where:{
-        horario : {[Op.gte]:new Date()}
+      where: {
+        horario: { [Op.gte]: new Date() }
       },
       include: [
         { model: Usuario, as: "motorista", attributes: ["nome"] },
@@ -239,7 +235,7 @@ app.delete("/api/caronas/:id/cancelar", async (req, res) => {
       return res.status(404).json({ message: "Carona não encontrada." });
     }
 
-    await carona.destroy(); // Deleta a carona do banco
+    await carona.destroy();
 
     res.status(200).json({ message: "Carona cancelada com sucesso!" });
   } catch (error) {
@@ -281,30 +277,25 @@ app.get("/api/historico/:userId/passageiro", async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const viagens = await Carona.findAll({
+    const caronasPassageiro = await Carona.findAll({
       where: {
         horario: { [Op.lt]: new Date() },
       },
       include: [
         {
           model: Usuario,
-          as: "motorista",
-          attributes: ["nome"],
-        },
-        {
-          model: Usuario,
           as: "passageiros",
           where: { id: userId },
-          attributes: ["id", "nome"],
+          attributes: ["id"],
           through: { attributes: [] },
         },
       ],
     });
 
-    res.json(viagens);
+    res.json(caronasPassageiro);
   } catch (error) {
-    console.error("Erro ao obter o histórico de caronas:", error);
-    res.status(500).json({ error: "Erro ao obter o histórico de caronas" });
+    console.error("Erro ao buscar histórico de caronas do passageiro:", error);
+    res.status(500).json({ error: "Erro ao buscar histórico" });
   }
 });
 
@@ -312,53 +303,33 @@ app.get("/api/historico/:userId/motorista", async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const viagens = await Carona.findAll({
+    const caronasMotorista = await Carona.findAll({
       where: {
+        id_motorista: userId,
         horario: { [Op.lt]: new Date() },
       },
-      include: [
-        {
-          model: Usuario,
-          as: "motorista",
-          where: { id: userId },
-          attributes: [],
-        },
-      ],
     });
 
-    res.json(viagens);
+    res.json(caronasMotorista);
   } catch (error) {
-    console.error("Erro ao obter o histórico de caronas:", error);
-    res.status(500).json({ error: "Erro ao obter o histórico de caronas" });
+    console.error("Erro ao buscar histórico de caronas do motorista:", error);
+    res.status(500).json({ error: "Erro ao buscar histórico" });
   }
 });
 
-/*app.put("/api/passageiro/:id", async (req, res) => {
-  const { id } = req.params;
-  const { nome, email, celular, ra } = req.body;
-
+// Rota para buscar informações de um usuário específico
+app.get("/api/usuario/:id", async (req, res) => {
   try {
-    const usuario = await Usuario.findByPk(id);
-    if (!usuario) {
-      return res.status(404).json({ error: "Usuário não encontrado" });
-    }
-
-    // Atualize as informações do usuário
-    usuario.nome = nome || usuario.nome;
-    usuario.email = email || usuario.email;
-    usuario.celular = celular || usuario.celular;
-    usuario.ra = ra || usuario.ra;
-
-    await usuario.save();
-
-    res.json({ message: "Informações atualizadas com sucesso!", usuario });
+      const usuario = await Usuario.findByPk(req.params.id);
+      if (usuario) {
+          return res.status(200).json(usuario);
+      }
+      return res.status(404).json({ message: 'Usuário não encontrado' });
   } catch (error) {
-    console.error("Erro ao atualizar informações do usuário:", error);
-    res.status(500).json({ error: "Erro ao atualizar informações" });
+      console.error('Erro ao buscar usuário:', error);
+      res.status(500).json({ message: 'Erro ao buscar usuário' });
   }
 });
-*/
-
 
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, "..", "frontend", "build")));
