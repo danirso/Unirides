@@ -8,6 +8,7 @@ const { Op, where } = require("sequelize");
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
 
+
 // Rota de API para buscar caronas disponíveis
 app.get("/api/caronas", async (req, res) => {
   try {
@@ -331,6 +332,33 @@ app.get("/api/historico/:userId/motorista", async (req, res) => {
     res.status(500).json({ error: "Erro ao obter o histórico de caronas" });
   }
 });
+
+/*app.put("/api/passageiro/:id", async (req, res) => {
+  const { id } = req.params;
+  const { nome, email, celular, ra } = req.body;
+
+  try {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+
+    // Atualize as informações do usuário
+    usuario.nome = nome || usuario.nome;
+    usuario.email = email || usuario.email;
+    usuario.celular = celular || usuario.celular;
+    usuario.ra = ra || usuario.ra;
+
+    await usuario.save();
+
+    res.json({ message: "Informações atualizadas com sucesso!", usuario });
+  } catch (error) {
+    console.error("Erro ao atualizar informações do usuário:", error);
+    res.status(500).json({ error: "Erro ao atualizar informações" });
+  }
+});
+*/
+
 
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, "..", "frontend", "build")));

@@ -151,7 +151,7 @@ function DashboardMotorista() {
               <h2>Bem-vindo, {usuario.name}!</h2>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="mb-4">
-                  <Link to="/perfil-passageiro" className="btn btn-primary me-2">
+                  <Link to="/perfil-motorista" className="btn btn-primary me-2">
                     Ver Perfil Completo
                   </Link>
                   <Link to="/historico" className="btn btn-info">

@@ -1,33 +1,178 @@
-import React from "react";
-import "./PerfilM.css"; // Importe um arquivo CSS para customizações adicionais
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function PerfilMotorista() {
-  const user = JSON.parse(localStorage.getItem("user")); // Pega as informações do usuário logado
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [formData, setFormData] = useState({
+    nome: user.nome,
+    email: user.email,
+    celular: user.celular,
+    ra: user.ra,
+    modeloCarro: user.modeloCarro || "",
+    placaCarro: user.placa || "",
+  });
+  const [editing, setEditing] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.put(`http://localhost:3000/api/usuario/${user.id}`, formData);
+      alert(response.data.message);
+      localStorage.setItem("user", JSON.stringify(response.data.usuario));
+      setEditing(false);
+    } catch (error) {
+      console.error("Erro ao atualizar as informações:", error);
+      alert("Erro ao atualizar as informações.");
+    }
+  };
+
+  const handleBackToDashboard = () => {
+    navigate("/motorista");
+  };
 
   return (
-    <div className="perfil-container mt-5">
-      <div className="perfil-card">
-        <div className="perfil-header">
-          <h3>Perfil Completo do Motorista</h3>
-        </div>
-        <div className="perfil-content">
-          <div className="perfil-item">
-            <strong>Nome:</strong> <span>{user.nome}</span>
+    <div className="d-flex flex-column align-items-center vh-100" style={{ background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)", color: "#f7f9fc", minHeight: "100vh", backgroundAttachment: "fixed" }}>
+      <style>
+        {`
+          body, html {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            background-attachment: fixed;
+          }
+        `}
+      </style>
+      <div className="container mt-3">
+        <div className="card shadow-sm p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+          <div className="card-header d-flex justify-content-between align-items-center" style={{ backgroundColor: "#1f3b4d" }}>
+            <h3 className="mb-0" style={{ color: "white" }}>Área do {formData.nome}</h3>
           </div>
-          <div className="perfil-item">
-            <strong>Email:</strong> <span>{user.email}</span>
-          </div>
-          <div className="perfil-item">
-            <strong>Telefone:</strong> <span>{user.telefone}</span>
-          </div>
-          <div className="perfil-item">
-            <strong>RA:</strong> <span>{user.RA}</span>
-          </div>
-          <div className="perfil-item">
-            <strong>Modelo do Carro:</strong> <span>{user.carroModelo || "Não informado"}</span>
-          </div>
-          <div className="perfil-item">
-            <strong>Placa do Carro:</strong> <span>{user.carroPlaca || "Não informada"}</span>
+          <div className="card-body">
+            {editing ? (
+              <form onSubmit={handleSubmit}>
+                <div className="row mb-3">
+                  <div className="col-md-4">
+                    <strong style={{ color: "white" }}>Nome:</strong>
+                  </div>
+                  <div className="col-md-8">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="nome"
+                      value={formData.nome}
+                      onChange={handleChange}
+                      style={{ backgroundColor: "white", color: "black" }}
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-4">
+                    <strong style={{ color: "white" }}>Email:</strong>
+                  </div>
+                  <div className="col-md-8">
+                    <input
+                      type="email"
+                      className="form-control"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      style={{ backgroundColor: "white", color: "black" }}
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-4">
+                    <strong style={{ color: "white" }}>Celular:</strong>
+                  </div>
+                  <div className="col-md-8">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="celular"
+                      value={formData.celular}
+                      onChange={handleChange}
+                      style={{ backgroundColor: "white", color: "black" }}
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-4">
+                    <strong style={{ color: "white" }}>RA:</strong>
+                  </div>
+                  <div className="col-md-8">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="ra"
+                      value={formData.ra}
+                      onChange={handleChange}
+                      style={{ backgroundColor: "white", color: "black" }}
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-4">
+                    <strong style={{ color: "white" }}>Modelo do Carro:</strong>
+                  </div>
+                  <div className="col-md-8">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="modeloCarro"
+                      value={formData.modeloCarro}
+                      onChange={handleChange}
+                      style={{ backgroundColor: "white", color: "black" }}
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-4">
+                    <strong style={{ color: "white" }}>Placa do Carro:</strong>
+                  </div>
+                  <div className="col-md-8">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="placaCarro"
+                      value={formData.placa}
+                      onChange={handleChange}
+                      style={{ backgroundColor: "white", color: "black" }}
+                    />
+                  </div>
+                </div>
+                <div className="d-flex justify-content-between">
+                  <button type="submit" className="btn btn-success me-2">
+                    Atualizar
+                  </button>
+                  <button type="button" className="btn btn-outline-danger" onClick={() => setEditing(false)}>
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div>
+                <p style={{ color: "white" }}><strong>Nome:</strong> {formData.nome}</p>
+                <p style={{ color: "white" }}><strong>Email:</strong> {formData.email}</p>
+                <p style={{ color: "white" }}><strong>Celular:</strong> {formData.celular}</p>
+                <p style={{ color: "white" }}><strong>RA:</strong> {formData.ra}</p>
+                <p style={{ color: "white" }}><strong>Modelo do Carro:</strong> {formData.modeloCarro}</p>
+                <p style={{ color: "white" }}><strong>Placa do Carro:</strong> {formData.placa}</p>
+                <div className="d-flex justify-content-between">
+                  <button className="btn btn-info" onClick={() => setEditing(true)}>
+                    Editar Informações
+                  </button>
+                  <button className="btn btn-outline-danger" onClick={handleBackToDashboard}>
+                    Voltar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
