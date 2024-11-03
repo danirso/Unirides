@@ -284,6 +284,11 @@ app.get("/api/historico/:userId/passageiro", async (req, res) => {
       include: [
         {
           model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+        },
+        {
+          model: Usuario,
           as: "passageiros",
           where: { id: userId },
           attributes: ["id"],
