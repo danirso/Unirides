@@ -9,8 +9,8 @@ function PerfilPassageiro() {
   const user = JSON.parse(localStorage.getItem("user")); 
 
   useEffect(() => {
-    if (user && user.id) { // Verifica se o user está disponível
-      // Carrega os dados do usuário do backend
+    if (user && user.id) {
+      // Carrega os dados do usuário apenas uma vez no carregamento inicial
       axios.get(`/api/usuario/${user.id}`)
         .then(response => {
           setUsuario(response.data);
@@ -20,11 +20,11 @@ function PerfilPassageiro() {
           alert("Não foi possível carregar os dados do usuário. Tente novamente mais tarde.");
         });
     }
-  }, [user]);
+  }, []); // Remova `user` das dependências para evitar chamadas excessivas
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUsuario(prevUsuario => ({ ...prevUsuario, [name]: value })); // Atualiza o usuário localmente
+    setUsuario(prevUsuario => ({ ...prevUsuario, [name]: value })); // Atualiza o estado corretamente
   };
 
   const handleSubmit = async (e) => {
@@ -65,7 +65,7 @@ function PerfilPassageiro() {
                       className="form-control"
                       name="nome"
                       value={usuario.nome}
-                      onChange={handleChange} // Adiciona o manipulador onChange
+                      onChange={handleChange}
                       style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
@@ -80,7 +80,7 @@ function PerfilPassageiro() {
                       className="form-control"
                       name="email"
                       value={usuario.email}
-                      onChange={handleChange} // Adiciona o manipulador onChange
+                      onChange={handleChange}
                       style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
@@ -95,7 +95,7 @@ function PerfilPassageiro() {
                       className="form-control"
                       name="celular"
                       value={usuario.celular}
-                      onChange={handleChange} // Adiciona o manipulador onChange
+                      onChange={handleChange}
                       style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
@@ -110,7 +110,7 @@ function PerfilPassageiro() {
                       className="form-control"
                       name="ra"
                       value={usuario.ra}
-                      onChange={handleChange} // Adiciona o manipulador onChange
+                      onChange={handleChange}
                       style={{ backgroundColor: "white", color: "black" }}
                     />
                   </div>
