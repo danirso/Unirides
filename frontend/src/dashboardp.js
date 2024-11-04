@@ -148,17 +148,17 @@ function Dashboard() {
           <div className="col-12">
             <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
               <h2>Bem-vindo, {usuario.name}!</h2>
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="mb-4">
-                  <Link to="/perfil-passageiro" className="btn btn-success me-2">
-                    Ver Perfil Completo
-                  </Link>
-                  <Link to="/historico" className="btn btn-info">
-                    Ver Histórico
-                  </Link>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <Link to="/perfil-passageiro" className="btn btn-success me-2">
+                        Ver Perfil Completo
+                    </Link>
+                    <Link to="/historico" className="btn btn-info me-2">
+                        Ver Histórico
+                    </Link>
                 </div>
                 <button className="btn btn-outline-danger" onClick={handleLogout}>
-                  Logout
+                    Logout
                 </button>
               </div>
             </div>
@@ -250,7 +250,7 @@ function Dashboard() {
                       />
                     </div>
                     <button
-                      className="btn btn-info"
+                      className="btn btn-warning"
                       onClick={limparFiltros}>
                       Limpar filtros
                     </button>
