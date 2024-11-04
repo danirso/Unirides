@@ -336,6 +336,33 @@ app.get("/api/usuario/:id", async (req, res) => {
   }
 });
 
+// Rota de API para atualizar informações do usuário
+app.put("/api/usuario/:id", async (req, res) => {
+  const { id } = req.params;
+  const { nome, email, celular, ra } = req.body;
+
+  try {
+    const usuario = await Usuario.findByPk(id);
+
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    usuario.nome = nome || usuario.nome;
+    usuario.email = email || usuario.email;
+    usuario.celular = celular || usuario.celular;
+    usuario.ra = ra || usuario.ra;
+
+    await usuario.save();
+
+    res.status(200).json({ message: "Informações atualizadas com sucesso!", usuario });
+  } catch (error) {
+    console.error("Erro ao atualizar informações do usuário:", error);
+    res.status(500).json({ error: "Erro ao atualizar informações do usuário" });
+  }
+});
+
+
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, "..", "frontend", "build")));
 

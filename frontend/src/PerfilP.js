@@ -10,7 +10,6 @@ function PerfilPassageiro() {
 
   useEffect(() => {
     if (user && user.id) {
-      // Carrega os dados do usuário apenas uma vez no carregamento inicial
       axios.get(`/api/usuario/${user.id}`)
         .then(response => {
           setUsuario(response.data);
@@ -20,20 +19,19 @@ function PerfilPassageiro() {
           alert("Não foi possível carregar os dados do usuário. Tente novamente mais tarde.");
         });
     }
-  }, []); // Remova `user` das dependências para evitar chamadas excessivas
+  }, []); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUsuario(prevUsuario => ({ ...prevUsuario, [name]: value })); // Atualiza o estado corretamente
+    setUsuario(prevUsuario => ({ ...prevUsuario, [name]: value })); 
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/usuario/${user.id}`, usuario); // Atualiza o usuário no backend
+      await axios.put(`/api/usuario/${user.id}`, usuario); 
       alert("Informações atualizadas com sucesso!");
       setEditing(false);
-      // Atualize o localStorage para refletir os dados atualizados
       localStorage.setItem("user", JSON.stringify({ ...user, ...usuario }));
     } catch (error) {
       console.error("Erro ao atualizar as informações do usuário:", error);
