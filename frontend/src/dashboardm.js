@@ -149,62 +149,19 @@ function DashboardMotorista() {
           <div className="col-12">
             <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
               <h2>Bem-vindo, {usuario.name}!</h2>
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="mb-4">
-                  <Link to="/perfil-motorista" className="btn btn-primary me-2">
-                    Ver Perfil Completo
-                  </Link>
-                  <Link to="/historico" className="btn btn-info">
-                    Ver Histórico
-                  </Link>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <Link to="/perfil-motorista" className="btn btn-success me-2">
+                        Ver Perfil Completo
+                    </Link>
+                    <Link to="/historico" className="btn btn-info me-2">
+                        Ver Histórico
+                    </Link>
                 </div>
                 <button className="btn btn-outline-danger" onClick={handleLogout}>
-                  Logout
+                    Logout
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-        {/* Caronas Oferecidas */}
-        <div className="row mb-4">
-          <div className="col-12">
-            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
-              <h3>Caronas que você está oferecendo</h3>
-              {caronas.length > 0 ? (
-                caronas.map((carona) => (
-                  <div key={carona.id} className="card mb-3 shadow-sm">
-                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
-                      <h5 className="card-title">Destino: {carona.destino}</h5>
-                      <p className="card-text">
-                        Local de partida: {carona.partida}
-                        <br />
-                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
-                        <br />
-                        Horário:{" "}
-                        {new Date(carona.horario).toLocaleTimeString("pt-BR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          timeZone: "America/Sao_Paulo",
-                        })}
-                        <br />
-                        Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
-                        <br />
-                        Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
-                        <br />
-                        Música: {carona.musica}
-                      </p>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => cancelarCarona(carona.id)}
-                      >
-                        Cancelar Carona
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p>Você não está oferecendo nenhuma carona no momento.</p>
-              )}
             </div>
           </div>
         </div>
@@ -318,6 +275,49 @@ function DashboardMotorista() {
                 </div>
               </div>
             )}
+            </div>
+          </div>
+        </div>
+        {/* Caronas Oferecidas */}
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              <h3>Caronas que você está oferecendo</h3>
+              {caronas.length > 0 ? (
+                caronas.map((carona) => (
+                  <div key={carona.id} className="card mb-3 shadow-sm">
+                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
+                      <h5 className="card-title">Destino: {carona.destino}</h5>
+                      <p className="card-text">
+                        Local de partida: {carona.partida}
+                        <br />
+                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                        <br />
+                        Horário:{" "}
+                        {new Date(carona.horario).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          timeZone: "America/Sao_Paulo",
+                        })}
+                        <br />
+                        Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
+                        <br />
+                        Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
+                        <br />
+                        Música: {carona.musica}
+                      </p>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => cancelarCarona(carona.id)}
+                      >
+                        Cancelar Carona
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Você não está oferecendo nenhuma carona no momento.</p>
+              )}
             </div>
           </div>
         </div>
