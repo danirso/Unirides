@@ -336,6 +336,30 @@ app.get("/api/usuario/:id", async (req, res) => {
   }
 });
 
+// Rota para buscar informações do motorista e seu carro
+app.get("/api/motorista/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const motorista = await Usuario.findOne({
+      where: { id },
+      include: [{ 
+        model: CarInfo, 
+        as: "carro", 
+        attributes: ["modelo", "placa"] 
+      }],
+    });
+    if (!motorista) {
+      return res.status(404).json({ error: "Motorista não encontrado" });
+    }
+    res.json(motorista);
+  } catch (error) {
+    console.error("Erro ao buscar dados do motorista:", error);
+    res.status(500).json({ error: "Erro ao buscar dados do motorista" });
+  }
+});
+
+
+
 // Rota de API para atualizar informações do usuário
 app.put("/api/usuario/:id", async (req, res) => {
   const { id } = req.params;

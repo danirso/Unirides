@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 function PerfilMotorista() {
   const [usuario, setUsuario] = useState({
@@ -8,8 +7,10 @@ function PerfilMotorista() {
     email: "",
     celular: "",
     ra: "",
-    modeloCarro: "",
-    placaCarro: ""
+  });
+  const [carInfo, setCarInfo] = useState({
+    modelo: "",
+    placa: ""
   });
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
@@ -17,36 +18,61 @@ function PerfilMotorista() {
 
   useEffect(() => {
     if (user && user.id) {
-      // Carrega os dados do usuário uma única vez no carregamento inicial
-      axios.get(`/api/usuario/${user.id}`)
-        .then(response => {
-          setUsuario(response.data);
-        })
+      fetch(`/api/usuario/${user.id}`)
+        .then(response => response.json())
+        .then(data => setUsuario(data))
         .catch(error => {
           console.error("Erro ao carregar os dados do usuário:", error);
-          alert("Não foi possível carregar os dados do usuário. Tente novamente mais tarde.");
+          alert("Não foi possível carregar os dados do usuário.");
+        });
+  
+      fetch(`/api/carInfo/${user.id}`)
+        .then(response => response.json())
+        .then(data => setCarInfo(data))
+        .catch(error => {
+          console.error("Erro ao carregar as informações do carro:", error);
+          alert("Não foi possível carregar os dados do carro.");
         });
     }
-  }, []); // Remova `user` das dependências para evitar chamadas excessivas
+  }, []);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUsuario(prevUsuario => ({ ...prevUsuario, [name]: value })); // Atualiza corretamente o estado do formulário
   };
 
+  const handleCarChange = (e) => {
+    const { name, value } = e.target;
+    setCarInfo(prevCarInfo => ({ ...prevCarInfo, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/usuario/${user.id}`, usuario);
+      // Atualizar dados do usuário
+      await fetch(`/api/usuario/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(usuario)
+      });
+  
+      // Atualizar informações do carro
+      await fetch(`/api/carInfo/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(carInfo)
+      });
+  
       alert("Informações atualizadas com sucesso!");
       setEditing(false);
-      // Atualiza o localStorage com os dados atualizados
-      localStorage.setItem("user", JSON.stringify({ ...user, ...usuario }));
+      localStorage.setItem("user", JSON.stringify({ ...user, ...usuario, carro: carInfo }));
     } catch (error) {
       console.error("Erro ao atualizar as informações do usuário:", error);
       alert("Erro ao atualizar as informações. Tente novamente mais tarde.");
     }
   };
+  
 
   const handleBackToDashboard = () => {
     navigate("/motorista");
@@ -128,14 +154,14 @@ function PerfilMotorista() {
                     <strong style={{ color: "white" }}>Modelo do Carro:</strong>
                   </div>
                   <div className="col-md-8">
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="modeloCarro"
-                      value={usuario.modeloCarro}
-                      onChange={handleChange}
-                      style={{ backgroundColor: "white", color: "black" }}
-                    />
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="modelo"
+                    value={carInfo.modelo}
+                    onChange={handleCarChange}
+                    style={{ backgroundColor: "white", color: "black" }}
+                  />
                   </div>
                 </div>
                 <div className="row mb-3">
@@ -143,14 +169,14 @@ function PerfilMotorista() {
                     <strong style={{ color: "white" }}>Placa do Carro:</strong>
                   </div>
                   <div className="col-md-8">
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="placaCarro"
-                      value={usuario.placaCarro}
-                      onChange={handleChange}
-                      style={{ backgroundColor: "white", color: "black" }}
-                    />
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="placa"
+                    value={carInfo.placa}
+                    onChange={handleCarChange}
+                    style={{ backgroundColor: "white", color: "black" }}
+                  />
                   </div>
                 </div>
                 <div className="d-flex justify-content-between">
@@ -169,8 +195,8 @@ function PerfilMotorista() {
                 <p style={{ color: "white" }}><strong>Email:</strong> {usuario.email}</p>
                 <p style={{ color: "white" }}><strong>Celular:</strong> {usuario.celular}</p>
                 <p style={{ color: "white" }}><strong>RA:</strong> {usuario.ra}</p>
-                <p style={{ color: "white" }}><strong>Modelo do Carro:</strong> {usuario.modeloCarro}</p>
-                <p style={{ color: "white" }}><strong>Placa do Carro:</strong> {usuario.placaCarro}</p>
+                <p style={{ color: "white" }}><strong>Modelo do Carro:</strong> {carInfo.modelo}</p>
+                <p style={{ color: "white" }}><strong>Placa do Carro:</strong> {carInfo.placa}</p>
                 <div className="d-flex justify-content-between">
                   <button className="btn btn-info" onClick={() => setEditing(true)}>
                     Editar Informações
