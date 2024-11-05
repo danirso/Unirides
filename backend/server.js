@@ -3,7 +3,7 @@ const path = require("path");
 const app = express();
 const port = 3000;
 const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes } = require("./models");
-const { Op, where } = require("sequelize");
+const { Op, where, Model } = require("sequelize");
 
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
@@ -313,14 +313,27 @@ app.get("/api/historico/:userId/motorista", async (req, res) => {
         id_motorista: userId,
         horario: { [Op.lt]: new Date() },
       },
+      include: [
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+        },
+        {
+          model: Usuario,
+          as: "passageiros",
+          attributes: ["id", "nome"],
+          through: { attributes: [] }
+        }
+      ]
     });
-
     res.json(caronasMotorista);
   } catch (error) {
     console.error("Erro ao buscar histórico de caronas do motorista:", error);
     res.status(500).json({ error: "Erro ao buscar histórico" });
   }
 });
+
 
 // Rota para buscar informações de um usuário específico
 app.get("/api/usuario/:id", async (req, res) => {
@@ -374,7 +387,7 @@ app.post("/api/avaliacoes", async (req, res) => {
         return res.status(404).json({ message: "Carona não encontrada." });
       }
       id_avaliado = carona.id_motorista;
-    } else if (req.user.role === 1) {
+    } else if (role === 1) {
       id_avaliado = req.body.id_avaliado;
     }
     const avaliacaoExistente = await Avaliacoes.findOne({

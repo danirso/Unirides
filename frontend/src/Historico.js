@@ -136,7 +136,7 @@ function Historico() {
                             onChange={(e) => handlePassageiroChange(carona.id, e.target.value)}
                           >
                             <option value="">Selecione</option>
-                            {carona.passageiros && carona.passageiros.map((passageiro) => (
+                            {carona.passageiros.map((passageiro) => (
                               <option key={passageiro.id} value={passageiro.id}>{passageiro.nome}</option>
                             ))}
                           </select>
