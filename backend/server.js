@@ -336,25 +336,22 @@ app.get("/api/usuario/:id", async (req, res) => {
   }
 });
 
-// Rota para buscar informações do motorista e seu carro
-app.get("/api/motorista/:id", async (req, res) => {
+// Rota para buscar informações carro
+app.get("/api/CarInfo/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const motorista = await Usuario.findOne({
-      where: { id },
-      include: [{ 
-        model: CarInfo, 
-        as: "carro", 
-        attributes: ["modelo", "placa"] 
-      }],
+    const Carro = await CarInfo.findOne({
+      where: { 
+        id_motorista:id
+       },
     });
-    if (!motorista) {
-      return res.status(404).json({ error: "Motorista não encontrado" });
+    if (!Carro) {
+      return res.status(404).json({ error: "Carro não encontrado" });
     }
-    res.json(motorista);
+    res.json(Carro);
   } catch (error) {
-    console.error("Erro ao buscar dados do motorista:", error);
-    res.status(500).json({ error: "Erro ao buscar dados do motorista" });
+    console.error("Erro ao buscar dados do carro:", error);
+    res.status(500).json({ error: "Erro ao buscar dados do carro" });
   }
 });
 
@@ -386,6 +383,30 @@ app.put("/api/usuario/:id", async (req, res) => {
   }
 });
 
+app.put("/api/CarInfo/:id", async (req, res) => {
+  const { id } = req.params;
+  const {modelo,placa} = req.body;
+
+  try {
+    const Carro = await CarInfo.findOne({
+      where: { 
+        id_motorista:id
+       },
+    });
+    if (!Carro) {
+      return res.status(404).json({ error: "Carro não encontrado!" });
+    }
+
+    Carro.modelo = modelo || Carro.modelo;
+    Carro.placa = placa || Carro.placa;
+
+    await Carro.save();
+    res.status(200).json({ message: "Informações atualizadas com sucesso!", Carro });
+  } catch (error) {
+    console.error("Erro ao buscar dados do carro:", error);
+    res.status(500).json({ error: "Erro ao buscar dados do carro" });
+  }
+});
 
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, "..", "frontend", "build")));
