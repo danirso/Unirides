@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 3000;
-const { Carona, Usuario, CarInfo, PassageirosCaronas } = require("./models");
+const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes } = require("./models");
 const { Op, where } = require("sequelize");
 
 // Middleware para permitir JSON no body das requisições
@@ -361,6 +361,37 @@ app.put("/api/usuario/:id", async (req, res) => {
     res.status(500).json({ error: "Erro ao atualizar informações do usuário" });
   }
 });
+
+app.post("/api/avaliacoes", async (req, res) => {
+  const { id_avaliador, id_avaliado, id_carona, nota, texto_avaliativo } = req.body;
+
+  try {
+    // Verifica se já existe uma avaliação para o mesmo usuário e carona
+    const avaliacaoExistente = await Avaliacoes.findOne({
+      where: { id_avaliador, id_avaliado, id_carona }
+    });
+
+    if (avaliacaoExistente) {
+      return res.status(400).json({ message: "Avaliação já realizada para esta carona." });
+    }
+
+    // Cria nova avaliação
+    const novaAvaliacao = await Avaliacoes.create({
+      id_avaliador,
+      id_avaliado,
+      id_carona,
+      nota,
+      texto_avaliativo
+    });
+
+    res.status(201).json(novaAvaliacao);
+  } catch (error) {
+    console.error("Erro ao salvar avaliação:", error);
+    res.status(500).json({ message: "Erro interno ao salvar avaliação." });
+  }
+});
+
+
 
 
 // Servir os arquivos estáticos do build do React (produção)
