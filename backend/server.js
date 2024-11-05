@@ -363,10 +363,20 @@ app.put("/api/usuario/:id", async (req, res) => {
 });
 
 app.post("/api/avaliacoes", async (req, res) => {
-  const { id_avaliador, id_avaliado, id_carona, nota, texto_avaliativo } = req.body;
+  const { id_avaliador, id_carona, nota, texto_avaliativo,role } = req.body;
 
   try {
-    // Verifica se já existe uma avaliação para o mesmo usuário e carona
+    let id_avaliado;
+
+    if (role === 0) {
+      const carona = await Carona.findOne({ where: { id: id_carona } });
+      if (!carona) {
+        return res.status(404).json({ message: "Carona não encontrada." });
+      }
+      id_avaliado = carona.id_motorista;
+    } else if (req.user.role === 1) {
+      id_avaliado = req.body.id_avaliado;
+    }
     const avaliacaoExistente = await Avaliacoes.findOne({
       where: { id_avaliador, id_avaliado, id_carona }
     });
@@ -374,8 +384,6 @@ app.post("/api/avaliacoes", async (req, res) => {
     if (avaliacaoExistente) {
       return res.status(400).json({ message: "Avaliação já realizada para esta carona." });
     }
-
-    // Cria nova avaliação
     const novaAvaliacao = await Avaliacoes.create({
       id_avaliador,
       id_avaliado,
@@ -390,7 +398,6 @@ app.post("/api/avaliacoes", async (req, res) => {
     res.status(500).json({ message: "Erro interno ao salvar avaliação." });
   }
 });
-
 
 
 

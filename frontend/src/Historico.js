@@ -29,15 +29,17 @@ function Historico() {
   };
 
   const handleAvaliarClick = (caronaId, motoristaId) => {
-    const avaliacaoInicial = user.role === 0 
-      ? { nota: "", textoAvaliativo: "", id_avaliado: motoristaId }
-      : { nota: "", textoAvaliativo: "" };
+    const avaliacaoInicial = {
+      nota: "",
+      textoAvaliativo: "",
+      id_avaliado: user.role === 0 ? motoristaId : null // Define motorista automaticamente se role === 0
+    };
     setAvaliacoes((prev) => ({
       ...prev,
       [caronaId]: avaliacaoInicial,
     }));
   };
-
+  
   const handleNotaChange = (caronaId, nota) => {
     setAvaliacoes((prev) => ({
       ...prev,
@@ -72,6 +74,7 @@ function Historico() {
       id_carona: caronaId,
       nota: avaliacao.nota,
       texto_avaliativo: avaliacao.textoAvaliativo,
+      role: user.role,
     };
 
     try {
