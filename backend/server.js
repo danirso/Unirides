@@ -395,7 +395,7 @@ app.post("/api/avaliacoes", async (req, res) => {
     });
 
     if (avaliacaoExistente) {
-      return res.status(400).json({ message: "Avaliação já realizada para esta carona." });
+      return res.status(400).json({ message: "Usuário já avaliado nesta carona!." });
     }
     const novaAvaliacao = await Avaliacoes.create({
       id_avaliador,

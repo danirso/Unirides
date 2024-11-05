@@ -47,9 +47,9 @@ module.exports = {
 
     // Adicionar caronas futuras
     await queryInterface.bulkInsert('Caronas', [
-      { id_motorista: motoristaIds[0], partida: 'Paulínia', destino: 'Tupi Paulista', horario: new Date("2024-10-24T18:00:00"), vagas: 4, vagas_disponiveis: 2, ar: 1, musica: 'Rock', createdAt: new Date(), updatedAt: new Date() },
-      { id_motorista: motoristaIds[1], partida: 'Barão Geraldo', destino: 'Centro', horario: new Date("2024-10-25T12:30:00"), vagas: 3, vagas_disponiveis: 1, ar: 0, musica: 'Sertanejo', createdAt: new Date(), updatedAt: new Date() },
-      { id_motorista: motoristaIds[2], partida: 'Shopping', destino: 'Shopping', horario: new Date("2024-10-26T21:00:00"), vagas: 4, vagas_disponiveis: 3, ar: 1, musica: 'Jazz', createdAt: new Date(), updatedAt: new Date() }
+      { id_motorista: motoristaIds[0], partida: 'Paulínia', destino: 'Tupi Paulista', horario: new Date("2024-11-05T18:00:00"), vagas: 4, vagas_disponiveis: 2, ar: 1, musica: 'Rock', createdAt: new Date(), updatedAt: new Date() },
+      { id_motorista: motoristaIds[1], partida: 'Barão Geraldo', destino: 'Centro', horario: new Date("2024-11-06T12:30:00"), vagas: 3, vagas_disponiveis: 1, ar: 0, musica: 'Sertanejo', createdAt: new Date(), updatedAt: new Date() },
+      { id_motorista: motoristaIds[2], partida: 'Shopping', destino: 'CT-A', horario: new Date("2024-11-11T16:15:00"), vagas: 4, vagas_disponiveis: 3, ar: 1, musica: 'Jazz', createdAt: new Date(), updatedAt: new Date() }
     ], {});
 
     // Adicionar caronas passadas para o histórico

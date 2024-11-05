@@ -40,6 +40,13 @@ function Historico() {
     }));
   };
   
+  const handleCancelarClick = (caronaId) => {
+    setAvaliacoes((prev) => ({
+      ...prev,
+      [caronaId]: null,
+    }));
+  };
+
   const handleNotaChange = (caronaId, nota) => {
     setAvaliacoes((prev) => ({
       ...prev,
@@ -104,7 +111,7 @@ function Historico() {
         <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2>Histórico de Caronas</h2>
-            <Link to={user && user.role === 0 ? "/passageiro" : "/motorista"} className="btn btn-outline-danger">Voltar</Link>
+            <Link to={user && user.role === 0 ? "/passageiro" : "/motorista"} className="btn btn-outline-info">Voltar</Link>
           </div>
           
           {historico.length > 0 ? (
@@ -162,9 +169,14 @@ function Historico() {
                         value={avaliacoes[carona.id].textoAvaliativo}
                         onChange={(e) => handleTextoChange(carona.id, e.target.value)}
                       ></textarea>
+                      <div className="d-flex justify-content-between align-items-center mb-4">
                       <button className="btn btn-success" onClick={() => enviarAvaliacao(carona.id)}>
                         Enviar Avaliação
                       </button>
+                      <button className="btn btn-danger" onClick={() => handleCancelarClick(carona.id)}>
+                          Cancelar
+                      </button>
+                      </div>
                     </div>
                   )}
                 </div>
