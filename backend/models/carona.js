@@ -6,13 +6,6 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       primaryKey: true
     },
-    id_passageiro: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Usuario',
-        key: 'id'
-      }
-    },
     id_motorista: {
       type: DataTypes.INTEGER,
       references: {
@@ -20,11 +13,26 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
+    partida: {
+      type: DataTypes.STRING
+    },
     destino: {
       type: DataTypes.STRING
     },
     horario: {
       type: DataTypes.DATE
+    },
+    vagas: {
+      type: DataTypes.INTEGER
+    },
+    vagas_disponiveis: {
+      type: DataTypes.INTEGER
+    },
+    ar: {
+      type: DataTypes.TINYINT
+    },
+    musica: {
+      type: DataTypes.STRING
     }
   }, {
     tableName: 'Caronas',
@@ -32,8 +40,15 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Carona.associate = (models) => {
-    Carona.belongsTo(models.Usuario, { as: 'passageiro', foreignKey: 'id_passageiro' });
+    // Relacionamento com a tabela Usuario para o motorista
     Carona.belongsTo(models.Usuario, { as: 'motorista', foreignKey: 'id_motorista' });
+    
+    Carona.belongsToMany(models.Usuario, {
+      through: models.PassageirosCaronas,
+      foreignKey: 'id_carona',      // Chave estrangeira que refere a tabela Carona
+      otherKey: 'id_passageiro',    // Chave estrangeira que refere a tabela Usuario
+      as: 'passageiros'             // Nome da associação
+    });
   };
 
   return Carona;

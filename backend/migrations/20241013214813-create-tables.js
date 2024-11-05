@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false
       },
       ra: {
-        type: Sequelize.INTEGER, // RA agora é INTEGER
+        type: Sequelize.INTEGER,
         allowNull: false
       },
       celular: {
@@ -24,13 +24,42 @@ module.exports = {
         type: Sequelize.STRING
       },
       senha: {
-        type: Sequelize.STRING, // Campo para armazenar a senha criptografada
+        type: Sequelize.STRING,
         allowNull: false
       },
       role: {
         type: Sequelize.TINYINT,
         allowNull: false,
-        defaultValue: 0
+        defaultValue: 0 // 0: passageiro, 1: motorista
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      }
+    });
+
+    // Criar tabela CarInfo
+    await queryInterface.createTable('CarInfo', {
+      id_motorista: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Usuarios',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      modelo: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      placa: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -49,8 +78,8 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true
       },
-      id_passageiro: {
-        type: Sequelize.INTEGER, // id_passageiro como INTEGER
+      id_motorista: {
+        type: Sequelize.INTEGER,
         references: {
           model: 'Usuarios',
           key: 'id'
@@ -58,20 +87,56 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      id_motorista: {
-        type: Sequelize.INTEGER, // id_motorista como INTEGER
-        references: {
-          model: 'Usuarios',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+      partida: {
+        type: Sequelize.STRING
       },
       destino: {
         type: Sequelize.STRING
       },
       horario: {
         type: Sequelize.DATE
+      },
+      vagas: {
+        type: Sequelize.INTEGER
+      },
+      vagas_disponiveis: {
+        type: Sequelize.INTEGER
+      },
+      ar: {
+        type: Sequelize.TINYINT
+      },
+      musica: {
+        type: Sequelize.STRING
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      }
+    });
+
+    // Criar tabela intermediária de Caronas e Passageiros
+    await queryInterface.createTable('PassageirosCaronas', {
+      id_passageiro: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Usuarios',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      id_carona: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Caronas',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -85,8 +150,10 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // Deletar as tabelas
+    // Deletar as tabelas na ordem inversa de criação
+    await queryInterface.dropTable('PassageirosCaronas');
     await queryInterface.dropTable('Caronas');
+    await queryInterface.dropTable('CarInfo');
     await queryInterface.dropTable('Usuarios');
   }
 };

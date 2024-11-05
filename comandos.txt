@@ -1,0 +1,15 @@
+COMANDOS IMPORTANTES PARA NAO ESQUECER DURANTE O DEVELOPMENT DO PROJETO:
+
+FRONTEND: Para rodar o projeto ao fazer alguma alteracao no codigo:
+    -ENTRAR NO CONTAINER: " docker exec -it caronas-app bash "
+    -ABRIR A PASTA DO FRONTEND: " cd frontend "
+    BUILDAR O PROJETO: " npm run build "
+
+Saindo da pasta do frontend ou backend: " cd .. "
+
+BACKEND: Para mexer no banco de dados (se tiver algum erro):
+    -SEMPRE NA PASTA BACKEND DO CONTAINER : " cd backend "
+    -FAZER MIGRATE: " npx sequelize-cli db:migrate *
+    -DESFAZER MIGRATE: * npx sequelize-cli db:migrate:undo *
+    -FAZER SEED: " npx sequelize-cli db:seed:all "
+    -DESFAZER SEED: " npx sequelize-cli db:seed:undo "
