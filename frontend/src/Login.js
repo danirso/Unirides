@@ -173,6 +173,14 @@ function Login() {
           >
             Criar Conta
           </Link>
+
+          <p className="text-center mb-0">
+            retornar - {" "}
+            <Link to="/" className="text-primary">
+              Inicio
+            </Link>
+          </p>
+
         </form>
       </div>
     </div>
