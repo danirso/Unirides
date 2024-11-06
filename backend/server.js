@@ -349,6 +349,27 @@ app.get("/api/usuario/:id", async (req, res) => {
   }
 });
 
+// Rota para buscar informações carro
+app.get("/api/CarInfo/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const Carro = await CarInfo.findOne({
+      where: { 
+        id_motorista:id
+       },
+    });
+    if (!Carro) {
+      return res.status(404).json({ error: "Carro não encontrado" });
+    }
+    res.json(Carro);
+  } catch (error) {
+    console.error("Erro ao buscar dados do carro:", error);
+    res.status(500).json({ error: "Erro ao buscar dados do carro" });
+  }
+});
+
+
+
 // Rota de API para atualizar informações do usuário
 app.put("/api/usuario/:id", async (req, res) => {
   const { id } = req.params;
@@ -372,6 +393,32 @@ app.put("/api/usuario/:id", async (req, res) => {
   } catch (error) {
     console.error("Erro ao atualizar informações do usuário:", error);
     res.status(500).json({ error: "Erro ao atualizar informações do usuário" });
+  }
+});
+
+
+app.put("/api/CarInfo/:id", async (req, res) => {
+  const { id } = req.params;
+  const {modelo,placa} = req.body;
+
+  try {
+    const Carro = await CarInfo.findOne({
+      where: { 
+        id_motorista:id
+       },
+    });
+    if (!Carro) {
+      return res.status(404).json({ error: "Carro não encontrado!" });
+    }
+
+    Carro.modelo = modelo || Carro.modelo;
+    Carro.placa = placa || Carro.placa;
+
+    await Carro.save();
+    res.status(200).json({ message: "Informações atualizadas com sucesso!", Carro });
+  } catch (error) {
+    console.error("Erro ao buscar dados do carro:", error);
+    res.status(500).json({ error: "Erro ao buscar dados do carro" });
   }
 });
 
@@ -411,7 +458,6 @@ app.post("/api/avaliacoes", async (req, res) => {
     res.status(500).json({ message: "Erro interno ao salvar avaliação." });
   }
 });
-
 
 
 // Servir os arquivos estáticos do build do React (produção)

@@ -28,11 +28,11 @@ function Signup() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors(Validation(values));
     const validationErrors = Validation(values);
+    setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      fetch("/signup", {
+      fetch("/api/signup", {  // Corrigido o caminho da rota
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,6 +41,7 @@ function Signup() {
       })
         .then((response) => response.json())
         .then((data) => {
+          console.log("Resposta do backend:", data);  // Verificar resposta
           if (data.error) {
             console.error("Erro:", data.error);
           } else {
@@ -75,18 +76,18 @@ function Signup() {
     width: "100%",
     boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.2)",
     margin: "0 20px",
-    minHeight: "400px",  // Altura mínima para o formulário
-    maxHeight: "800px",  // Altura máxima para evitar estourar
+    minHeight: "400px",  
+    maxHeight: "800px",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",  // Deixa espaço entre os itens
+    justifyContent: "space-between",
   };
 
   return (
     <div
       className="d-flex justify-content-center align-items-center"
       style={{
-        minHeight: "100vh",  // Garante que o container sempre ocupe no mínimo 100% da altura da tela
+        minHeight: "100vh",
         background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
         padding: "20px",
       }}
@@ -99,7 +100,7 @@ function Signup() {
           width: "100%",
           maxWidth: "400px",
           borderRadius: "12px",
-          marginTop: "150px", 
+          marginTop: "20px", 
         }}
       >
         <h3 className="text-center mb-4" style={{ color: "#f7f9fc" }}>Crie sua conta</h3>

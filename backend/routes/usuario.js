@@ -6,7 +6,7 @@ const { Usuario } = require('../models');
 router.post('/api/signup', async (req, res) => {
     try {
         console.log(req.body); // Para verificar os dados recebidos
-        const { nome, email, celular, ra, password, role } = req.body;
+        const { nome, email, celular, ra, password, role, modeloCarro, placaCarro} = req.body;
 
         // Criar um novo usuário usando o modelo Usuario
         const novoUsuario = await Usuario.create({
@@ -16,6 +16,7 @@ router.post('/api/signup', async (req, res) => {
             ra,
             password, // Certifique-se de que a senha esteja sendo tratada corretamente
             role,
+            ...(role === '1' && { modeloCarro, placaCarro }),
         });
 
         res.status(201).json(novoUsuario); // Retornar o novo usuário como resposta
@@ -29,11 +30,19 @@ router.post('/api/signup', async (req, res) => {
 router.put('/api/usuario/:id', async (req, res) => {
     try {
         const { id } = req.params; // Pega o ID do usuário a ser atualizado
-        const { nome, email, celular, ra } = req.body;
+        const { nome, email, celular, ra, modeloCarro, placaCarro, role} = req.body;
 
+        const updateData = {
+            nome,
+            email,
+            celular,
+            ra,
+            ...(role === '1' && { modeloCarro, placaCarro }),
+        };
+        
         // Atualizar o usuário no banco de dados
         const [updated] = await Usuario.update(
-            { nome, email, celular, ra },
+            updateData,
             {
                 where: { id },
             }
@@ -57,7 +66,18 @@ router.get('/:id', async (req, res) => {
         const usuario = await Usuario.findByPk(req.params.id);
 
         if (usuario) {
-            return res.status(200).json(usuario); // Retorna todas as informações do usuário
+            const responseData = {
+                id: usuario.id,
+                nome: usuario.nome,
+                email: usuario.email,
+                celular: usuario.celular,
+                ra: usuario.ra,
+                ...(usuario.role === '1' && {
+                    modeloCarro: usuario.modeloCarro,
+                    placaCarro: usuario.placaCarro,
+                }), // Inclui apenas se for motorista
+            };
+            return res.status(200).json(responseData); // Retorna todas as informações do usuário
         }
 
         return res.status(404).json({ message: 'Usuário não encontrado' });
