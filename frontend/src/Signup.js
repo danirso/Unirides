@@ -239,7 +239,7 @@ function Signup() {
 
           <p className="text-center mb-0">
             Já possui uma conta?{" "}
-            <Link to="/" className="text-primary">
+            <Link to="/login" className="text-primary">
               Login
             </Link>
           </p>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Login from './Login';
 import Signup from './Signup';
+import LandPage from './landPage';
 import Dashboard from './dashboardp';  // Dashboard para passageiro
 import DashboardM from './dashboardm';  // Dashboard para motorista
 import Historico from './Historico';    // Histórico do usuário
@@ -12,7 +13,8 @@ function App() {
     return (
       <BrowserRouter> 
         <Routes>
-          <Route path='/' element={<Login />}></Route>
+          <Route path='/' element={<LandPage />}></Route>
+          <Route path='/login' element={<Login />}></Route>
           <Route path='/signup' element={<Signup />}></Route>
           <Route path='/passageiro' element={<Dashboard />}></Route>
           <Route path='/motorista' element={<DashboardM />}></Route>  {/* Rota para DashboardM */}
