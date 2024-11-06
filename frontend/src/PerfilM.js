@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Validation from "./PerfilValidations";
 
 function PerfilMotorista() {
   const [usuario, setUsuario] = useState({
@@ -13,6 +14,8 @@ function PerfilMotorista() {
     placa: ""
   });
   const [editing, setEditing] = useState(false);
+  const [initialUsuario, setInitialUsuario] = useState({});
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -49,6 +52,18 @@ function PerfilMotorista() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validationErrors = Validation(usuario);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    if (JSON.stringify(usuario) === JSON.stringify(initialUsuario)) {
+      alert("Nenhuma informação foi alterada.");
+      return;
+    }
+
     try {
       // Atualizar dados do usuário
       await fetch(`/api/usuario/${user.id}`, {
@@ -102,6 +117,9 @@ function PerfilMotorista() {
                       onChange={handleChange}
                       style={{ backgroundColor: "white", color: "black" }}
                     />
+                    {errors.nome && (
+                      <small className="text-danger">{errors.nome}</small>
+                    )}
                   </div>
                 </div>
                 <div className="row mb-3">
@@ -117,6 +135,9 @@ function PerfilMotorista() {
                       onChange={handleChange}
                       style={{ backgroundColor: "white", color: "black" }}
                     />
+                    {errors.email && (
+                      <small className="text-danger">{errors.email}</small>
+                    )}
                   </div>
                 </div>
                 <div className="row mb-3">
@@ -132,6 +153,9 @@ function PerfilMotorista() {
                       onChange={handleChange}
                       style={{ backgroundColor: "white", color: "black" }}
                     />
+                    {errors.celular && (
+                      <small className="text-danger">{errors.celular}</small>
+                    )}
                   </div>
                 </div>
                 <div className="row mb-3">
@@ -147,6 +171,9 @@ function PerfilMotorista() {
                       onChange={handleChange}
                       style={{ backgroundColor: "white", color: "black" }}
                     />
+                    {errors.ra && (
+                      <small className="text-danger">{errors.ra}</small>
+                    )}
                   </div>
                 </div>
                 <div className="row mb-3">
