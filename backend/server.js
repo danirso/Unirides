@@ -2,8 +2,8 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 3000;
-const { Carona, Usuario, CarInfo, PassageirosCaronas } = require("./models");
-const { Op, where } = require("sequelize");
+const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes } = require("./models");
+const { Op, where, Model } = require("sequelize");
 
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
@@ -313,14 +313,27 @@ app.get("/api/historico/:userId/motorista", async (req, res) => {
         id_motorista: userId,
         horario: { [Op.lt]: new Date() },
       },
+      include: [
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+        },
+        {
+          model: Usuario,
+          as: "passageiros",
+          attributes: ["id", "nome"],
+          through: { attributes: [] }
+        }
+      ]
     });
-
     res.json(caronasMotorista);
   } catch (error) {
     console.error("Erro ao buscar histórico de caronas do motorista:", error);
     res.status(500).json({ error: "Erro ao buscar histórico" });
   }
 });
+
 
 // Rota para buscar informações de um usuário específico
 app.get("/api/usuario/:id", async (req, res) => {
@@ -383,6 +396,7 @@ app.put("/api/usuario/:id", async (req, res) => {
   }
 });
 
+
 app.put("/api/CarInfo/:id", async (req, res) => {
   const { id } = req.params;
   const {modelo,placa} = req.body;
@@ -407,6 +421,44 @@ app.put("/api/CarInfo/:id", async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar dados do carro" });
   }
 });
+
+app.post("/api/avaliacoes", async (req, res) => {
+  const { id_avaliador, id_carona, nota, texto_avaliativo,role } = req.body;
+
+  try {
+    let id_avaliado;
+
+    if (role === 0) {
+      const carona = await Carona.findOne({ where: { id: id_carona } });
+      if (!carona) {
+        return res.status(404).json({ message: "Carona não encontrada." });
+      }
+      id_avaliado = carona.id_motorista;
+    } else if (role === 1) {
+      id_avaliado = req.body.id_avaliado;
+    }
+    const avaliacaoExistente = await Avaliacoes.findOne({
+      where: { id_avaliador, id_avaliado, id_carona }
+    });
+
+    if (avaliacaoExistente) {
+      return res.status(400).json({ message: "Usuário já avaliado nesta carona!." });
+    }
+    const novaAvaliacao = await Avaliacoes.create({
+      id_avaliador,
+      id_avaliado,
+      id_carona,
+      nota,
+      texto_avaliativo
+    });
+
+    res.status(201).json(novaAvaliacao);
+  } catch (error) {
+    console.error("Erro ao salvar avaliação:", error);
+    res.status(500).json({ message: "Erro interno ao salvar avaliação." });
+  }
+});
+
 
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, "..", "frontend", "build")));
