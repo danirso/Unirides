@@ -209,13 +209,13 @@ function PerfilPassageiro() {
                 </p>
                 <div className="d-flex justify-content-between">
                   <button
-                    className="btn btn-info"
+                    className="btn btn-warning"
                     onClick={() => setEditing(true)}
                   >
                     Editar Informações
                   </button>
                   <button
-                    className="btn btn-outline-danger"
+                    className="btn btn-outline-info"
                     onClick={handleBackToDashboard}
                   >
                     Voltar

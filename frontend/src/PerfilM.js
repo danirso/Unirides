@@ -225,10 +225,10 @@ function PerfilMotorista() {
                 <p style={{ color: "white" }}><strong>Modelo do Carro:</strong> {carInfo.modelo}</p>
                 <p style={{ color: "white" }}><strong>Placa do Carro:</strong> {carInfo.placa}</p>
                 <div className="d-flex justify-content-between">
-                  <button className="btn btn-info" onClick={() => setEditing(true)}>
+                  <button className="btn btn-warning" onClick={() => setEditing(true)}>
                     Editar Informações
                   </button>
-                  <button className="btn btn-outline-danger" onClick={handleBackToDashboard}>
+                  <button className="btn btn-outline-info" onClick={handleBackToDashboard}>
                     Voltar
                   </button>
                 </div>
