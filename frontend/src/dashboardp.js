@@ -341,12 +341,18 @@ function Dashboard() {
                             <br />
                             Música: {carona.musica}
                           </p>
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => sairDaCarona(carona.id)}
-                          >
-                            Sair da Carona
-                          </button>
+                            <button
+                              className="btn btn-danger"
+                              onClick={() => sairDaCarona(carona.id)}
+                            >
+                              Sair da Carona
+                            </button>
+                            <button
+                              className="btn btn-warning"
+                              onClick={() => navigate(`/chat/${carona.id}`)} // Redireciona para o chat da carona
+                            >
+                              Falar com o Motorista
+                            </button>
                         </div>
                       </div>
                     ))

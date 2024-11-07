@@ -312,6 +312,12 @@ function DashboardMotorista() {
                       >
                         Cancelar Carona
                       </button>
+                      <button
+                        className="btn btn-warning"
+                        onClick={() => navigate(`/chat/${carona.id}`)} // Redireciona para o chat da carona
+                      >
+                        Falar com o Passageiro
+                      </button>
                     </div>
                   </div>
                 ))

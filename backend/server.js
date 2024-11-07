@@ -4,6 +4,45 @@ const app = express();
 const port = 3000;
 const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes } = require("./models");
 const { Op, where, Model } = require("sequelize");
+const http = require('http');
+const cors = require('cors');
+
+const server = http.createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:3000", // URL do frontend
+    methods: ["GET", "POST"]
+  }
+});
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET","POST"],
+  credentials: true
+}));
+
+app.get('/test',(req,res)=> {
+  res.json({message:'all working, buddy'});
+});
+
+//aqui começa a parte de chat entre usuarios
+io.on("connection", (socket) => {
+  console.log("Usuário conectado:", socket.id);
+
+  // Escuta quando uma mensagem é enviada
+  socket.on("mensagem", (data) => {
+    console.log("Mensagem recebida:", data);
+    io.emit("mensagem", data); // Envia a mensagem para todos os conectados (ou especifique um ID se for para uma pessoa)
+  });
+
+  // Escuta a desconexão
+  socket.on("disconnect", () => {
+    console.log("Usuário desconectado:", socket.id);
+  });
+});
+
+server.listen(3001, () => {
+  console.log('Servidor rodando na porta 3001');
+});
 
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
@@ -458,7 +497,6 @@ app.post("/api/avaliacoes", async (req, res) => {
     res.status(500).json({ message: "Erro interno ao salvar avaliação." });
   }
 });
-
 
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, "..", "frontend", "build")));

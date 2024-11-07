@@ -7,6 +7,7 @@ import Historico from './Historico';    // Histórico do usuário
 import PerfilPassageiro from './PerfilP';  // Novo componente para perfil de passageiro
 import PerfilMotorista from './PerfilM';    // Novo componente para perfil de motorista
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Chat from "./Chat"
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/historico" element={<Historico />}></Route>  {/* Nova rota para o componente Historico */}
           <Route path='/perfil-passageiro' element={<PerfilPassageiro />}></Route> {/* Perfil completo passageiro */}
           <Route path='/perfil-motorista' element={<PerfilMotorista />}></Route> {/* Perfil completo motorista */}
+          <Route path="/chat/:caronaId" element={<Chat />} />
         </Routes>
       </BrowserRouter>
     );
