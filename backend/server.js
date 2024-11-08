@@ -228,7 +228,7 @@ app.put("/api/caronas/:id/sair", async (req, res) => {
 
 // Rota de API para cadastro de usuário
 app.post("/signup", async (req, res) => {
-  const { name, email, password, celular, ra, role, modelo, placa } = req.body;
+  const { name, email, password, celular, ra, role, modeloCarro, placa } = req.body;
 
   try {
     const existingUser = await Usuario.findOne({ where: { email } });
@@ -248,9 +248,9 @@ app.post("/signup", async (req, res) => {
     });
 
     if (role === 1) {
-      await CarInfo.create({
+        await CarInfo.create({
         id_motorista: newUser.id,
-        modelo,
+        modelo: modeloCarro,
         placa,
       });
     }
