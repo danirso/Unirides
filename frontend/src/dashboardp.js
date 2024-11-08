@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 
 const socket = io("http://localhost:3001"); // Conectando ao backend na porta 3001
-
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -21,9 +20,10 @@ function Dashboard() {
   const [showMinhasCaronas, setShowMinhasCaronas] = useState(true);
   const [mensagem, setMensagem] = useState("");
   const [historicoMensagens, setHistoricoMensagens] = useState([]);
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(true);
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
+  const inputRef = useRef(null);
   
   useEffect(() => {
     socket.on("mensagem", (data) => {
@@ -31,20 +31,21 @@ function Dashboard() {
     });
 
     return () => {
-      socket.off("mensagem"); // Remove o evento quando o componente é desmontado
+      socket.off("mensagem"); 
     };
   }, []);
 
   const enviarMensagem = () => {
     const mensagemData = {
       mensagem,
-      usuario: usuario.name, // Enviando o nome do usuário (passageiro ou motorista)
+      usuario: usuario.name,
       usuarioId: usuario.id,
       caronaId: chatCaronaId,
     };
-    socket.emit("mensagem", mensagemData); // Envia a mensagem completa para o servidor
-    setMensagem(""); // Limpa o campo de mensagem após o envio
-  };  
+    socket.emit("mensagem", mensagemData);
+    setMensagem(""); 
+    inputRef.current.focus();
+  }; 
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -154,7 +155,6 @@ function Dashboard() {
 
   const abrirChat = (caronaId) => {
     setChatCaronaId(caronaId);
-    setShowChat(true);
     setIsChatMinimized(false);
   };
 
@@ -329,10 +329,16 @@ function Dashboard() {
                         Música: {carona.musica}
                       </p>
                       <button
-                        className="btn btn-success"
+                        className="btn btn-success me-2"
                         onClick={() => solicitarCarona(carona.id)}
                       >
                         Solicitar Carona
+                      </button>
+                      <button
+                        className="btn btn-warning"
+                        onClick={() => abrirChat(carona.id)}
+                      >
+                        Falar com o Motorista
                       </button>
                     </div>
                   </div>
@@ -381,17 +387,18 @@ function Dashboard() {
                             <br />
                             Música: {carona.musica}
                           </p>
-                            <button
-                              className="btn btn-danger"
-                              onClick={() => sairDaCarona(carona.id)}
-                            >
-                              Sair da Carona
-                            </button>
-                            <button
-                              className="btn btn-warning" onClick={() => abrirChat(carona.id)}
-                            >
-                              Falar com o Motorista
-                            </button>
+                          <button
+                            className="btn btn-danger me-2" 
+                            onClick={() => sairDaCarona(carona.id)}
+                          >
+                            Sair da Carona
+                          </button>
+                          <button
+                            className="btn btn-warning"
+                            onClick={() => abrirChat(carona.id)}
+                          >
+                            Falar com o Motorista
+                          </button>
                         </div>
                       </div>
                     ))
@@ -409,7 +416,7 @@ function Dashboard() {
           style={{
             position: "fixed",
             bottom: "20px",
-            right: "20px", // Caixa agora está na direita
+            right: "20px", 
             width: "350px",
             zIndex: 1000,
             backgroundColor: "#fff",
@@ -443,16 +450,15 @@ function Dashboard() {
               {isChatMinimized ? "Expandir" : "Minimizar"}
             </button>
           </div>
-
           {!isChatMinimized && (
             <>
               <div
                 style={{
-                  maxHeight: "400px", // Altura maior por padrão
+                  maxHeight: "400px", 
                   overflowY: "auto",
                   padding: "10px",
                   backgroundColor: "#f8f9fa",
-                  color: "#000", // Garantir que o texto seja visível
+                  color: "#000", 
                 }}
               >
                 {historicoMensagens.length > 0 ? (
@@ -467,7 +473,7 @@ function Dashboard() {
                       wordBreak: "break-word",
                     }}
                   >
-                    <strong>{msg.usuario === usuario.name ? "Você" : msg.usuario}:</strong> {msg.mensagem} {/* Exibe "Você" para a mensagem do próprio usuário */}
+                    <strong>{msg.usuario === usuario.name ? "Você" : msg.usuario}:</strong> {msg.mensagem}
                   </div>
                 ))
               ) : (
@@ -482,9 +488,15 @@ function Dashboard() {
                 }}
               >
                 <input
+                ref={inputRef}
                   type="text"
                   value={mensagem}
                   onChange={(e) => setMensagem(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      enviarMensagem();
+                    }
+                  }}
                   placeholder="Digite sua mensagem..."
                   style={{
                     flex: 1,
