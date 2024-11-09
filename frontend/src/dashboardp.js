@@ -40,12 +40,13 @@ function Dashboard() {
       mensagem,
       usuario: usuario.name,
       usuarioId: usuario.id,
-      caronaId: chatCaronaId,
+      caronaId: chatCaronaId, // inclui o caronaId
     };
     socket.emit("mensagem", mensagemData);
-    setMensagem(""); 
+    setMensagem("");
     inputRef.current.focus();
-  }; 
+  };
+  
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -156,7 +157,14 @@ function Dashboard() {
   const abrirChat = (caronaId) => {
     setChatCaronaId(caronaId);
     setIsChatMinimized(false);
+  
+    // Envia ao servidor o caronaId e os dados do usuário ao abrir o chat
+    socket.emit("entrarCarona", caronaId, {
+      name: usuario.name,
+      id: usuario.id
+    });
   };
+  
 
   const minimizarChat = () => {
     setIsChatMinimized(!isChatMinimized);

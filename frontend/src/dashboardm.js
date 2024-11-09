@@ -157,6 +157,11 @@ function DashboardMotorista() {
   const abrirChat = (caronaId) => {
     setChatCaronaId(caronaId);
     setIsChatMinimized(false);
+
+    socket.emit("entrarCarona",caronaId,{
+      name: usuario.name,
+      id: usuario.id
+    });
   };
 
   const minimizarChat = () => {

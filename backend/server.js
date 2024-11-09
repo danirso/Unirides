@@ -24,14 +24,27 @@ app.get('/test',(req,res)=> {
   res.json({message:'all working, buddy'});
 });
 
-//aqui começa a parte de chat entre usuarios
 io.on("connection", (socket) => {
   console.log("Usuário conectado:", socket.id);
 
+  // Entrar na sala da carona específica
+  socket.on("entrarCarona", (caronaId, usuario) => {
+    socket.join(caronaId); // Adiciona o usuário à sala da carona
+    socket.caronaId = caronaId; // Armazena o ID da carona no socket
+    socket.usuario = usuario; // Armazena as informações do usuário no socket
+
+    console.log(`Usuário ${usuario.name} entrou na carona ${caronaId}`);
+  });
+
   // Escuta quando uma mensagem é enviada
   socket.on("mensagem", (data) => {
-    console.log("Mensagem recebida:", data);
-    io.emit("mensagem", data); // Envia a mensagem para todos os conectados (ou especifique um ID se for para uma pessoa)
+    const { caronaId, mensagem, usuario, usuarioId } = data;
+    if (socket.caronaId === caronaId) { // Verifica se o usuário está na sala correta
+      console.log("Mensagem recebida:", data);
+      io.to(caronaId).emit("mensagem", data); // Envia a mensagem para todos na sala da carona
+    } else {
+      console.log("Tentativa de envio de mensagem para carona incorreta:", data);
+    }
   });
 
   // Escuta a desconexão
@@ -39,6 +52,7 @@ io.on("connection", (socket) => {
     console.log("Usuário desconectado:", socket.id);
   });
 });
+
 
 server.listen(3001, () => {
   console.log('Servidor rodando na porta 3001');
