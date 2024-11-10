@@ -32,16 +32,20 @@ function Dashboard() {
     });
   
     // Recebe o histórico de mensagens quando entra em uma carona
-    socket.on("historicoMensagens", (mensagens) => {
-      setHistoricoMensagens(mensagens);
-    });
-  
-    return () => {
-      socket.off("mensagem"); 
-      socket.off("historicoMensagens");
-    };
-  }, []);
+  socket.on("historicoMensagens", (mensagens) => {
+    console.log("Mensagens Recebidas:", mensagens); // Verifica a estrutura das mensagens recebidas
+    const mensagensComNomes = mensagens.map((msg) => ({
+      ...msg,
+      usuario: msg.autor ? msg.autor.name : "Desconhecido", // Usa o nome do autor se disponível
+    }));
+    setHistoricoMensagens(mensagensComNomes);
+  });
 
+  return () => {
+    socket.off("historicoMensagens");
+  };
+}, []);
+  
   const enviarMensagem = () => {
     const mensagemData = {
       mensagem,
@@ -173,7 +177,6 @@ function Dashboard() {
     });
   };
   
-
   const minimizarChat = () => {
     setIsChatMinimized(!isChatMinimized);
   };
@@ -478,23 +481,23 @@ function Dashboard() {
                 }}
               >
                 {historicoMensagens.length > 0 ? (
-                historicoMensagens.map((msg, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      marginBottom: "8px",
-                      backgroundColor: msg.usuario === "Motorista" ? "#d4edda" : "#f1f1f1",
-                      padding: "8px",
-                      borderRadius: "5px",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    <strong>{msg.usuario === usuario.name ? "Você" : msg.usuario}:</strong> {msg.mensagem}
-                  </div>
-                ))
-              ) : (
-                <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
-              )}
+                  historicoMensagens.map((msg, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        marginBottom: "8px",
+                        backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
+                        padding: "8px",
+                        borderRadius: "5px",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.name || "Desconhecido"}:</strong> {msg.mensagem}
+                    </div>
+                  ))
+                ) : (
+                  <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
+                )}
               </div>
               <div
                 style={{
@@ -509,7 +512,7 @@ function Dashboard() {
                   value={mensagem}
                   onChange={(e) => setMensagem(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                    if (e.key === "Enter" && mensagem.trim() !== "") {
                       enviarMensagem();
                     }
                   }}
@@ -523,7 +526,11 @@ function Dashboard() {
                   }}
                 />
                 <button
-                  onClick={enviarMensagem}
+                  onClick={() => {
+                    if (mensagem.trim() !== "") { // verifica se a mensagem não está vazia
+                      enviarMensagem();
+                    }
+                  }}
                   style={{
                     padding: "8px 12px",
                     backgroundColor: "#007bff",

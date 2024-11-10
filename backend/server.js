@@ -53,12 +53,14 @@ io.on("connection", (socket) => {
 
         // Busca o histórico e inclui o autor da mensagem
         const historico = await MensagemCarona.findAll({
-          where: { 
-            caronaId: caronaId
-           },
+          where: { caronaId: caronaId },
           order: [["createdAt", "ASC"]],
+          include: [{ model: Usuario, as: "autor", attributes: ["name"] }], // Inclui o nome do autor
         });
-       
+        
+        console.log("Histórico de Mensagens:", JSON.stringify(historico, null, 2)); // Exibe a estrutura completa
+        socket.emit("historicoMensagens", historico);        
+        
         socket.emit("historicoMensagens", historico);
       } else {
         console.log(`Usuário ${usuario.name} não pertence à carona ${caronaId}`);
@@ -67,7 +69,6 @@ io.on("connection", (socket) => {
       console.error("Erro ao verificar carona ou carregar histórico:", error);
     }
   });
-
 
   // Escuta quando uma mensagem é enviada
   socket.on("mensagem", async (data) => {
