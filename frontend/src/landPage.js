@@ -54,37 +54,49 @@ function LandPage() {
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif' }}>
-      {/* Navbar */}
-      <nav style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        padding: '1rem 2rem', 
-        background: '#f0f4f8', 
-        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', 
-        color: '#333'
-      }}>        
-      <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#38b000' }}>Unirides - Caronas</div>
-        <div>
+    {/* Navbar */}
+    <nav style={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      padding: '1rem 2rem', 
+      background: '#f0f4f8', 
+      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', 
+      color: '#333'
+    }}>        
+      {/* Logo e Links */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#38b000', marginRight: '1.5rem' }}>
+          Unirides - Caronas
+        </div>
+        <div style={{ display: 'flex', gap: '1rem' }}>
           <button
             onClick={() => scrollToSection('home')}
-            style={{ margin: '0 1rem', background: 'none', border: 'none', color: '#333', cursor: 'pointer', fontSize: '1rem' }}
+            style={{ background: 'none', border: 'none', color: '#333', cursor: 'pointer', fontSize: '1rem' }}
           >
             Home
           </button>
           <button
             onClick={() => scrollToSection('quem-somos')}
-            style={{ margin: '0 1rem', background: 'none', border: 'none', color: '#333', cursor: 'pointer', fontSize: '1rem' }}
+            style={{ background: 'none', border: 'none', color: '#333', cursor: 'pointer', fontSize: '1rem' }}
           >
             Quem Somos
           </button>
           <button
             onClick={() => scrollToSection('contato')}
-            style={{ margin: '0 1rem', background: 'none', border: 'none', color: '#333', cursor: 'pointer', fontSize: '1rem' }}
+            style={{ background: 'none', border: 'none', color: '#333', cursor: 'pointer', fontSize: '1rem' }}
           >
             Contato
           </button>
+          <button
+            onClick={() => scrollToSection('localização')}
+            style={{ background: 'none', border: 'none', color: '#333', cursor: 'pointer', fontSize: '1rem' }}
+          >
+            Localização
+          </button>
         </div>
+      </div>
+
 
          {/* Botão entrar de forma intuitiva */}
          <div style={{ position: 'relative' }}>
@@ -295,9 +307,21 @@ function LandPage() {
               </a>
             </div>
           </div>
+        
+      </section>
+
+      {/* Sessão de localização */}
+      <section
+          id="localização"
+          style={{
+            padding: '4rem 2rem',
+            background: 'linear-gradient(to right, #0f2027, #203a43, #2c5364)',
+            color: '#f7f9fc'
+          }}
+        >
 
           {/* Endereço */}
-          <div style={{ marginTop: '3rem' }}>
+          <div style={{ marginTop: '1.5rem' }}>
             <h3 style={{ color: '#38b000' }}>Nosso Endereço</h3>
             <p>Av. Reitor Benedito José Barreto Fonseca, H15 - Parque dos Jacarandás, Campinas - SP</p>
           </div>
@@ -319,7 +343,7 @@ function LandPage() {
             </div>
           </div>
 
-        </section>
+      </section>
 
     </div>
   );
