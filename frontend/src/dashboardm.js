@@ -9,6 +9,7 @@ function DashboardMotorista() {
   const [usuario, setUsuario] = useState({
     name: "",
     id: "",
+    role:"",
   });
   const [caronas, setCaronas] = useState([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -29,12 +30,19 @@ function DashboardMotorista() {
   const inputRef = useRef(null);
 
   useEffect(() => {
+    // Recebe novas mensagens em tempo real
     socket.on("mensagem", (data) => {
       setHistoricoMensagens((prev) => [...prev, data]);
     });
-
+  
+    // Recebe o histórico de mensagens quando entra em uma carona
+    socket.on("historicoMensagens", (mensagens) => {
+      setHistoricoMensagens(mensagens);
+    });
+  
     return () => {
       socket.off("mensagem"); 
+      socket.off("historicoMensagens");
     };
   }, []);
 
@@ -46,7 +54,7 @@ function DashboardMotorista() {
       caronaId: chatCaronaId,
     };
     socket.emit("mensagem", mensagemData);
-    setMensagem(""); 
+    setMensagem("");
     inputRef.current.focus();
   };
 
@@ -56,6 +64,7 @@ function DashboardMotorista() {
       setUsuario({
         name: user.nome,
         id: user.id,
+        role: user.role,
       });
       fetchCaronasMotorista(user.id);
     } else {
@@ -160,7 +169,8 @@ function DashboardMotorista() {
 
     socket.emit("entrarCarona",caronaId,{
       name: usuario.name,
-      id: usuario.id
+      id: usuario.id,
+      role: usuario.role,
     });
   };
 

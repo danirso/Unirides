@@ -6,7 +6,7 @@ const socket = io("http://localhost:3001"); // Conectando ao backend na porta 30
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState({ name: "", id: "" });
+  const [usuario, setUsuario] = useState({ name: "", id: "" , role:""});
   const [caronas, setCaronas] = useState([]);
   const [minhasCaronas, setMinhasCaronas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,12 +26,19 @@ function Dashboard() {
   const inputRef = useRef(null);
   
   useEffect(() => {
+    // Recebe novas mensagens em tempo real
     socket.on("mensagem", (data) => {
       setHistoricoMensagens((prev) => [...prev, data]);
     });
-
+  
+    // Recebe o histórico de mensagens quando entra em uma carona
+    socket.on("historicoMensagens", (mensagens) => {
+      setHistoricoMensagens(mensagens);
+    });
+  
     return () => {
       socket.off("mensagem"); 
+      socket.off("historicoMensagens");
     };
   }, []);
 
@@ -40,13 +47,12 @@ function Dashboard() {
       mensagem,
       usuario: usuario.name,
       usuarioId: usuario.id,
-      caronaId: chatCaronaId, // inclui o caronaId
+      caronaId: chatCaronaId,
     };
     socket.emit("mensagem", mensagemData);
     setMensagem("");
     inputRef.current.focus();
   };
-  
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -54,6 +60,7 @@ function Dashboard() {
       setUsuario({
         name: user.nome,
         id: user.id,
+        role: user.role,
       });
       fetchMinhasCaronas(user.id);
     } else {
@@ -161,7 +168,8 @@ function Dashboard() {
     // Envia ao servidor o caronaId e os dados do usuário ao abrir o chat
     socket.emit("entrarCarona", caronaId, {
       name: usuario.name,
-      id: usuario.id
+      id: usuario.id,
+      role:usuario.role,
     });
   };
   

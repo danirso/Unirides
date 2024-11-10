@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 3000;
-const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes } = require("./models");
+const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
 const { Op, where, Model } = require("sequelize");
 const http = require('http');
 const cors = require('cors');
@@ -28,19 +28,61 @@ io.on("connection", (socket) => {
   console.log("Usuário conectado:", socket.id);
 
   // Entrar na sala da carona específica
-  socket.on("entrarCarona", (caronaId, usuario) => {
-    socket.join(caronaId); // Adiciona o usuário à sala da carona
-    socket.caronaId = caronaId; // Armazena o ID da carona no socket
-    socket.usuario = usuario; // Armazena as informações do usuário no socket
+  socket.on("entrarCarona", async (caronaId, usuario) => {
+    try {
+      let carona;
+      if (usuario.role === 1) {
+        carona = await Carona.findByPk(caronaId, {
+          where: { id_motorista: usuario.id },
+        });
+      } else {
+        carona = await PassageirosCaronas.findOne({
+          where: {
+            id_passageiro: usuario.id,
+            id_carona: caronaId,
+          },
+        });
+      }
 
-    console.log(`Usuário ${usuario.name} entrou na carona ${caronaId}`);
+      if (carona) {
+        socket.join(caronaId);
+        socket.caronaId = caronaId;
+        socket.usuario = usuario;
+
+        console.log(`Usuário ${usuario.name} entrou na carona ${caronaId}`);
+
+        // Busca o histórico e inclui o autor da mensagem
+        const historico = await MensagemCarona.findAll({
+          where: { 
+            caronaId: caronaId
+           },
+          order: [["createdAt", "ASC"]],
+        });
+       
+        socket.emit("historicoMensagens", historico);
+      } else {
+        console.log(`Usuário ${usuario.name} não pertence à carona ${caronaId}`);
+      }
+    } catch (error) {
+      console.error("Erro ao verificar carona ou carregar histórico:", error);
+    }
   });
 
+
   // Escuta quando uma mensagem é enviada
-  socket.on("mensagem", (data) => {
+  socket.on("mensagem", async (data) => {
     const { caronaId, mensagem, usuario, usuarioId } = data;
+
     if (socket.caronaId === caronaId) { // Verifica se o usuário está na sala correta
       console.log("Mensagem recebida:", data);
+
+      // Salva a mensagem no banco de dados
+      await MensagemCarona.create({
+        caronaId,
+        usuarioId,
+        mensagem,
+      });
+
       io.to(caronaId).emit("mensagem", data); // Envia a mensagem para todos na sala da carona
     } else {
       console.log("Tentativa de envio de mensagem para carona incorreta:", data);
@@ -52,6 +94,7 @@ io.on("connection", (socket) => {
     console.log("Usuário desconectado:", socket.id);
   });
 });
+
 
 
 server.listen(3001, () => {
