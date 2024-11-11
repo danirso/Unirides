@@ -37,7 +37,12 @@ function DashboardMotorista() {
   
     // Recebe o histórico de mensagens quando entra em uma carona
     socket.on("historicoMensagens", (mensagens) => {
-      setHistoricoMensagens(mensagens);
+      console.log("Mensagens Recebidas:", mensagens); // Verifica a estrutura das mensagens recebidas
+      const mensagensComNomes = mensagens.map((msg) => ({
+        ...msg,
+        usuario: msg.autor ? msg.autor.nome : msg.autor.nome, // Usa o nome do autor se disponível
+      }));
+      setHistoricoMensagens(mensagensComNomes);
     });
   
     return () => {
@@ -163,17 +168,18 @@ function DashboardMotorista() {
     });
   };
 
+ 
   const abrirChat = (caronaId) => {
     setChatCaronaId(caronaId);
     setIsChatMinimized(false);
-
-    socket.emit("entrarCarona",caronaId,{
+  
+    // Envia ao servidor o caronaId e os dados do usuário ao abrir o chat
+    socket.emit("entrarCarona", caronaId, {
       name: usuario.name,
       id: usuario.id,
-      role: usuario.role,
+      role:usuario.role,
     });
   };
-
   const minimizarChat = () => {
     setIsChatMinimized(!isChatMinimized);
   };
@@ -436,16 +442,16 @@ function DashboardMotorista() {
                 {historicoMensagens.length > 0 ? (
                 historicoMensagens.map((msg, index) => (
                   <div
-                    key={index}
-                    style={{
-                      marginBottom: "8px",
-                      backgroundColor: msg.usuario === "Motorista" ? "#d4edda" : "#f1f1f1",
-                      padding: "8px",
-                      borderRadius: "5px",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    <strong>{msg.usuario === usuario.name ? "Você" : msg.usuario}:</strong> {msg.mensagem} 
+                      key={index}
+                      style={{
+                        marginBottom: "8px",
+                        backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
+                        padding: "8px",
+                        borderRadius: "5px",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                    <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.nome || "Desconhecido"}:</strong> {msg.mensagem}
                   </div>
                 ))
               ) : (
@@ -479,7 +485,11 @@ function DashboardMotorista() {
                   }}
                 />
                 <button
-                  onClick={enviarMensagem}
+                  onClick={() => {
+                    if (mensagem.trim() !== "") { // verifica se a mensagem não está vazia
+                      enviarMensagem();
+                    }
+                  }}
                   style={{
                     padding: "8px 12px",
                     backgroundColor: "#007bff",

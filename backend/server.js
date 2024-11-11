@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
         const historico = await MensagemCarona.findAll({
           where: { caronaId: caronaId },
           order: [["createdAt", "ASC"]],
-          include: [{ model: Usuario, as: "autor", attributes: ["name"] }], // Inclui o nome do autor
+          include: [{ model: Usuario, as: "autor", attributes: ["nome"] }], // Inclui o nome do autor
         });
         
         console.log("Histórico de Mensagens:", JSON.stringify(historico, null, 2)); // Exibe a estrutura completa

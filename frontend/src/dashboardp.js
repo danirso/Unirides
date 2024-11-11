@@ -31,12 +31,12 @@ function Dashboard() {
       setHistoricoMensagens((prev) => [...prev, data]);
     });
   
-    // Recebe o histórico de mensagens quando entra em uma carona
+    
   socket.on("historicoMensagens", (mensagens) => {
     console.log("Mensagens Recebidas:", mensagens); // Verifica a estrutura das mensagens recebidas
     const mensagensComNomes = mensagens.map((msg) => ({
       ...msg,
-      usuario: msg.autor ? msg.autor.name : "Desconhecido", // Usa o nome do autor se disponível
+      usuario: msg.autor ? msg.autor.nome : msg.autor.nome, // Usa o nome do autor se disponível
     }));
     setHistoricoMensagens(mensagensComNomes);
   });
@@ -492,7 +492,7 @@ function Dashboard() {
                         wordBreak: "break-word",
                       }}
                     >
-                      <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.name || "Desconhecido"}:</strong> {msg.mensagem}
+                      <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.nome || "Desconhecido"}:</strong> {msg.mensagem}
                     </div>
                   ))
                 ) : (
