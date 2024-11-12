@@ -24,7 +24,7 @@ function DashboardMotorista() {
   });
   const [mensagem, setMensagem] = useState("");
   const [historicoMensagens, setHistoricoMensagens] = useState([]);
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
   const inputRef = useRef(null);
@@ -170,6 +170,7 @@ function DashboardMotorista() {
 
  
   const abrirChat = (caronaId) => {
+    setShowChat(true);
     setChatCaronaId(caronaId);
     setIsChatMinimized(false);
   

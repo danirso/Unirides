@@ -20,7 +20,7 @@ function Dashboard() {
   const [showMinhasCaronas, setShowMinhasCaronas] = useState(true);
   const [mensagem, setMensagem] = useState("");
   const [historicoMensagens, setHistoricoMensagens] = useState([]);
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
   const inputRef = useRef(null);
@@ -167,6 +167,7 @@ function Dashboard() {
   };
 
   const abrirChat = (caronaId) => {
+    setShowChat(true);
     setChatCaronaId(caronaId); // Define o ID da carona para o chat
     setIsChatMinimized(false); // Abre o chat se estiver minimizado
   
@@ -353,12 +354,6 @@ function Dashboard() {
                 onClick={() => solicitarCarona(carona.id)}
               >
                 Solicitar Carona
-              </button>
-              <button
-                className="btn btn-warning"
-                onClick={() => abrirChat(carona.id)} // Mantém a função abrirChat para abrir o chat da carona específica
-              >
-                Falar com o Motorista
               </button>
             </div>
           </div>
