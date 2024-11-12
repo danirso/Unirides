@@ -13,7 +13,7 @@ function LandPage() {
   };
 
   const inputStyle = {
-    width: "100%",
+    width: "45%",
     padding: "0.75rem",
     margin: "0.5rem 0",
     borderRadius: "8px",
@@ -22,7 +22,7 @@ function LandPage() {
   };
 
   const textareaStyle = {
-    width: "100%",
+    width: "45%",
     padding: "0.75rem",
     margin: "0.5rem 0",
     borderRadius: "8px",
@@ -244,63 +244,34 @@ function LandPage() {
           amizades. Cadastre-se agora e junte-se à nossa comunidade!
         </p>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "1rem",
-            marginBottom: "2rem",
-          }}
-        >
-          <button
-            style={{
-              padding: "0.75rem 1.5rem",
-              backgroundColor: "#38b000",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-            onClick={() => scrollToSection("/signup")}
-          >
-            Dar Carona
-          </button>
-          <button
-            style={{
-              padding: "0.75rem 1.5rem",
-              backgroundColor: "#38b000",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-            onClick={() => scrollToSection("/signup")}
-          >
-            Pegar Carona
-          </button>
+      {/* Carroussel de imagens */}
+      <div id="CarroseldeImagens" class="carousel slide carousel-fade" data-ride="carousel" data-interval="3000" data-wrap="true">
+        <ol class="carousel-indicators">
+          <li data-target="#CarroseldeImagens" data-slide-to="0" class="active"></li>
+          <li data-target="#CarroseldeImagens" data-slide-to="1"></li>
+          <li data-target="#CarroseldeImagens" data-slide-to="2"></li>
+        </ol>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img class="d-block w-100" src="carona4.png" alt="primeira imagem"/>
+          </div>
+          <div class="carousel-item">
+            <img class="d-block w-100" src="carona5.png" alt="segunda imagem"/>
+          </div>
+          <div class="carousel-item">
+            <img class="d-block w-100" src="carona6.png" alt="terceira imagem"/>
+          </div>
         </div>
+        <a class="carousel-control-prev" href="#CarroseldeImagens" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#CarroseldeImagens" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
 
-        <div className="carousel-item">
-          <img
-            src={"/carona1.png"}
-            alt="Carona 1"
-            style={{ width: "100%", height: "auto" }}
-          />
-        </div>
-        <div className="carousel-item">
-          <img
-            src={"/carona2.png"}
-            alt="Carona 2"
-            style={{ width: "100%", height: "auto" }}
-          />
-        </div>
-        <div className="carousel-item">
-          <img
-            src={"/carona3.png"}
-            alt="Carona 3"
-            style={{ width: "100%", height: "auto" }}
-          />
-        </div>
       </section>
 
       {/* Sessão de apresentação */}
@@ -372,26 +343,51 @@ function LandPage() {
           <strong>contato@sistemadecaronas.com</strong>
         </p>
 
+        <div
+          style={{
+            display: "flex",               // Define um layout flex para colocar os itens lado a lado
+            justifyContent: "space-between", // Espaço entre o formulário e a imagem
+            alignItems: "flex-start",       // Alinha os itens ao topo
+            marginTop: "2rem",
+          }}
+        />
+
+
         {/* Formulário de contato */}
-        <div style={{ marginTop: "2rem" }}>
+        <div style={{ flex: 1, marginRight: "2rem" }}>
           <h3 style={{ color: "#38b000" }}>Envie uma Mensagem</h3>
           <form>
             <label style={{ display: "block", marginBottom: "0.5rem" }}>
               Nome:
+              <br />
               <input type="text" placeholder="Seu nome" style={inputStyle} />
             </label>
             <label style={{ display: "block", marginBottom: "0.5rem" }}>
               E-mail:
+              <br />
               <input type="email" placeholder="Seu e-mail" style={inputStyle} />
             </label>
             <label style={{ display: "block", marginBottom: "0.5rem" }}>
               Mensagem:
+              <br />
               <textarea placeholder="Sua mensagem" style={textareaStyle} />
             </label>
             <button type="submit" style={buttonStyle}>
               Enviar Mensagem
             </button>
           </form>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <img
+            src="contato.png"
+            alt="Imagem de contato"
+            style={{
+              width: "100%", // Ajuste o tamanho da imagem
+              maxWidth: "300px", // Limite o tamanho máximo da imagem
+              height: "auto", // Mantenha a proporção da imagem
+            }}
+          />
         </div>
 
         {/* Redes sociais */}
