@@ -61,9 +61,10 @@ function Login() {
       }}
     >
       <button
-        className="btn btn-info me-2"
+        className="btn me-2"
         onClick={handleBackTolandPage}
         style={{
+          backgroundColor: "#8fdcbc",
           position: "absolute",
           top: "20px",
           right: "20px",
@@ -161,15 +162,15 @@ function Login() {
           <button
             className="btn w-100"
             style={{
-              backgroundColor: "#38b000",
+              backgroundColor: "#8fdcbc",
               color: "#fff",
               padding: "10px",
               fontWeight: "bold",
               borderRadius: "8px",
               transition: "background 0.3s",
             }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#2c8200")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#38b000")}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#76ad96")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#8fdcbc")}
           >
             Login
           </button>
@@ -192,7 +193,7 @@ function Login() {
           </Link>
 
           <p className="text-center mb-0">
-            retornar - {" "}
+            retornar -{" "}
             <Link to="/" className="text-primary">
               Inicio
             </Link>
