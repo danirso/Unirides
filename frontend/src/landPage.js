@@ -33,7 +33,7 @@ function LandPage() {
 
   const buttonStyle = {
     padding: "0.75rem 1.5rem",
-    backgroundColor: "#38b000",
+    backgroundColor: "#8fdcbc",
     color: "#fff",
     border: "none",
     borderRadius: "8px",
@@ -49,7 +49,7 @@ function LandPage() {
   };
 
   socialIconStyle[":hover"] = {
-    color: "#38b000",
+    color: "#8fdcbc",
   };
 
   return (
@@ -69,15 +69,23 @@ function LandPage() {
       >
         {/* Logo e Links */}
         <div style={{ display: "flex", alignItems: "center" }}>
+          <img
+            src={`${process.env.PUBLIC_URL}/logo.png`}
+            alt="UniRides logo"
+            style={{
+              width: "50px", // ajuste o tamanho conforme necessário
+              marginRight: "10px",
+            }}
+          />
           <div
             style={{
               fontSize: "1.5rem",
               fontWeight: "bold",
-              color: "#38b000",
+              color: "#8fdcbc",
               marginRight: "1.5rem",
             }}
           >
-            Unirides - Caronas
+            Unirides
           </div>
           <div style={{ display: "flex", gap: "1rem" }}>
             <button
@@ -230,7 +238,7 @@ function LandPage() {
           color: "#f7f9fc",
         }}
       >
-        <h1 style={{ fontSize: "2.5rem", color: "#38b000" }}>
+        <h1 style={{ fontSize: "2.5rem", color: "#8fdcbc" }}>
           Bem-vindo ao Unirides
         </h1>
         <p
@@ -281,49 +289,95 @@ function LandPage() {
           padding: "4rem 2rem",
           background: "linear-gradient(to right, #1a262f, #203a44, #2b4e64)",
           color: "#f7f9fc",
+          textAlign: "center",
         }}
       >
-        <h2 style={{ fontSize: "2rem", color: "#38b000" }}>Quem Somos</h2>
-        <p style={{ fontSize: "1rem", color: "#f7f9fc", lineHeight: "1.6" }}>
+        <h2
+          style={{ fontSize: "2rem", color: "#8fdcbc", marginBottom: "2rem" }}
+        >
+          Quem Somos
+        </h2>
+        <p
+          style={{
+            fontSize: "1rem",
+            color: "#f7f9fc",
+            lineHeight: "1.6",
+            marginBottom: "2rem",
+          }}
+        >
           No <strong>Unirides</strong>, acreditamos que cada viagem é uma
           oportunidade para compartilhar experiências, reduzir custos e tornar o
           mundo mais sustentável. Somos uma plataforma inovadora que conecta
           motoristas e passageiros com um objetivo comum: facilitar
           deslocamentos de forma prática, segura e econômica.
         </p>
-        <p style={{ fontSize: "1rem", color: "#f7f9fc", lineHeight: "1.6" }}>
-          Nossa missão é promover um ambiente confiável e dinâmico, onde tanto
-          motoristas quanto passageiros possam planejar suas caronas com
-          transparência e flexibilidade. Seja para viagens diárias para o
-          trabalho ou para trajetos de longa distância, oferecemos uma solução
-          de mobilidade que se adapta às necessidades dos nossos usuários.
-        </p>
-        <p style={{ fontSize: "1rem", color: "#f7f9fc", lineHeight: "1.6" }}>
-          <strong>Por que escolher o Unirides - Sistema de Caronas?</strong>
-          <br />
-          <ul>
-            <li>
-              <strong>Segurança em Primeiro Lugar:</strong> Valorizamos sua
-              segurança e desenvolvemos um sistema que permite que motoristas e
-              passageiros avaliem uns aos outros, criando uma rede de confiança
-              e credibilidade.
-            </li>
-            <li>
-              <strong>Sustentabilidade:</strong> Ao compartilhar o trajeto, você
-              reduz sua pegada de carbono, contribuindo para um planeta mais
-              verde e sustentável.
-            </li>
-            <li>
-              <strong>Conveniência e Economia:</strong> Evite o estresse dos
-              transportes públicos ou os altos custos de viagens individuais.
-              Com o Unirides, você divide despesas e viaja com conforto.
-            </li>
-          </ul>
-        </p>
-        <p style={{ fontSize: "1rem", color: "#f7f9fc", lineHeight: "1.6" }}>
-          Somos uma equipe apaixonada por inovação e bem-estar. Com o{" "}
-          <strong>Unirides</strong>, cada usuário faz parte de uma comunidade de
-          pessoas que acreditam em um futuro mais colaborativo e sustentável.
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1.5rem",
+            alignItems: "center",
+          }}
+        >
+          {/* Box 1 */}
+          <div
+            style={{
+              backgroundColor: "#203a44",
+              padding: "1.5rem",
+              borderRadius: "8px",
+              maxWidth: "600px",
+              width: "100%",
+            }}
+          >
+            <strong>Segurança em Primeiro Lugar:</strong> Valorizamos sua
+            segurança e desenvolvemos um sistema que permite que motoristas e
+            passageiros avaliem uns aos outros, criando uma rede de confiança e
+            credibilidade.
+          </div>
+
+          {/* Box 2 */}
+          <div
+            style={{
+              backgroundColor: "#203a44",
+              padding: "1.5rem",
+              borderRadius: "8px",
+              maxWidth: "600px",
+              width: "100%",
+            }}
+          >
+            <strong>Sustentabilidade:</strong> Ao compartilhar o trajeto, você
+            reduz sua pegada de carbono, contribuindo para um planeta mais verde
+            e sustentável.
+          </div>
+
+          {/* Box 3 */}
+          <div
+            style={{
+              backgroundColor: "#203a44",
+              padding: "1.5rem",
+              borderRadius: "8px",
+              maxWidth: "600px",
+              width: "100%",
+            }}
+          >
+            <strong>Conveniência e Economia:</strong> Evite o estresse dos
+            transportes públicos ou os altos custos de viagens individuais. Com
+            o Unirides, você divide despesas e viaja com conforto.
+          </div>
+        </div>
+
+        <p
+          style={{
+            fontSize: "1rem",
+            color: "#f7f9fc",
+            lineHeight: "1.6",
+            marginTop: "2rem",
+          }}
+        >
+          Somos uma equipe apaixonada por inovação e bem-estar. Com o Unirides,
+          você encontra mais do que uma carona: encontra uma experiência de
+          mobilidade eficiente e prazerosa!
         </p>
       </section>
 
@@ -336,7 +390,7 @@ function LandPage() {
           color: "#f7f9fc",
         }}
       >
-        <h2 style={{ fontSize: "2rem", color: "#38b000" }}>Contato</h2>
+        <h2 style={{ fontSize: "2rem", color: "#8fdcbc" }}>Contato</h2>
 
         <p style={{ fontSize: "1rem", color: "#f7f9fc" }}>
           Entre em contato conosco pelo email: <br />
@@ -355,7 +409,7 @@ function LandPage() {
 
         {/* Formulário de contato */}
         <div style={{ flex: 1, marginRight: "2rem" }}>
-          <h3 style={{ color: "#38b000" }}>Envie uma Mensagem</h3>
+          <h3 style={{ color: "#8fdcbc" }}>Envie uma Mensagem</h3>
           <form>
             <label style={{ display: "block", marginBottom: "0.5rem" }}>
               Nome:
@@ -392,13 +446,13 @@ function LandPage() {
 
         {/* Redes sociais */}
         <div style={{ marginTop: "3rem" }}>
-          <h3 style={{ color: "#38b000" }}>Siga-nos nas Redes Sociais</h3>
+          <h3 style={{ color: "#8fdcbc" }}>Siga-nos nas Redes Sociais</h3>
           <div style={{ display: "flex", gap: "1rem" }}>
             <a
               href="https://www.facebook.com/puccampinas/?locale=pt_BR"
               target="_blank"
               style={socialIconStyle}
-              onMouseEnter={(e) => (e.target.style.color = "#38b000")} // fica verde se passa em cima com o mouse
+              onMouseEnter={(e) => (e.target.style.color = "#8fdcbc")} // fica verde se passa em cima com o mouse
               onMouseLeave={(e) => (e.target.style.color = "#f7f9fc")} // Cor original ao tirar o mouse
             >
               <i className="fab fa-facebook-f"></i>
@@ -407,7 +461,7 @@ function LandPage() {
               href="https://www.instagram.com/puccampinas/"
               target="_blank"
               style={socialIconStyle}
-              onMouseEnter={(e) => (e.target.style.color = "#38b000")}
+              onMouseEnter={(e) => (e.target.style.color = "#8fdcbc")}
               onMouseLeave={(e) => (e.target.style.color = "#f7f9fc")}
             >
               <i className="fab fa-instagram"></i>
@@ -416,7 +470,7 @@ function LandPage() {
               href="https://x.com/puccampinas"
               target="_blank"
               style={socialIconStyle}
-              onMouseEnter={(e) => (e.target.style.color = "#38b000")}
+              onMouseEnter={(e) => (e.target.style.color = "#8fdcbc")}
               onMouseLeave={(e) => (e.target.style.color = "#f7f9fc")}
             >
               <i className="fab fa-twitter"></i>
@@ -436,7 +490,7 @@ function LandPage() {
       >
         {/* Endereço */}
         <div style={{ marginTop: "1.5rem" }}>
-          <h3 style={{ color: "#38b000" }}>Nosso Endereço</h3>
+          <h3 style={{ color: "#8fdcbc" }}>Nosso Endereço</h3>
           <p>
             Av. Reitor Benedito José Barreto Fonseca, H15 - Parque dos
             Jacarandás, Campinas - SP
@@ -445,7 +499,7 @@ function LandPage() {
 
         {/* Mapa */}
         <div style={{ marginTop: "3rem" }}>
-          <h3 style={{ color: "#38b000" }}>Encontre-nos no Mapa</h3>
+          <h3 style={{ color: "#8fdcbc" }}>Encontre-nos no Mapa</h3>
           <div>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.060320348315!2d-47.05483758442353!3d-22.834080985049522!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8c423e9c92bc5%3A0xce9a7f4920d1df4b!2sAv.%20Reitor%20Benedito%20Jos%C3%A9%20Barreto%20Fonseca%2C%20H15%20-%20Parque%20dos%20Jacarand%C3%A1s%2C%20Campinas%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1697061014515!5m2!1spt-BR!2sbr"
