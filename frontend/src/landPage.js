@@ -13,7 +13,7 @@ function LandPage() {
   };
 
   const inputStyle = {
-    width: "45%",
+    width: "80%",
     padding: "0.75rem",
     margin: "0.5rem 0",
     borderRadius: "8px",
@@ -22,7 +22,7 @@ function LandPage() {
   };
 
   const textareaStyle = {
-    width: "45%",
+    width: "80%",
     padding: "0.75rem",
     margin: "0.5rem 0",
     borderRadius: "8px",
@@ -253,7 +253,7 @@ function LandPage() {
         </p>
 
       {/* Carroussel de imagens */}
-      <div id="CarroseldeImagens" class="carousel slide carousel-fade" data-ride="carousel" data-interval="3000" data-wrap="true">
+      <div id="CarroseldeImagens" class="carousel slide carousel-fade" data-ride="carousel" data-interval="4000" data-wrap="true">
         <ol class="carousel-indicators">
           <li data-target="#CarroseldeImagens" data-slide-to="0" class="active"></li>
           <li data-target="#CarroseldeImagens" data-slide-to="1"></li>
@@ -261,13 +261,25 @@ function LandPage() {
         </ol>
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img class="d-block w-100" src="carona4.png" alt="primeira imagem"/>
+            <img 
+            class="d-block w-100" 
+            src="carona4.png" 
+            alt="primeira imagem" 
+            style={{ height: '500px', objectFit: 'hidden' }}/>
           </div>
           <div class="carousel-item">
-            <img class="d-block w-100" src="carona5.png" alt="segunda imagem"/>
+            <img 
+            class="d-block w-100" 
+            src="carona5.png" 
+            alt="segunda imagem" 
+            style={{ height: '500px', objectFit: 'hidden' }}/>
           </div>
           <div class="carousel-item">
-            <img class="d-block w-100" src="carona6.png" alt="terceira imagem"/>
+            <img 
+            class="d-block w-100" 
+            src="carona6.png" 
+            alt="terceira imagem" 
+            style={{ height: '500px', objectFit: 'hidden' }}/>
           </div>
         </div>
         <a class="carousel-control-prev" href="#CarroseldeImagens" role="button" data-slide="prev">
@@ -284,102 +296,113 @@ function LandPage() {
 
       {/* Sessão de apresentação */}
       <section
-        id="quem-somos"
+  id="quem-somos"
+  style={{
+    padding: "4rem 2rem",
+    background: "linear-gradient(to right, #1a262f, #203a44, #2b4e64)",
+    color: "#f7f9fc",
+    textAlign: "center",
+  }}
+>
+  <h2 style={{ fontSize: "2rem", color: "#8fdcbc", marginBottom: "2rem" }}>
+    Quem Somos
+  </h2>
+  <p
+    style={{
+      fontSize: "1rem",
+      color: "#f7f9fc",
+      lineHeight: "1.6",
+      marginBottom: "2rem",
+    }}
+  >
+    No <strong>Unirides</strong>, acreditamos que cada viagem é uma oportunidade para compartilhar experiências, reduzir custos e tornar o mundo mais sustentável. Somos uma plataforma inovadora que conecta motoristas e passageiros com um objetivo comum: facilitar deslocamentos de forma prática, segura e econômica.
+  </p>
+
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between", // Espaço entre as caixas e a imagem
+      alignItems: "center", // Alinha os itens no topo
+      maxWidth: "1200px", // Limita a largura total
+      margin: "0 auto", // Centraliza o container
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1.5rem",
+        width: "60%", // Ajuste a largura das caixas
+        marginRight: "2rem",
+      }}
+    >
+      {/* Box 1 */}
+      <div
         style={{
-          padding: "4rem 2rem",
-          background: "linear-gradient(to right, #1a262f, #203a44, #2b4e64)",
-          color: "#f7f9fc",
-          textAlign: "center",
+          backgroundColor: "#203a44",
+          padding: "1.5rem",
+          borderRadius: "8px",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+          color: "#fff",
         }}
       >
-        <h2
-          style={{ fontSize: "2rem", color: "#8fdcbc", marginBottom: "2rem" }}
-        >
-          Quem Somos
-        </h2>
-        <p
-          style={{
-            fontSize: "1rem",
-            color: "#f7f9fc",
-            lineHeight: "1.6",
-            marginBottom: "2rem",
-          }}
-        >
-          No <strong>Unirides</strong>, acreditamos que cada viagem é uma
-          oportunidade para compartilhar experiências, reduzir custos e tornar o
-          mundo mais sustentável. Somos uma plataforma inovadora que conecta
-          motoristas e passageiros com um objetivo comum: facilitar
-          deslocamentos de forma prática, segura e econômica.
-        </p>
+        <strong>Segurança em Primeiro Lugar:</strong> Valorizamos sua segurança e desenvolvemos um sistema que permite que motoristas e passageiros avaliem uns aos outros, criando uma rede de confiança e credibilidade.
+      </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.5rem",
-            alignItems: "center",
-          }}
-        >
-          {/* Box 1 */}
-          <div
-            style={{
-              backgroundColor: "#203a44",
-              padding: "1.5rem",
-              borderRadius: "8px",
-              maxWidth: "600px",
-              width: "100%",
-            }}
-          >
-            <strong>Segurança em Primeiro Lugar:</strong> Valorizamos sua
-            segurança e desenvolvemos um sistema que permite que motoristas e
-            passageiros avaliem uns aos outros, criando uma rede de confiança e
-            credibilidade.
-          </div>
+      {/* Box 2 */}
+      <div
+        style={{
+          backgroundColor: "#203a44",
+          padding: "1.5rem",
+          borderRadius: "8px",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+          color: "#fff",
+        }}
+      >
+        <strong>Sustentabilidade:</strong> Ao compartilhar o trajeto, você reduz sua pegada de carbono, contribuindo para um planeta mais verde e sustentável.
+      </div>
 
-          {/* Box 2 */}
-          <div
-            style={{
-              backgroundColor: "#203a44",
-              padding: "1.5rem",
-              borderRadius: "8px",
-              maxWidth: "600px",
-              width: "100%",
-            }}
-          >
-            <strong>Sustentabilidade:</strong> Ao compartilhar o trajeto, você
-            reduz sua pegada de carbono, contribuindo para um planeta mais verde
-            e sustentável.
-          </div>
+      {/* Box 3 */}
+      <div
+        style={{
+          backgroundColor: "#203a44",
+          padding: "1.5rem",
+          borderRadius: "8px",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+          color: "#fff",
+        }}
+      >
+        <strong>Conveniência e Economia:</strong> Evite o estresse dos transportes públicos ou os altos custos de viagens individuais. Com o Unirides, você divide despesas e viaja com conforto.
+      </div>
+    </div>
 
-          {/* Box 3 */}
-          <div
-            style={{
-              backgroundColor: "#203a44",
-              padding: "1.5rem",
-              borderRadius: "8px",
-              maxWidth: "600px",
-              width: "100%",
-            }}
-          >
-            <strong>Conveniência e Economia:</strong> Evite o estresse dos
-            transportes públicos ou os altos custos de viagens individuais. Com
-            o Unirides, você divide despesas e viaja com conforto.
-          </div>
-        </div>
+    <div style={{ flex: "1", display: "flex", alignItems: "center" }}>
+      <img
+        src="quemSomos4.png"
+        alt="Imagem de apresentação"
+        style={{
+          width: "80%", // Ajuste a largura da imagem
+          maxWidth: "400px", // Defina um tamanho máximo para a imagem
+          height: "auto",
+          borderRadius: "8px", // Arredonda os cantos da imagem
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)", // Adiciona sombra à imagem
+        }}
+      />
+    </div>
+  </div>
 
-        <p
-          style={{
-            fontSize: "1rem",
-            color: "#f7f9fc",
-            lineHeight: "1.6",
-            marginTop: "2rem",
-          }}
-        >
-          Somos uma equipe apaixonada por inovação e bem-estar. Com o Unirides,
-          você encontra mais do que uma carona: encontra uma experiência de
-          mobilidade eficiente e prazerosa!
-        </p>
-      </section>
+  <p
+    style={{
+      fontSize: "1rem",
+      color: "#f7f9fc",
+      lineHeight: "1.6",
+      marginTop: "2rem",
+    }}
+  >
+    Somos uma equipe apaixonada por inovação e bem-estar. Com o Unirides, você encontra mais do que uma carona: encontra uma experiência de mobilidade eficiente e prazerosa!
+  </p>
+</section>
+
 
       {/* Sessão de Contato */}
       <section
@@ -390,25 +413,15 @@ function LandPage() {
           color: "#f7f9fc",
         }}
       >
-        <h2 style={{ fontSize: "2rem", color: "#8fdcbc" }}>Contato</h2>
+       <h2 style={{ fontSize: '2rem', color: '#8fdcbc' }}>Contato</h2>
+          
+          <p style={{ fontSize: '1rem', color: '#f7f9fc' }}>
+            Entre em contato conosco pelo email: <br />
+            <strong>contato@sistemadecaronas.com</strong>
+          </p>
 
-        <p style={{ fontSize: "1rem", color: "#f7f9fc" }}>
-          Entre em contato conosco pelo email: <br />
-          <strong>contato@sistemadecaronas.com</strong>
-        </p>
-
-        <div
-          style={{
-            display: "flex",               // Define um layout flex para colocar os itens lado a lado
-            justifyContent: "space-between", // Espaço entre o formulário e a imagem
-            alignItems: "flex-start",       // Alinha os itens ao topo
-            marginTop: "2rem",
-          }}
-        />
-
-
-        {/* Formulário de contato */}
-        <div style={{ flex: 1, marginRight: "2rem" }}>
+          {/* Formulário de contato */}
+          <div style={{ marginTop: '2rem' }}>
           <h3 style={{ color: "#8fdcbc" }}>Envie uma Mensagem</h3>
           <form>
             <label style={{ display: "block", marginBottom: "0.5rem" }}>
@@ -428,21 +441,10 @@ function LandPage() {
             </label>
             <button type="submit" style={buttonStyle}>
               Enviar Mensagem
-            </button>
-          </form>
-        </div>
-
-        <div style={{ flex: 1 }}>
-          <img
-            src="contato.png"
-            alt="Imagem de contato"
-            style={{
-              width: "100%", // Ajuste o tamanho da imagem
-              maxWidth: "300px", // Limite o tamanho máximo da imagem
-              height: "auto", // Mantenha a proporção da imagem
-            }}
-          />
-        </div>
+              </button>
+            </form>
+          </div>
+        
 
         {/* Redes sociais */}
         <div style={{ marginTop: "3rem" }}>
@@ -490,16 +492,28 @@ function LandPage() {
       >
         {/* Endereço */}
         <div style={{ marginTop: "1.5rem" }}>
-          <h3 style={{ color: "#8fdcbc" }}>Nosso Endereço</h3>
+          <h3 style={{ color: "#8fdcbc" }}>
+            <i
+              className="fas fa-map-marker-alt"
+              style={{ marginRight: "0.5rem", color: "#B22222" }}
+            ></i>
+            Nosso Endereço
+          </h3>
           <p>
-            Av. Reitor Benedito José Barreto Fonseca, H15 - Parque dos
-            Jacarandás, Campinas - SP
+            Av. Reitor Benedito José Barreto Fonseca, H15 - Parque dos Jacarandás, Campinas - SP
           </p>
         </div>
 
+
         {/* Mapa */}
         <div style={{ marginTop: "3rem" }}>
-          <h3 style={{ color: "#8fdcbc" }}>Encontre-nos no Mapa</h3>
+          <h3 style={{ color: "#8fdcbc", display: "flex", alignItems: "center" }}>
+            <i
+              className="fas fa-map"
+              style={{ marginRight: "0.5rem", color: "#B22222" }}
+            ></i>
+            Encontre-nos no Mapa
+          </h3>
           <div>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.060320348315!2d-47.05483758442353!3d-22.834080985049522!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8c423e9c92bc5%3A0xce9a7f4920d1df4b!2sAv.%20Reitor%20Benedito%20Jos%C3%A9%20Barreto%20Fonseca%2C%20H15%20-%20Parque%20dos%20Jacarand%C3%A1s%2C%20Campinas%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1697061014515!5m2!1spt-BR!2sbr"
@@ -512,6 +526,7 @@ function LandPage() {
             ></iframe>
           </div>
         </div>
+
       </section>
     </div>
   );
