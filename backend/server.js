@@ -2,8 +2,105 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 3000;
-const { Carona, Usuario, CarInfo, PassageirosCaronas } = require("./models");
-const { Op, where } = require("sequelize");
+const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
+const { Op, where, Model } = require("sequelize");
+const http = require('http');
+const cors = require('cors');
+
+const server = http.createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:3000", // URL do frontend
+    methods: ["GET", "POST"]
+  }
+});
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET","POST"],
+  credentials: true
+}));
+
+app.get('/test',(req,res)=> {
+  res.json({message:'all working, buddy'});
+});
+
+io.on("connection", (socket) => {
+  console.log("Usuário conectado:", socket.id);
+
+  // Entrar na sala da carona específica
+  socket.on("entrarCarona", async (caronaId, usuario) => {
+    try {
+      let carona;
+      if (usuario.role === 1) {
+        carona = await Carona.findByPk(caronaId, {
+          where: { id_motorista: usuario.id },
+        });
+      } else {
+        carona = await PassageirosCaronas.findOne({
+          where: {
+            id_passageiro: usuario.id,
+            id_carona: caronaId,
+          },
+        });
+      }
+
+      if (carona) {
+        socket.join(caronaId);
+        socket.caronaId = caronaId;
+        socket.usuario = usuario;
+
+        console.log(`Usuário ${usuario.name} entrou na carona ${caronaId}`);
+
+        // Busca o histórico e inclui o autor da mensagem
+        const historico = await MensagemCarona.findAll({
+          where: { caronaId: caronaId },
+          order: [["createdAt", "ASC"]],
+          include: [{ model: Usuario, as: "autor", attributes: ["nome"] }], // Inclui o nome do autor
+        });
+        
+        console.log("Histórico de Mensagens:", JSON.stringify(historico, null, 2)); // Exibe a estrutura completa
+        socket.emit("historicoMensagens", historico);        
+        
+        socket.emit("historicoMensagens", historico);
+      } else {
+        console.log(`Usuário ${usuario.name} não pertence à carona ${caronaId}`);
+      }
+    } catch (error) {
+      console.error("Erro ao verificar carona ou carregar histórico:", error);
+    }
+  });
+
+  // Escuta quando uma mensagem é enviada
+  socket.on("mensagem", async (data) => {
+    const { caronaId, mensagem, usuario, usuarioId } = data;
+
+    if (socket.caronaId === caronaId) { // Verifica se o usuário está na sala correta
+      console.log("Mensagem recebida:", data);
+
+      // Salva a mensagem no banco de dados
+      await MensagemCarona.create({
+        caronaId,
+        usuarioId,
+        mensagem,
+      });
+
+      io.to(caronaId).emit("mensagem", data); // Envia a mensagem para todos na sala da carona
+    } else {
+      console.log("Tentativa de envio de mensagem para carona incorreta:", data);
+    }
+  });
+
+  // Escuta a desconexão
+  socket.on("disconnect", () => {
+    console.log("Usuário desconectado:", socket.id);
+  });
+});
+
+
+
+server.listen(3001, () => {
+  console.log('Servidor rodando na porta 3001');
+});
 
 // Middleware para permitir JSON no body das requisições
 app.use(express.json());
@@ -189,7 +286,7 @@ app.put("/api/caronas/:id/sair", async (req, res) => {
 
 // Rota de API para cadastro de usuário
 app.post("/signup", async (req, res) => {
-  const { name, email, password, celular, ra, role, modelo, placa } = req.body;
+  const { name, email, password, celular, ra, role, modeloCarro, placa } = req.body;
 
   try {
     const existingUser = await Usuario.findOne({ where: { email } });
@@ -209,9 +306,9 @@ app.post("/signup", async (req, res) => {
     });
 
     if (role === 1) {
-      await CarInfo.create({
+        await CarInfo.create({
         id_motorista: newUser.id,
-        modelo,
+        modelo: modeloCarro,
         placa,
       });
     }
@@ -313,14 +410,27 @@ app.get("/api/historico/:userId/motorista", async (req, res) => {
         id_motorista: userId,
         horario: { [Op.lt]: new Date() },
       },
+      include: [
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+        },
+        {
+          model: Usuario,
+          as: "passageiros",
+          attributes: ["id", "nome"],
+          through: { attributes: [] }
+        }
+      ]
     });
-
     res.json(caronasMotorista);
   } catch (error) {
     console.error("Erro ao buscar histórico de caronas do motorista:", error);
     res.status(500).json({ error: "Erro ao buscar histórico" });
   }
 });
+
 
 // Rota para buscar informações de um usuário específico
 app.get("/api/usuario/:id", async (req, res) => {
@@ -335,6 +445,27 @@ app.get("/api/usuario/:id", async (req, res) => {
       res.status(500).json({ message: 'Erro ao buscar usuário' });
   }
 });
+
+// Rota para buscar informações carro
+app.get("/api/CarInfo/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const Carro = await CarInfo.findOne({
+      where: { 
+        id_motorista:id
+       },
+    });
+    if (!Carro) {
+      return res.status(404).json({ error: "Carro não encontrado" });
+    }
+    res.json(Carro);
+  } catch (error) {
+    console.error("Erro ao buscar dados do carro:", error);
+    res.status(500).json({ error: "Erro ao buscar dados do carro" });
+  }
+});
+
+
 
 // Rota de API para atualizar informações do usuário
 app.put("/api/usuario/:id", async (req, res) => {
@@ -362,6 +493,68 @@ app.put("/api/usuario/:id", async (req, res) => {
   }
 });
 
+
+app.put("/api/CarInfo/:id", async (req, res) => {
+  const { id } = req.params;
+  const {modelo,placa} = req.body;
+
+  try {
+    const Carro = await CarInfo.findOne({
+      where: { 
+        id_motorista:id
+       },
+    });
+    if (!Carro) {
+      return res.status(404).json({ error: "Carro não encontrado!" });
+    }
+
+    Carro.modelo = modelo || Carro.modelo;
+    Carro.placa = placa || Carro.placa;
+
+    await Carro.save();
+    res.status(200).json({ message: "Informações atualizadas com sucesso!", Carro });
+  } catch (error) {
+    console.error("Erro ao buscar dados do carro:", error);
+    res.status(500).json({ error: "Erro ao buscar dados do carro" });
+  }
+});
+
+app.post("/api/avaliacoes", async (req, res) => {
+  const { id_avaliador, id_carona, nota, texto_avaliativo,role } = req.body;
+
+  try {
+    let id_avaliado;
+
+    if (role === 0) {
+      const carona = await Carona.findOne({ where: { id: id_carona } });
+      if (!carona) {
+        return res.status(404).json({ message: "Carona não encontrada." });
+      }
+      id_avaliado = carona.id_motorista;
+    } else if (role === 1) {
+      id_avaliado = req.body.id_avaliado;
+    }
+    const avaliacaoExistente = await Avaliacoes.findOne({
+      where: { id_avaliador, id_avaliado, id_carona }
+    });
+
+    if (avaliacaoExistente) {
+      return res.status(400).json({ message: "Usuário já avaliado nesta carona!." });
+    }
+    const novaAvaliacao = await Avaliacoes.create({
+      id_avaliador,
+      id_avaliado,
+      id_carona,
+      nota,
+      texto_avaliativo
+    });
+
+    res.status(201).json(novaAvaliacao);
+  } catch (error) {
+    console.error("Erro ao salvar avaliação:", error);
+    res.status(500).json({ message: "Erro interno ao salvar avaliação." });
+  }
+});
 
 // Servir os arquivos estáticos do build do React (produção)
 app.use(express.static(path.join(__dirname, "..", "frontend", "build")));

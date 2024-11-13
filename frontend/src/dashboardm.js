@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:3001"); // Conectando ao backend na porta 3001
 
 function DashboardMotorista() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState({
     name: "",
     id: "",
+    role:"",
   });
   const [caronas, setCaronas] = useState([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -18,6 +22,46 @@ function DashboardMotorista() {
     ar: 0,
     musica: "",
   });
+  const [mensagem, setMensagem] = useState("");
+  const [historicoMensagens, setHistoricoMensagens] = useState([]);
+  const [showChat, setShowChat] = useState(false);
+  const [chatCaronaId, setChatCaronaId] = useState(null);
+  const [isChatMinimized, setIsChatMinimized] = useState(true);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    // Recebe novas mensagens em tempo real
+    socket.on("mensagem", (data) => {
+      setHistoricoMensagens((prev) => [...prev, data]);
+    });
+  
+    // Recebe o histórico de mensagens quando entra em uma carona
+    socket.on("historicoMensagens", (mensagens) => {
+      console.log("Mensagens Recebidas:", mensagens); // Verifica a estrutura das mensagens recebidas
+      const mensagensComNomes = mensagens.map((msg) => ({
+        ...msg,
+        usuario: msg.autor ? msg.autor.nome : msg.autor.nome, // Usa o nome do autor se disponível
+      }));
+      setHistoricoMensagens(mensagensComNomes);
+    });
+  
+    return () => {
+      socket.off("mensagem"); 
+      socket.off("historicoMensagens");
+    };
+  }, []);
+
+  const enviarMensagem = () => {
+    const mensagemData = {
+      mensagem,
+      usuario: usuario.name,
+      usuarioId: usuario.id,
+      caronaId: chatCaronaId,
+    };
+    socket.emit("mensagem", mensagemData);
+    setMensagem("");
+    inputRef.current.focus();
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -25,6 +69,7 @@ function DashboardMotorista() {
       setUsuario({
         name: user.nome,
         id: user.id,
+        role: user.role,
       });
       fetchCaronasMotorista(user.id);
     } else {
@@ -121,6 +166,23 @@ function DashboardMotorista() {
       ar: 0, 
       musica: "",
     });
+  };
+
+ 
+  const abrirChat = (caronaId) => {
+    setShowChat(true);
+    setChatCaronaId(caronaId);
+    setIsChatMinimized(false);
+  
+    // Envia ao servidor o caronaId e os dados do usuário ao abrir o chat
+    socket.emit("entrarCarona", caronaId, {
+      name: usuario.name,
+      id: usuario.id,
+      role:usuario.role,
+    });
+  };
+  const minimizarChat = () => {
+    setIsChatMinimized(!isChatMinimized);
   };
 
   return (
@@ -307,10 +369,16 @@ function DashboardMotorista() {
                         Música: {carona.musica}
                       </p>
                       <button
-                        className="btn btn-danger"
+                        className="btn btn-danger me-2" 
                         onClick={() => cancelarCarona(carona.id)}
                       >
                         Cancelar Carona
+                      </button>
+                      <button
+                        className="btn btn-warning"
+                        onClick={() => abrirChat(carona.id)}
+                      >
+                        Falar com o Passageiro
                       </button>
                     </div>
                   </div>
@@ -321,7 +389,124 @@ function DashboardMotorista() {
             </div>
           </div>
         </div>
-
+        {/* Componente de Chat */}
+        {showChat && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px", 
+            width: "350px",
+            zIndex: 1000,
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#343a40",
+              color: "#fff",
+              padding: "10px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <h5 style={{ margin: 0 }}>Chat com o Passageiro</h5>
+            <button
+              onClick={() => setIsChatMinimized(!isChatMinimized)}
+              style={{
+                padding: "5px",
+                backgroundColor: "#6c757d",
+                color: "#fff",
+                border: "none",
+                borderRadius: "3px",
+                cursor: "pointer",
+              }}
+            >
+              {isChatMinimized ? "Expandir" : "Minimizar"}
+            </button>
+          </div>
+          {!isChatMinimized && (
+            <>
+              <div
+                style={{
+                  maxHeight: "400px", 
+                  overflowY: "auto",
+                  padding: "10px",
+                  backgroundColor: "#f8f9fa",
+                  color: "#000", 
+                }}
+              >
+                {historicoMensagens.length > 0 ? (
+                historicoMensagens.map((msg, index) => (
+                  <div
+                      key={index}
+                      style={{
+                        marginBottom: "8px",
+                        backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
+                        padding: "8px",
+                        borderRadius: "5px",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                    <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.nome || "Desconhecido"}:</strong> {msg.mensagem}
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
+              )}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  padding: "10px",
+                  borderTop: "1px solid #ccc",
+                }}
+              >
+                <input
+                ref={inputRef}
+                  type="text"
+                  value={mensagem}
+                  onChange={(e) => setMensagem(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      enviarMensagem();
+                    }
+                  }}
+                  placeholder="Digite sua mensagem..."
+                  style={{
+                    flex: 1,
+                    padding: "8px",
+                    marginRight: "8px",
+                    border: "1px solid #ced4da",
+                    borderRadius: "4px",
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    if (mensagem.trim() !== "") { // verifica se a mensagem não está vazia
+                      enviarMensagem();
+                    }
+                  }}
+                  style={{
+                    padding: "8px 12px",
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Enviar
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
       </div>
     </div>   
   );

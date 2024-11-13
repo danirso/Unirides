@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:3001"); // Conectando ao backend na porta 3001
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState({ name: "", id: "" });
+  const [usuario, setUsuario] = useState({ name: "", id: "" , role:""});
   const [caronas, setCaronas] = useState([]);
   const [minhasCaronas, setMinhasCaronas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +18,46 @@ function Dashboard() {
   const [musica, setMusica] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showMinhasCaronas, setShowMinhasCaronas] = useState(true);
+  const [mensagem, setMensagem] = useState("");
+  const [historicoMensagens, setHistoricoMensagens] = useState([]);
+  const [showChat, setShowChat] = useState(false);
+  const [chatCaronaId, setChatCaronaId] = useState(null);
+  const [isChatMinimized, setIsChatMinimized] = useState(true);
+  const inputRef = useRef(null);
+  const [caronaAtiva, setCaronaAtiva] = useState(null);
+  
+  useEffect(() => {
+    // Recebe novas mensagens em tempo real
+    socket.on("mensagem", (data) => {
+      setHistoricoMensagens((prev) => [...prev, data]);
+    });
+  
+    
+  socket.on("historicoMensagens", (mensagens) => {
+    console.log("Mensagens Recebidas:", mensagens); // Verifica a estrutura das mensagens recebidas
+    const mensagensComNomes = mensagens.map((msg) => ({
+      ...msg,
+      usuario: msg.autor ? msg.autor.nome : msg.autor.nome, // Usa o nome do autor se disponível
+    }));
+    setHistoricoMensagens(mensagensComNomes);
+  });
+
+  return () => {
+    socket.off("historicoMensagens");
+  };
+}, []);
+  
+  const enviarMensagem = () => {
+    const mensagemData = {
+      mensagem,
+      usuario: usuario.name,
+      usuarioId: usuario.id,
+      caronaId: chatCaronaId,
+    };
+    socket.emit("mensagem", mensagemData);
+    setMensagem("");
+    inputRef.current.focus();
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -22,6 +65,7 @@ function Dashboard() {
       setUsuario({
         name: user.nome,
         id: user.id,
+        role: user.role,
       });
       fetchMinhasCaronas(user.id);
     } else {
@@ -120,6 +164,23 @@ function Dashboard() {
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  const abrirChat = (caronaId) => {
+    setShowChat(true);
+    setChatCaronaId(caronaId); // Define o ID da carona para o chat
+    setIsChatMinimized(false); // Abre o chat se estiver minimizado
+  
+    // Envia ao servidor o caronaId e os dados do usuário ao abrir o chat
+    socket.emit("entrarCarona", caronaId, {
+      name: usuario.name,
+      id: usuario.id,
+      role: usuario.role,
+    });
+  };  
+  
+  const minimizarChat = () => {
+    setIsChatMinimized(!isChatMinimized);
   };
 
   return (
@@ -261,48 +322,48 @@ function Dashboard() {
           </div>
         </div>
         {/* Caronas Disponíveis */}
-        <div className="row mb-4">
-          <div className="col-12">
-            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
-              <h3>Caronas Disponíveis</h3>
-              {filteredCaronas.length > 0 ? (
-                filteredCaronas.map((carona) => (
-                  <div key={carona.id} className="card mb-3 shadow-sm">
-                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}> 
-                      <h5 className="card-title">Destino: {carona.destino}</h5>
-                      <p className="card-text">
-                        Partida: {carona.partida}
-                        <br />
-                        Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        <br />
-                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
-                        <br />
-                        Motorista: {carona.motorista.nome}
-                        <br />
-                        Vagas disponíveis: {carona.vagas_disponiveis}
-                        <br />
-                        Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
-                        <br /> 
-                        Música: {carona.musica}
-                      </p>
-                      <button
-                        className="btn btn-success"
-                        onClick={() => solicitarCarona(carona.id)}
-                      >
-                        Solicitar Carona
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p>Nenhuma carona disponível corresponde a pesquisa feita.</p>
-              )}
+<div className="row mb-4">
+  <div className="col-12">
+    <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+      <h3>Caronas Disponíveis</h3>
+      {filteredCaronas.length > 0 ? (
+        filteredCaronas.map((carona) => (
+          <div key={carona.id} className="card mb-3 shadow-sm">
+            <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
+              <h5 className="card-title">Destino: {carona.destino}</h5>
+              <p className="card-text">
+                Partida: {carona.partida}
+                <br />
+                Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+                <br />
+                Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                <br />
+                Motorista: {carona.motorista.nome}
+                <br />
+                Vagas disponíveis: {carona.vagas_disponiveis}
+                <br />
+                Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
+                <br />
+                Música: {carona.musica}
+              </p>
+              <button
+                className="btn btn-success me-2"
+                onClick={() => solicitarCarona(carona.id)}
+              >
+                Solicitar Carona
+              </button>
             </div>
           </div>
-        </div>
+        ))
+      ) : (
+        <p>Nenhuma carona disponível corresponde a pesquisa feita.</p>
+      )}
+    </div>
+  </div>
+</div>
         {/* Minhas Caronas */}
         <div className="row mb-4">
           <div className="col-12">
@@ -342,10 +403,16 @@ function Dashboard() {
                             Música: {carona.musica}
                           </p>
                           <button
-                            className="btn btn-danger"
+                            className="btn btn-danger me-2" 
                             onClick={() => sairDaCarona(carona.id)}
                           >
                             Sair da Carona
+                          </button>
+                          <button
+                            className="btn btn-warning"
+                            onClick={() => abrirChat(carona.id)}
+                          >
+                            Falar com o Motorista
                           </button>
                         </div>
                       </div>
@@ -358,6 +425,124 @@ function Dashboard() {
             </div>
           </div>
         </div>
+        {/* Componente de Chat */}
+        {showChat && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px", 
+            width: "350px",
+            zIndex: 1000,
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#343a40",
+              color: "#fff",
+              padding: "10px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <h5 style={{ margin: 0 }}>Chat com o Motorista</h5>
+            <button
+              onClick={() => setIsChatMinimized(!isChatMinimized)}
+              style={{
+                padding: "5px",
+                backgroundColor: "#6c757d",
+                color: "#fff",
+                border: "none",
+                borderRadius: "3px",
+                cursor: "pointer",
+              }}
+            >
+              {isChatMinimized ? "Expandir" : "Minimizar"}
+            </button>
+          </div>
+          {!isChatMinimized && (
+            <>
+              <div
+                style={{
+                  maxHeight: "400px", 
+                  overflowY: "auto",
+                  padding: "10px",
+                  backgroundColor: "#f8f9fa",
+                  color: "#000", 
+                }}
+              >
+                {historicoMensagens.length > 0 ? (
+                  historicoMensagens.map((msg, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        marginBottom: "8px",
+                        backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
+                        padding: "8px",
+                        borderRadius: "5px",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.nome || "Desconhecido"}:</strong> {msg.mensagem}
+                    </div>
+                  ))
+                ) : (
+                  <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
+                )}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  padding: "10px",
+                  borderTop: "1px solid #ccc",
+                }}
+              >
+                <input
+                ref={inputRef}
+                  type="text"
+                  value={mensagem}
+                  onChange={(e) => setMensagem(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && mensagem.trim() !== "") {
+                      enviarMensagem();
+                    }
+                  }}
+                  placeholder="Digite sua mensagem..."
+                  style={{
+                    flex: 1,
+                    padding: "8px",
+                    marginRight: "8px",
+                    border: "1px solid #ced4da",
+                    borderRadius: "4px",
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    if (mensagem.trim() !== "") { // verifica se a mensagem não está vazia
+                      enviarMensagem();
+                    }
+                  }}
+                  style={{
+                    padding: "8px 12px",
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Enviar
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
       </div>
     </div>
   );  
