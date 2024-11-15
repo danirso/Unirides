@@ -195,7 +195,9 @@ function Dashboard() {
 
   useEffect(() => {
     if (showNotificacao) {
-      const timer = setTimeout(() => setShowNotificacao(false), 5000); 
+      const timer = setTimeout(() => {
+        setNovaMensagem(false); // Esconde a notificação após 3 segundos
+      }, 3000); 
       return () => clearTimeout(timer);
     }
   }, [showNotificacao]);
@@ -236,14 +238,35 @@ function Dashboard() {
                     </Link>
                 </div>
                 {novaMensagem && (
-                  <div style={{
-                    backgroundColor: "#ffeb3b",
-                    color: "#000",
-                    padding: "5px 10px",
-                    borderRadius: "5px",
-                    fontWeight: "bold",
-                    marginRight: "10px" }}>
-                    <span>Nova mensagem recebida!</span>
+                  <div 
+                    style={{
+                      position: "fixed", // Fixa a posição na tela
+                      top: "20px",       // Distância do topo
+                      right: "20px",     // Distância da borda direita
+                      backgroundColor: "#ff9800", // Cor de fundo
+                      color: "#fff",     // Cor do texto
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Sombra para destacar
+                      fontWeight: "bold",
+                      zIndex: 1000,      // Certifica-se de que a notificação estará por cima de outros elementos
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ marginRight: "10px" }}>💬 Nova mensagem recebida!</span>
+                    <button 
+                      onClick={() => setNovaMensagem(false)} // Fecha a notificação ao clicar
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        color: "#fff",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ✖
+                    </button>
                   </div>
                 )}
                 <button className="btn btn-outline-danger" onClick={handleLogout}>
