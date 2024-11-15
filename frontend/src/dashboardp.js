@@ -24,12 +24,20 @@ function Dashboard() {
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
   const inputRef = useRef(null);
+  const [novaMensagem, setNovaMensagem] = useState(null);
+  const [showNotificacao, setShowNotificacao] = useState(false);
+
 
   
   useEffect(() => {
     socket.on("mensagem", (data) => {
         const mensagemComNome = { ...data, usuario: data.usuario || "Desconhecido" };
         setHistoricoMensagens((prev) => [...prev, mensagemComNome]);
+
+      if (data.usuarioId !== usuario.id) {
+        setNovaMensagem(data);
+        setShowNotificacao(true);
+      }
     });
 
     socket.on("historicoMensagens", (mensagens) => {
@@ -39,6 +47,8 @@ function Dashboard() {
         }));
         setHistoricoMensagens(mensagensComNomes);
     });
+
+    
 
     return () => {
         socket.off("mensagem");
@@ -183,6 +193,13 @@ function Dashboard() {
     setIsChatMinimized(!isChatMinimized);
   };
 
+  useEffect(() => {
+    if (showNotificacao) {
+      const timer = setTimeout(() => setShowNotificacao(false), 5000); 
+      return () => clearTimeout(timer);
+    }
+  }, [showNotificacao]);
+  
   return (
     <div
       className="d-flex flex-column align-items-center vh-100"
@@ -218,6 +235,17 @@ function Dashboard() {
                         Ver Histórico
                     </Link>
                 </div>
+                {novaMensagem && (
+                  <div style={{
+                    backgroundColor: "#ffeb3b",
+                    color: "#000",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    fontWeight: "bold",
+                    marginRight: "10px" }}>
+                    <span>Nova mensagem recebida!</span>
+                  </div>
+                )}
                 <button className="btn btn-outline-danger" onClick={handleLogout}>
                     Logout
                 </button>
@@ -322,48 +350,48 @@ function Dashboard() {
           </div>
         </div>
         {/* Caronas Disponíveis */}
-<div className="row mb-4">
-  <div className="col-12">
-    <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
-      <h3>Caronas Disponíveis</h3>
-      {filteredCaronas.length > 0 ? (
-        filteredCaronas.map((carona) => (
-          <div key={carona.id} className="card mb-3 shadow-sm">
-            <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
-              <h5 className="card-title">Destino: {carona.destino}</h5>
-              <p className="card-text">
-                Partida: {carona.partida}
-                <br />
-                Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-                <br />
-                Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
-                <br />
-                Motorista: {carona.motorista.nome}
-                <br />
-                Vagas disponíveis: {carona.vagas_disponiveis}
-                <br />
-                Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
-                <br />
-                Música: {carona.musica}
-              </p>
-              <button
-                className="btn btn-success me-2"
-                onClick={() => solicitarCarona(carona.id)}
-              >
-                Solicitar Carona
-              </button>
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              <h3>Caronas Disponíveis</h3>
+              {filteredCaronas.length > 0 ? (
+                filteredCaronas.map((carona) => (
+                  <div key={carona.id} className="card mb-3 shadow-sm">
+                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
+                      <h5 className="card-title">Destino: {carona.destino}</h5>
+                      <p className="card-text">
+                        Partida: {carona.partida}
+                        <br />
+                        Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                        <br />
+                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                        <br />
+                        Motorista: {carona.motorista.nome}
+                        <br />
+                        Vagas disponíveis: {carona.vagas_disponiveis}
+                        <br />
+                        Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
+                        <br />
+                        Música: {carona.musica}
+                      </p>
+                      <button
+                        className="btn btn-success me-2"
+                        onClick={() => solicitarCarona(carona.id)}
+                      >
+                        Solicitar Carona
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Nenhuma carona disponível corresponde a pesquisa feita.</p>
+              )}
             </div>
           </div>
-        ))
-      ) : (
-        <p>Nenhuma carona disponível corresponde a pesquisa feita.</p>
-      )}
-    </div>
-  </div>
-</div>
+        </div>
         {/* Minhas Caronas */}
         <div className="row mb-4">
           <div className="col-12">
