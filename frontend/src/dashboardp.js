@@ -39,7 +39,6 @@ function Dashboard() {
         setShowNotificacao(true);
       }
     });
-
     socket.on("historicoMensagens", (mensagens) => {
         const mensagensComNomes = mensagens.map((msg) => ({
             ...msg,
@@ -47,14 +46,11 @@ function Dashboard() {
         }));
         setHistoricoMensagens(mensagensComNomes);
     });
-
-    
-
     return () => {
         socket.off("mensagem");
         socket.off("historicoMensagens");
     };
-}, []);
+}, [usuario.id]);
 
 
   const enviarMensagem = () => {

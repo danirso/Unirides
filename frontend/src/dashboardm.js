@@ -24,32 +24,35 @@ function DashboardMotorista() {
   });
   const [mensagem, setMensagem] = useState("");
   const [historicoMensagens, setHistoricoMensagens] = useState([]);
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(false );
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
   const inputRef = useRef(null);
+  const [novaMensagem, setNovaMensagem] = useState(null);
+  const [showNotificacao, setShowNotificacao] = useState(false);
 
   useEffect(() => {
-    // Recebe novas mensagens em tempo real
     socket.on("mensagem", (data) => {
-      setHistoricoMensagens((prev) => [...prev, data]);
+        const mensagemComNome = { ...data, usuario: data.usuario || "Desconhecido" };
+        setHistoricoMensagens((prev) => [...prev, mensagemComNome]);
+
+      if (data.usuarioId != usuario.id) {
+        setNovaMensagem(data);
+        setShowNotificacao(true);
+      }
     });
-  
-    // Recebe o histórico de mensagens quando entra em uma carona
     socket.on("historicoMensagens", (mensagens) => {
-      console.log("Mensagens Recebidas:", mensagens); // Verifica a estrutura das mensagens recebidas
-      const mensagensComNomes = mensagens.map((msg) => ({
-        ...msg,
-        usuario: msg.autor ? msg.autor.nome : msg.autor.nome, // Usa o nome do autor se disponível
-      }));
-      setHistoricoMensagens(mensagensComNomes);
+        const mensagensComNomes = mensagens.map((msg) => ({
+            ...msg,
+            usuario: msg.autor ? msg.autor.nome : "Desconhecido",
+        }));
+        setHistoricoMensagens(mensagensComNomes);
     });
-  
     return () => {
-      socket.off("mensagem"); 
-      socket.off("historicoMensagens");
+        socket.off("mensagem");
+        socket.off("historicoMensagens");
     };
-  }, []);
+}, [usuario.id]);
 
   const enviarMensagem = () => {
     const mensagemData = {
@@ -185,6 +188,15 @@ function DashboardMotorista() {
     setIsChatMinimized(!isChatMinimized);
   };
 
+  useEffect(() => {
+    if (showNotificacao) {
+      const timer = setTimeout(() => {
+        setNovaMensagem(false); // Esconde a notificação após 3 segundos
+      }, 4000); 
+      return () => clearTimeout(timer);
+    }
+  }, [showNotificacao]);
+
   return (
     <div
       className="d-flex flex-column align-items-center vh-100"
@@ -220,6 +232,38 @@ function DashboardMotorista() {
                         Ver Histórico
                     </Link>
                 </div>
+                {novaMensagem && (
+                  <div 
+                    style={{
+                      position: "fixed", // Fixa a posição na tela
+                      top: "20px",       // Distância do topo
+                      right: "20px",     // Distância da borda direita
+                      backgroundColor: "#ff9800", // Cor de fundo
+                      color: "#fff",     // Cor do texto
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Sombra para destacar
+                      fontWeight: "bold",
+                      zIndex: 1000,      // Certifica-se de que a notificação estará por cima de outros elementos
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ marginRight: "10px" }}>💬 Nova mensagem recebida!</span>
+                    <button 
+                      onClick={() => setNovaMensagem(false)} // Fecha a notificação ao clicar
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        color: "#fff",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ✖
+                    </button>
+                  </div>
+                )}
                 <button className="btn btn-outline-danger" onClick={handleLogout}>
                     Logout
                 </button>
@@ -441,22 +485,22 @@ function DashboardMotorista() {
                 }}
               >
                 {historicoMensagens.length > 0 ? (
-                historicoMensagens.map((msg, index) => (
-                  <div
-                      key={index}
-                      style={{
-                        marginBottom: "8px",
-                        backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
-                        padding: "8px",
-                        borderRadius: "5px",
-                        wordBreak: "break-word",
-                      }}
-                    >
-                    <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.nome || "Desconhecido"}:</strong> {msg.mensagem}
-                  </div>
-                ))
+                  historicoMensagens.map((msg, index) => (
+                      <div
+                          key={index}
+                          style={{
+                              marginBottom: "8px",
+                              backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
+                              padding: "8px",
+                              borderRadius: "5px",
+                              wordBreak: "break-word",
+                          }}
+                      >
+                          <strong>{msg.usuarioId === usuario.id ? "Você" : msg.usuario}:</strong> {msg.mensagem}
+                      </div>
+                  ))
               ) : (
-                <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
+                  <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
               )}
               </div>
               <div
