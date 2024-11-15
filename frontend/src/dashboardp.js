@@ -24,29 +24,29 @@ function Dashboard() {
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
   const inputRef = useRef(null);
-  const [caronaAtiva, setCaronaAtiva] = useState(null);
+
   
   useEffect(() => {
-    // Recebe novas mensagens em tempo real
     socket.on("mensagem", (data) => {
-      setHistoricoMensagens((prev) => [...prev, data]);
+        const mensagemComNome = { ...data, usuario: data.usuario || "Desconhecido" };
+        setHistoricoMensagens((prev) => [...prev, mensagemComNome]);
     });
-  
-    
-  socket.on("historicoMensagens", (mensagens) => {
-    console.log("Mensagens Recebidas:", mensagens); // Verifica a estrutura das mensagens recebidas
-    const mensagensComNomes = mensagens.map((msg) => ({
-      ...msg,
-      usuario: msg.autor ? msg.autor.nome : msg.autor.nome, // Usa o nome do autor se disponível
-    }));
-    setHistoricoMensagens(mensagensComNomes);
-  });
 
-  return () => {
-    socket.off("historicoMensagens");
-  };
+    socket.on("historicoMensagens", (mensagens) => {
+        const mensagensComNomes = mensagens.map((msg) => ({
+            ...msg,
+            usuario: msg.autor ? msg.autor.nome : "Desconhecido",
+        }));
+        setHistoricoMensagens(mensagensComNomes);
+    });
+
+    return () => {
+        socket.off("mensagem");
+        socket.off("historicoMensagens");
+    };
 }, []);
-  
+
+
   const enviarMensagem = () => {
     const mensagemData = {
       mensagem,
@@ -478,22 +478,22 @@ function Dashboard() {
               >
                 {historicoMensagens.length > 0 ? (
                   historicoMensagens.map((msg, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        marginBottom: "8px",
-                        backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
-                        padding: "8px",
-                        borderRadius: "5px",
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.nome || "Desconhecido"}:</strong> {msg.mensagem}
-                    </div>
+                      <div
+                          key={index}
+                          style={{
+                              marginBottom: "8px",
+                              backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
+                              padding: "8px",
+                              borderRadius: "5px",
+                              wordBreak: "break-word",
+                          }}
+                      >
+                          <strong>{msg.usuarioId === usuario.id ? "Você" : msg.usuario}:</strong> {msg.mensagem}
+                      </div>
                   ))
-                ) : (
+              ) : (
                   <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
-                )}
+              )}
               </div>
               <div
                 style={{

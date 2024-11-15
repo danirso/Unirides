@@ -70,25 +70,26 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Escuta quando uma mensagem é enviada
-  socket.on("mensagem", async (data) => {
-    const { caronaId, mensagem, usuario, usuarioId } = data;
+// Escuta quando uma mensagem é enviada
+socket.on("mensagem", async (data) => {
+  const { caronaId, mensagem, usuario, usuarioId, nome } = data;
 
-    if (socket.caronaId === caronaId) { // Verifica se o usuário está na sala correta
-      console.log("Mensagem recebida:", data);
+  if (socket.caronaId === caronaId) {
+    console.log("Mensagem recebida:", data);
 
-      // Salva a mensagem no banco de dados
-      await MensagemCarona.create({
-        caronaId,
-        usuarioId,
-        mensagem,
-      });
+    // Salva a mensagem no banco de dados
+    await MensagemCarona.create({
+      caronaId,
+      usuarioId,
+      mensagem,
+    });
 
-      io.to(caronaId).emit("mensagem", data); // Envia a mensagem para todos na sala da carona
-    } else {
-      console.log("Tentativa de envio de mensagem para carona incorreta:", data);
-    }
-  });
+    io.to(caronaId).emit("mensagem", { mensagem, usuario, usuarioId, caronaId, nome });
+  } else {
+    console.log("Tentativa de envio de mensagem para carona incorreta:", data);
+  }
+});
+
 
   // Escuta a desconexão
   socket.on("disconnect", () => {
@@ -96,6 +97,7 @@ io.on("connection", (socket) => {
   });
 });
 
+  
 
 
 server.listen(3001, () => {
