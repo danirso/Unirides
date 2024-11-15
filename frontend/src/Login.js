@@ -15,6 +15,9 @@ function Login() {
   const handleInput = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+  const handleBackTolandPage = () => {
+    navigate("/");
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -54,14 +57,29 @@ function Login() {
       className="d-flex justify-content-center align-items-center vh-100"
       style={{
         background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
+        position: "relative",
       }}
     >
+      <button
+        className="btn me-2"
+        onClick={handleBackTolandPage}
+        style={{
+          backgroundColor: "#8fdcbc",
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: 10,
+        }}
+      >
+        Voltar
+      </button>
+
       <img
         src={`${process.env.PUBLIC_URL}/logo.png`}
         alt="UniRides logo"
         style={{
           position: "absolute",
-          top: "30px", // Aumentado para espaçar a logo da caixa de login
+          top: "30px",
           left: "50%",
           transform: "translateX(-50%)",
           width: "150px",
@@ -78,7 +96,7 @@ function Login() {
           width: "100%",
           maxWidth: "400px",
           borderRadius: "12px",
-          marginTop: "150px", 
+          marginTop: "150px",
         }}
       >
         <h2 className="text-center mb-4" style={{ color: "#f7f9fc" }}>
@@ -144,15 +162,15 @@ function Login() {
           <button
             className="btn w-100"
             style={{
-              backgroundColor: "#38b000",
+              backgroundColor: "#8fdcbc",
               color: "#fff",
               padding: "10px",
               fontWeight: "bold",
               borderRadius: "8px",
               transition: "background 0.3s",
             }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#2c8200")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#38b000")}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#76ad96")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#8fdcbc")}
           >
             Login
           </button>
@@ -173,6 +191,7 @@ function Login() {
           >
             Criar Conta
           </Link>
+          
         </form>
       </div>
     </div>

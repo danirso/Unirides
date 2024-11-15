@@ -20,7 +20,7 @@ function PerfilPassageiro() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [mensagem, setMensagem] = useState("");
   const [historicoMensagens, setHistoricoMensagens] = useState([]);
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
   const inputRef = useRef(null);

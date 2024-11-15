@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useBeforeUnload, useNavigate } from "react-router-dom";
 import Validation from "./PerfilValidations";
 import io from "socket.io-client";
 
@@ -14,7 +14,7 @@ function PerfilMotorista() {
   });
   const [carInfo, setCarInfo] = useState({
     modelo: "",
-    placa: ""
+    placa: "",
   });
   const [editing, setEditing] = useState(false);
   const [initialUsuario, setInitialUsuario] = useState({});
@@ -23,7 +23,7 @@ function PerfilMotorista() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [mensagem, setMensagem] = useState("");
   const [historicoMensagens, setHistoricoMensagens] = useState([]);
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
   const inputRef = useRef(null);
@@ -53,17 +53,17 @@ function PerfilMotorista() {
   useEffect(() => {
     if (user && user.id) {
       fetch(`/api/usuario/${user.id}`)
-        .then(response => response.json())
-        .then(data => setUsuario(data))
-        .catch(error => {
+        .then((response) => response.json())
+        .then((data) => setUsuario(data))
+        .catch((error) => {
           console.error("Erro ao carregar os dados do usuário:", error);
           alert("Não foi possível carregar os dados do usuário.");
         });
   
       fetch(`/api/carInfo/${user.id}`)
-        .then(response => response.json())
-        .then(data => setCarInfo(data))
-        .catch(error => {
+        .then((response) => response.json())
+        .then((data) => setCarInfo(data))
+        .catch((error) => {
           console.error("Erro ao carregar as informações do carro:", error);
           alert("Não foi possível carregar os dados do carro.");
         });
@@ -73,53 +73,53 @@ function PerfilMotorista() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUsuario(prevUsuario => ({ ...prevUsuario, [name]: value })); // Atualiza corretamente o estado do formulário
+    setUsuario((prevUsuario) => ({ ...prevUsuario, [name]: value })); // Atualiza corretamente o estado do formulário
   };
 
   const handleCarChange = (e) => {
     const { name, value } = e.target;
-    setCarInfo(prevCarInfo => ({ ...prevCarInfo, [name]: value }));
+    setCarInfo((prevCarInfo) => ({ ...prevCarInfo, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const validationErrors = Validation(usuario);
+    const combinedValues = {...usuario,...carInfo};
+    const validationErrors = Validation(combinedValues);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
-    if (JSON.stringify(usuario) === JSON.stringify(initialUsuario)) {
-      alert("Nenhuma informação foi alterada.");
-      return;
-    }
-
     try {
       // Atualizar dados do usuário
-      await fetch(`/api/usuario/${user.id}`, {
+      const usuarioResponse = await fetch(`/api/usuario/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(usuario)
       });
   
       // Atualizar informações do carro
-      await fetch(`/api/carInfo/${user.id}`, {
+      const carInfoResponse = await fetch(`/api/carInfo/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(carInfo)
       });
-  
+    
+    if(usuarioResponse.ok && carInfoResponse.ok){
       alert("Informações atualizadas com sucesso!");
       setEditing(false);
       localStorage.setItem("user", JSON.stringify({ ...user, ...usuario, carro: carInfo }));
-    } catch (error) {
+    } else{
+      throw new Error("erro ao atualizar dados.");
+    }
+    
+   } catch (error) {
       console.error("Erro ao atualizar as informações do usuário:", error);
       alert("Erro ao atualizar as informações. Tente novamente mais tarde.");
     }
   };
   
-
   const handleBackToDashboard = () => {
     navigate("/motorista");
   };
@@ -240,10 +240,13 @@ function PerfilMotorista() {
                     type="text"
                     className="form-control"
                     name="placa"
-                    value={carInfo.placa}
+                    value={carInfo.placa.toUpperCase()}
                     onChange={handleCarChange}
                     style={{ backgroundColor: "white", color: "black" }}
                   />
+                  {errors.placa && (
+                    <small className="text-danger">{errors.placa}</small>
+                  )}
                   </div>
                 </div>
                 <div className="d-flex justify-content-between">
