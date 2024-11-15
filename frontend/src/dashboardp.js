@@ -34,7 +34,7 @@ function Dashboard() {
         const mensagemComNome = { ...data, usuario: data.usuario || "Desconhecido" };
         setHistoricoMensagens((prev) => [...prev, mensagemComNome]);
 
-      if (data.usuarioId !== usuario.id) {
+      if (data.usuarioId != usuario.id) {
         setNovaMensagem(data);
         setShowNotificacao(true);
       }
@@ -197,7 +197,7 @@ function Dashboard() {
     if (showNotificacao) {
       const timer = setTimeout(() => {
         setNovaMensagem(false); // Esconde a notificação após 3 segundos
-      }, 3000); 
+      }, 4000); 
       return () => clearTimeout(timer);
     }
   }, [showNotificacao]);
