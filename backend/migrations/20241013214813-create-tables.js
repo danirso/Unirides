@@ -189,6 +189,11 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true
       },
+      media: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0,
+        allowNull: false
+      },
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
