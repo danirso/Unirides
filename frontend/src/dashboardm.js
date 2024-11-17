@@ -409,8 +409,8 @@ function DashboardMotorista() {
                         Passageiros: {carona.passageiros && carona.passageiros.length > 0 ? (
                           carona.passageiros.map((passageiro) => (
                             <span key={passageiro.id}>
-                              {passageiro.nome} - Nota: {passageiro.media}
-                              <br />
+                              <br/>
+                              {passageiro.nome} - Nota: {passageiro.avaliacoes[0] ? passageiro.avaliacoes[0].media.toFixed(1) : "N/A"}
                             </span>
                           ))
                         ) : (
