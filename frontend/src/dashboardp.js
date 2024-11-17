@@ -111,8 +111,6 @@ function Dashboard() {
     setSelectedMotorista("");
     setMusica("");
   };
-  
-
   useEffect(() => {
     fetch("http://localhost:3000/api/caronas")
       .then((response) => response.json())
@@ -388,7 +386,7 @@ function Dashboard() {
                         <br />
                         Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
                         <br />
-                        Motorista: {carona.motorista.nome}
+                        Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ? carona.motorista.avaliacoes[0].media.toFixed(1) : "N/A"}
                         <br />
                         Vagas disponíveis: {carona.vagas_disponiveis}
                         <br />

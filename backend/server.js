@@ -120,9 +120,21 @@ app.get("/api/caronas", async (req, res) => {
         horario: { [Op.gte]: new Date() },
       },
       include: [
-        { model: Usuario, as: "motorista", attributes: ["nome"] },
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
       ],
     });
+
     res.json(caronas);
   } catch (error) {
     console.error("Erro ao buscar caronas disponíveis:", error);

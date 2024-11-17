@@ -44,6 +44,12 @@ module.exports = (sequelize, DataTypes) => {
       otherKey: 'id_carona',       // Chave estrangeira que refere a tabela Carona
       as: 'caronas'                // Nome da associação
     });
+    
+    Usuario.hasMany(models.Avaliacoes, {
+      foreignKey: 'id_avaliado',
+      as: 'avaliacoes'
+    });
+
   };
   return Usuario;
 };
