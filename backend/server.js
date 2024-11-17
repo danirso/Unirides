@@ -152,6 +152,20 @@ app.get("/api/motorista/:id/caronas", async (req, res) => {
         id_motorista: id,
         horario: { [Op.gte]: new Date() },
       },
+      include: [
+        {
+          model: Usuario,
+          as: "passageiros",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
+      ],
     });
 
     if (caronasMotorista.length === 0) {
@@ -248,7 +262,13 @@ app.get("/api/caronas/minhas", async (req, res) => {
         horario: { [Op.gte]: new Date() }
       },
       include: [
-        { model: Usuario, as: "motorista", attributes: ["nome"] },
+        { model: Usuario, as: "motorista", attributes: ["nome"],include: [
+          {
+            model: Avaliacoes,
+            as: "avaliacoes",
+            attributes: ["media"],
+          },
+        ],  },
         {
           model: Usuario,
           as: "passageiros",

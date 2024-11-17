@@ -190,7 +190,7 @@ function Dashboard() {
   useEffect(() => {
     if (showNotificacao) {
       const timer = setTimeout(() => {
-        setNovaMensagem(false); // Esconde a notificação após 3 segundos
+        setNovaMensagem(false); 
       }, 4000); 
       return () => clearTimeout(timer);
     }
@@ -377,14 +377,14 @@ function Dashboard() {
                     <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
                       <h5 className="card-title">Destino: {carona.destino}</h5>
                       <p className="card-text">
-                        Partida: {carona.partida}
+                        Local de Partida: {carona.partida}
+                        <br />
+                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
                         <br />
                         Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
-                        <br />
-                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
                         <br />
                         Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ? carona.motorista.avaliacoes[0].media.toFixed(1) : "N/A"}
                         <br />
@@ -439,7 +439,7 @@ function Dashboard() {
                             <br />
                             Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
                             <br />
-                            Motorista: {carona.motorista.nome}
+                            Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ? carona.motorista.avaliacoes[0].media.toFixed(1) : "N/A"}
                             <br />
                             Vagas disponíveis: {carona.vagas_disponiveis}
                             <br />

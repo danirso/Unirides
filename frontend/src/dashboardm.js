@@ -406,6 +406,17 @@ function DashboardMotorista() {
                           timeZone: "America/Sao_Paulo",
                         })}
                         <br />
+                        Passageiros: {carona.passageiros && carona.passageiros.length > 0 ? (
+                          carona.passageiros.map((passageiro) => (
+                            <span key={passageiro.id}>
+                              {passageiro.nome} - Nota: {passageiro.media}
+                              <br />
+                            </span>
+                          ))
+                        ) : (
+                          <span>Sem passageiros no momento.</span>
+                        )}
+                        <br />
                         Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
                         <br />
                         Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
