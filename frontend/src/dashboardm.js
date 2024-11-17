@@ -407,15 +407,22 @@ function DashboardMotorista() {
                         })}
                         <br />
                         Passageiros: {carona.passageiros && carona.passageiros.length > 0 ? (
-                          carona.passageiros.map((passageiro) => (
-                            <span key={passageiro.id}>
-                              <br/>
-                              {passageiro.nome} - Nota: {passageiro.avaliacoes[0] ? passageiro.avaliacoes[0].media.toFixed(1) : "N/A"}
-                            </span>
-                          ))
-                        ) : (
-                          <span>Sem passageiros no momento.</span>
-                        )}
+  carona.passageiros.map((passageiro, index) => (
+    <span key={passageiro.id}>
+      {passageiro.nome} - Nota: {passageiro.avaliacoes[0] ? (
+        <>
+          {passageiro.avaliacoes[0].media.toFixed(1)} ⭐
+        </>
+      ) : (
+        "N/A"
+      )}
+      {index < carona.passageiros.length - 1 && <br />}
+    </span>
+  ))
+) : (
+  <span>Sem passageiros no momento.</span>
+)}
+
                         <br />
                         Vagas disponíveis: {carona.vagas_disponiveis}/{carona.vagas}
                         <br />
