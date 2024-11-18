@@ -28,7 +28,7 @@ function Detalhescaronam() {
   };
 
   const handleBackToDashboard = () => {
-    navigate("/passageiro");
+    navigate("/motorista");
   };
 
   return (
@@ -61,19 +61,21 @@ function Detalhescaronam() {
                   <h5 style={{ color: "white" }}>Informações da Carona</h5>
                   <hr style={{ borderColor: "white" }} />
                   <p style={{ color: "white" }}>
-                    <strong>ID da Carona:</strong> {caronaId}
-                  </p>
-                  <p style={{ color: "white" }}>
-                    <strong>Motorista:</strong> {caronaDetalhes.motoristaNome}
-                  </p>
-                  <p style={{ color: "white" }}>
-                    <strong>Local de Partida:</strong> {caronaDetalhes.localPartida}
+                    <strong>Local de Partida:</strong> {caronaDetalhes.partida}
                   </p>
                   <p style={{ color: "white" }}>
                     <strong>Destino:</strong> {caronaDetalhes.destino}
                   </p>
                   <p style={{ color: "white" }}>
-                    <strong>Horário:</strong> {caronaDetalhes.horario}
+                    <strong>Data:</strong> {new Date(caronaDetalhes.horario).toLocaleDateString("pt-BR")}
+                  </p>
+                  <p style={{ color: "white" }}>
+                    <strong>Horário:{" "}</strong>
+                        {new Date(caronaDetalhes.horario).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          timeZone: "America/Sao_Paulo",
+                        })}
                   </p>
                 </div>
 
@@ -91,10 +93,14 @@ function Detalhescaronam() {
                         }}
                       >
                         <div className="d-flex justify-content-between align-items-center">
-                          <strong>{passageiro.nome}</strong>
-                          <span>
-                            Nota: {passageiro.nota ? `${passageiro.nota}/5` : 'Sem nota'}
-                          </span>
+                          <strong>{passageiro.nome} - Nota:{" "}
+                              {passageiro.avaliacoes[0] ? (
+                                <>
+                                  {passageiro.avaliacoes[0].media.toFixed(1)} ⭐
+                                </>
+                              ) : (
+                                "N/A"
+                              )}</strong>
                         </div>
                       </div>
                     ))

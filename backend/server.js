@@ -183,12 +183,13 @@ app.get("/api/motorista/:id/caronas", async (req, res) => {
 });
 
 // Rota de API para buscar caronas disponíveis
-app.get("/api/detalhe", async (req, res) => {
+// Rota de API para buscar detalhes da carona
+app.get("/api/detalhes/:id/caronas", async (req, res) => {
   try {
-    const caronas = await Carona.findOne({
-      where: {
-        id : caronaId
-      },
+    const caronaId = req.params.id; // Correção para obter o ID da URL
+
+    const carona = await Carona.findOne({
+      where: { id: caronaId },
       include: [
         {
           model: Usuario,
@@ -202,15 +203,25 @@ app.get("/api/detalhe", async (req, res) => {
             },
           ],
         },
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"], // Inclui o nome do motorista para exibir na página
+        },
       ],
     });
 
-    res.json(caronas);
+    if (!carona) {
+      return res.status(404).json({ error: "Carona não encontrada" });
+    }
+
+    res.json(carona);
   } catch (error) {
-    console.error("Erro ao buscar caronas disponíveis:", error);
-    res.status(500).send("Erro ao buscar caronas");
+    console.error("Erro ao buscar detalhes da carona:", error);
+    res.status(500).send("Erro ao buscar detalhes da carona");
   }
 });
+
 
 // Rota para o motorista criar uma nova carona
 app.post("/api/motorista/:id/caronas", async (req, res) => {
