@@ -120,11 +120,11 @@ function Dashboard() {
   
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/caronas")
+    fetch(`http://localhost:3000/api/caronas?userId=${usuario.id}`)
       .then((response) => response.json())
       .then((data) => setCaronas(data))
       .catch((error) => console.error("Erro ao buscar caronas:", error));
-  }, []);
+  }, [usuario.id]);
 
   const fetchMinhasCaronas = (idPassageiro) => {
     fetch(`http://localhost:3000/api/caronas/minhas?id_passageiro=${idPassageiro}`)
