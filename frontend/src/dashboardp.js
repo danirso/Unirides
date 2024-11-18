@@ -400,6 +400,13 @@ function Dashboard() {
                       >
                         Solicitar Carona
                       </button>
+                      <button
+                            className="btn btn-info me-2"
+                            style={{ backgroundColor: "#add8e6", color: "#000" }}
+                            onClick={() => navigate(`/detalhescaronap?id=${carona.id}`)}
+                          >
+                            Ver Detalhes
+                          </button>
                     </div>
                   </div>
                 ))

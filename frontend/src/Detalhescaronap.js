@@ -101,14 +101,13 @@ function Detalhescaronap() {
                                     "N/A"
                                 )}
                                 </p>
-                                <p>
-                                <strong>Avaliações recentes:</strong> 
-                                </p>
-                                {caronaDetalhes.motorista.avaliacoes.slice(0, 3).map((avaliacao, index) => (
-                                <p key={index}>
-                                    {avaliacao.texto_Avaliativo ? avaliacao.texto_Avaliativo : "Sem avaliação por texto"}
-                                </p>
-                                ))}
+                                <strong>Avaliações recentes:</strong>
+                                {caronaDetalhes.motorista.avaliacoes
+                                  .filter((avaliacao) => avaliacao.texto_avaliativo && avaliacao.texto_avaliativo.trim() !== "")
+                                  .slice(0, 3)
+                                  .map((avaliacao, index) => (
+                                    <p key={index}>{avaliacao.texto_avaliativo}</p>
+                                )) || <p>Nenhuma avaliação por texto</p>}
                                 <p>
                                 <strong>Modelo do carro:</strong> {caronaDetalhes.motorista.veiculo.modelo}
                                 </p>
