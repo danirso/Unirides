@@ -50,6 +50,11 @@ module.exports = (sequelize, DataTypes) => {
       as: 'avaliacoes'
     });
 
+    Usuario.hasOne(models.CarInfo,{
+      foreignKey:'id_motorista',
+      as:'veiculo'
+    });
+    
   };
   return Usuario;
 };

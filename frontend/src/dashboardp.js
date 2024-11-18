@@ -454,10 +454,17 @@ function Dashboard() {
                             Sair da Carona
                           </button>
                           <button
-                            className="btn btn-warning"
+                            className="btn btn-warning me-2"
                             onClick={() => abrirChat(carona.id)}
                           >
                             Falar com o Motorista
+                          </button>
+                          <button
+                            className="btn btn-info me-2"
+                            style={{ backgroundColor: "#add8e6", color: "#000" }}
+                            onClick={() => navigate(`/detalhescaronap?id=${carona.id}`)}
+                          >
+                            Ver Detalhes
                           </button>
                         </div>
                       </div>

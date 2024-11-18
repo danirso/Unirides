@@ -8,6 +8,7 @@ import Historico from './Historico';    // Histórico do usuário
 import PerfilPassageiro from './PerfilP';  // Novo componente para perfil de passageiro
 import PerfilMotorista from './PerfilM';    // Novo componente para perfil de motorista
 import Detalhescaronam from './Detalhescaronam';    // Detalhes da carona para o motorista
+import Detalhescaronap from './Detalhescaronap';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path='/passageiro' element={<Dashboard />}></Route>
           <Route path='/motorista' element={<DashboardM />}></Route>  {/* Rota para DashboardM */}
           <Route path='/detalhescaronam' element={<Detalhescaronam />}></Route>
+          <Route path='/detalhescaronap' element={<Detalhescaronap />}></Route>          
           <Route path="/historico" element={<Historico />}></Route>  {/* Nova rota para o componente Historico */}
           <Route path='/perfil-passageiro' element={<PerfilPassageiro />}></Route> {/* Perfil completo passageiro */}
           <Route path='/perfil-motorista' element={<PerfilMotorista />}></Route> {/* Perfil completo motorista */}
