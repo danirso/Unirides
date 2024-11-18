@@ -41,6 +41,16 @@ function Detalhescaronap() {
         backgroundAttachment: "fixed",
       }}
     >
+      <style>
+        {`
+          body, html {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            background-attachment: fixed;
+          }
+        `}
+      </style>
       <div className="container mt-3">
         <div
           className="card shadow-sm p-4 rounded"
