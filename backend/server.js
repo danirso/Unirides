@@ -3,7 +3,7 @@ const path = require("path");
 const app = express();
 const port = 3000;
 const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
-const { Op, where, Model } = require("sequelize");
+const { Op, where, Model,Sequelize } = require("sequelize");
 const http = require('http');
 const cors = require('cors');
 
@@ -111,34 +111,40 @@ const usuarioRoutes = require('./routes/usuario');
 
 app.use('/api/usuario', usuarioRoutes);
 
-// Rota de API para buscar caronas disponíveis
 app.get("/api/caronas", async (req, res) => {
   try {
-     const userId = req.query.userId; // Pass the current user's ID as a query parameter
- 
-     const caronas = await Carona.findAll({
-       where: {
-         vagas_disponiveis: { [Op.gt]: 0 },
-         horario: { [Op.gte]: new Date() },
-         // Exclude caronas where the user is already a passenger
-         ...(userId && {
-           [Op.not]: sequelize.literal(`EXISTS (
-             SELECT 1 FROM PassageiroCarona pc 
-             WHERE pc.caronaId = Carona.id AND pc.usuarioId = ${userId}
-           )`)
-         })
-       },
-       include: [
-         { model: Usuario, as: "motorista", attributes: ["nome"] },
-       ],
-     });
-     
-     res.json(caronas);
+    const userId = req.query.userId;
+    const caronas = await Carona.findAll({
+      where: {
+        vagas_disponiveis: { [Op.gt]: 0 },
+        horario: { [Op.gte]: new Date() },
+        ...(userId && {
+          [Op.and]: [
+            Sequelize.literal(`NOT EXISTS (
+              SELECT 1 
+              FROM PassageirosCaronas 
+              WHERE 
+                PassageirosCaronas.id_carona= Carona.id 
+                AND PassageirosCaronas.id_passageiro = ${userId}
+            )`)
+          ]
+        })
+      },
+      include: [
+        { 
+          model: Usuario, 
+          as: "motorista", 
+          attributes: ["nome"] 
+        }
+      ]
+    });
+
+    res.json(caronas);
   } catch (error) {
-     console.error("Erro ao buscar caronas disponíveis:", error);
-     res.status(500).send("Erro ao buscar caronas");
+    console.error("Erro ao buscar caronas disponíveis:", error);
+    res.status(500).send("Erro ao buscar caronas");
   }
- });
+});
 
 app.get("/api/motorista/:id/caronas", async (req, res) => {
   const { id } = req.params;
