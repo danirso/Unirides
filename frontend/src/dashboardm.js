@@ -177,7 +177,6 @@ function DashboardMotorista() {
     });
   };
 
- 
   const abrirChat = (caronaId) => {
     setShowChat(true);
     setChatCaronaId(caronaId);
@@ -418,18 +417,50 @@ function DashboardMotorista() {
                         Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
                         <br />
                         Música: {carona.musica}
+                        <br />
+                        Passageiros:
+                        <br />
+                        {carona.passageiros && carona.passageiros.length > 0 ? (
+                          carona.passageiros.map((passageiro) => (
+                            <span
+                              key={passageiro.id}
+                              style={{
+                                display: "block",
+                                paddingLeft: "20px", // Espaço da borda esquerda
+                              }}
+                            >
+                              {passageiro.nome} - Nota:{" "}
+                              {passageiro.avaliacoes[0] ? (
+                                <>
+                                  {passageiro.avaliacoes[0].media.toFixed(1)} ⭐
+                                </>
+                              ) : (
+                                "N/A"
+                              )}
+                            </span>
+                          ))
+                        ) : (
+                          <span>Sem passageiros no momento.</span>
+                        )}
                       </p>
                       <button
-                        className="btn btn-danger me-2" 
+                        className="btn btn-danger me-2"
                         onClick={() => cancelarCarona(carona.id)}
                       >
                         Cancelar Carona
                       </button>
                       <button
-                        className="btn btn-warning"
+                        className="btn btn-warning me-2"
                         onClick={() => abrirChat(carona.id)}
                       >
                         Falar com o Passageiro
+                      </button>
+                      <button
+                        className="btn btn-info"
+                        style={{ backgroundColor: "#add8e6", color: "#000" }}
+                        onClick={() => navigate(`/detalhescaronam?id=${carona.id}`)}
+                      >
+                        Ver Detalhes
                       </button>
                     </div>
                   </div>

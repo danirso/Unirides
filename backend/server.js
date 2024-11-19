@@ -131,12 +131,19 @@ app.get("/api/caronas", async (req, res) => {
         })
       },
       include: [
-        { 
-          model: Usuario, 
-          as: "motorista", 
-          attributes: ["nome"] 
-        }
-      ]
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
+      ],
     });
 
     res.json(caronas);
@@ -156,6 +163,20 @@ app.get("/api/motorista/:id/caronas", async (req, res) => {
         id_motorista: id,
         horario: { [Op.gte]: new Date() },
       },
+      include: [
+        {
+          model: Usuario,
+          as: "passageiros",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
+      ],
     });
 
     if (caronasMotorista.length === 0) {
@@ -169,6 +190,80 @@ app.get("/api/motorista/:id/caronas", async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar caronas do motorista:", error);
     res.status(500).send("Erro ao buscar caronas");
+  }
+});
+
+// Rota de API para buscar detalhes da carona
+app.get("/api/detalhes/:id/caronas", async (req, res) => {
+  try {
+    const caronaId = req.params.id;
+    const carona = await Carona.findOne({
+      where: { id: caronaId },
+      include: [
+        {
+          model: Usuario,
+          as: "passageiros",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"], // Inclui o nome do motorista para exibir na página
+        },
+      ],
+    });
+
+    if (!carona) {
+      return res.status(404).json({ error: "Carona não encontrada" });
+    }
+
+    res.json(carona);
+  } catch (error) {
+    console.error("Erro ao buscar detalhes da carona:", error);
+    res.status(500).send("Erro ao buscar detalhes da carona");
+  }
+});
+
+app.get("/api/detalhesp/:id/caronas", async (req, res) => {
+  try {
+    const caronaId = req.params.id;
+    const carona = await Carona.findOne({
+      where: { id: caronaId },
+      include: [
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media","texto_avaliativo"],
+            },
+            {
+              model: CarInfo,
+              as:"veiculo",
+            }
+          ],
+        },
+        
+      ],
+    });
+    if (!carona) {
+      return res.status(404).json({ error: "Carona não encontrada" });
+    }
+
+    res.json(carona);
+  } catch (error) {
+    console.error("Erro ao buscar detalhes da carona:", error);
+    res.status(500).send("Erro ao buscar detalhes da carona");
   }
 });
 
@@ -252,7 +347,13 @@ app.get("/api/caronas/minhas", async (req, res) => {
         horario: { [Op.gte]: new Date() }
       },
       include: [
-        { model: Usuario, as: "motorista", attributes: ["nome"] },
+        { model: Usuario, as: "motorista", attributes: ["nome"],include: [
+          {
+            model: Avaliacoes,
+            as: "avaliacoes",
+            attributes: ["media"],
+          },
+        ],  },
         {
           model: Usuario,
           as: "passageiros",
@@ -448,7 +549,6 @@ app.get("/api/historico/:userId/motorista", async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar histórico" });
   }
 });
-
 
 // Rota para buscar informações de um usuário específico
 app.get("/api/usuario/:id", async (req, res) => {
