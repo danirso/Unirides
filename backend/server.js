@@ -3,7 +3,7 @@ const path = require("path");
 const app = express();
 const port = 3000;
 const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
-const { Op, where, Model } = require("sequelize");
+const { Op, where, Model,Sequelize } = require("sequelize");
 const http = require('http');
 const cors = require('cors');
 
@@ -70,25 +70,26 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Escuta quando uma mensagem é enviada
-  socket.on("mensagem", async (data) => {
-    const { caronaId, mensagem, usuario, usuarioId } = data;
+// Escuta quando uma mensagem é enviada
+socket.on("mensagem", async (data) => {
+  const { caronaId, mensagem, usuario, usuarioId, nome } = data;
 
-    if (socket.caronaId === caronaId) { // Verifica se o usuário está na sala correta
-      console.log("Mensagem recebida:", data);
+  if (socket.caronaId === caronaId) {
+    console.log("Mensagem recebida:", data);
 
-      // Salva a mensagem no banco de dados
-      await MensagemCarona.create({
-        caronaId,
-        usuarioId,
-        mensagem,
-      });
+    // Salva a mensagem no banco de dados
+    await MensagemCarona.create({
+      caronaId,
+      usuarioId,
+      mensagem,
+    });
 
-      io.to(caronaId).emit("mensagem", data); // Envia a mensagem para todos na sala da carona
-    } else {
-      console.log("Tentativa de envio de mensagem para carona incorreta:", data);
-    }
-  });
+    io.to(caronaId).emit("mensagem", { mensagem, usuario, usuarioId, caronaId, nome });
+  } else {
+    console.log("Tentativa de envio de mensagem para carona incorreta:", data);
+  }
+});
+
 
   // Escuta a desconexão
   socket.on("disconnect", () => {
@@ -96,6 +97,7 @@ io.on("connection", (socket) => {
   });
 });
 
+  
 
 
 server.listen(3001, () => {
@@ -109,18 +111,34 @@ const usuarioRoutes = require('./routes/usuario');
 
 app.use('/api/usuario', usuarioRoutes);
 
-// Rota de API para buscar caronas disponíveis
 app.get("/api/caronas", async (req, res) => {
   try {
+    const userId = req.query.userId;
     const caronas = await Carona.findAll({
       where: {
         vagas_disponiveis: { [Op.gt]: 0 },
         horario: { [Op.gte]: new Date() },
+        ...(userId && {
+          [Op.and]: [
+            Sequelize.literal(`NOT EXISTS (
+              SELECT 1 
+              FROM PassageirosCaronas 
+              WHERE 
+                PassageirosCaronas.id_carona= Carona.id 
+                AND PassageirosCaronas.id_passageiro = ${userId}
+            )`)
+          ]
+        })
       },
       include: [
-        { model: Usuario, as: "motorista", attributes: ["nome"] },
-      ],
+        { 
+          model: Usuario, 
+          as: "motorista", 
+          attributes: ["nome"] 
+        }
+      ]
     });
+
     res.json(caronas);
   } catch (error) {
     console.error("Erro ao buscar caronas disponíveis:", error);

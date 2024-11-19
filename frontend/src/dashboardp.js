@@ -24,29 +24,41 @@ function Dashboard() {
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
   const inputRef = useRef(null);
-  const [caronaAtiva, setCaronaAtiva] = useState(null);
+  const [novaMensagem, setNovaMensagem] = useState(null);
+  const [showNotificacao, setShowNotificacao] = useState(false);
+  const [MinhaMensagem,setMinhaMensagem] = useState(false);
+
+
   
   useEffect(() => {
-    // Recebe novas mensagens em tempo real
     socket.on("mensagem", (data) => {
-      setHistoricoMensagens((prev) => [...prev, data]);
-    });
-  
-    
-  socket.on("historicoMensagens", (mensagens) => {
-    console.log("Mensagens Recebidas:", mensagens); // Verifica a estrutura das mensagens recebidas
-    const mensagensComNomes = mensagens.map((msg) => ({
-      ...msg,
-      usuario: msg.autor ? msg.autor.nome : msg.autor.nome, // Usa o nome do autor se disponível
-    }));
-    setHistoricoMensagens(mensagensComNomes);
-  });
+        const mensagemComNome = { ...data, usuario: data.usuario || "Desconhecido" };
+        setHistoricoMensagens((prev) => [...prev, mensagemComNome]);
 
-  return () => {
-    socket.off("historicoMensagens");
-  };
-}, []);
-  
+      if (data.usuarioId != usuario.id) {
+        setNovaMensagem(true);
+        setShowNotificacao(true);
+      }
+      else{
+        setMinhaMensagem(true)
+        setNovaMensagem(true);
+        setShowNotificacao(true);
+      }
+    });
+    socket.on("historicoMensagens", (mensagens) => {
+        const mensagensComNomes = mensagens.map((msg) => ({
+            ...msg,
+            usuario: msg.autor ? msg.autor.nome : "Desconhecido",
+        }));
+        setHistoricoMensagens(mensagensComNomes);
+    });
+    return () => {
+        socket.off("mensagem");
+        socket.off("historicoMensagens");
+    };
+}, [usuario.id]);
+
+
   const enviarMensagem = () => {
     const mensagemData = {
       mensagem,
@@ -108,11 +120,11 @@ function Dashboard() {
   
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/caronas")
+    fetch(`http://localhost:3000/api/caronas?userId=${usuario.id}`)
       .then((response) => response.json())
       .then((data) => setCaronas(data))
       .catch((error) => console.error("Erro ao buscar caronas:", error));
-  }, []);
+  }, [usuario.id]);
 
   const fetchMinhasCaronas = (idPassageiro) => {
     fetch(`http://localhost:3000/api/caronas/minhas?id_passageiro=${idPassageiro}`)
@@ -168,10 +180,9 @@ function Dashboard() {
 
   const abrirChat = (caronaId) => {
     setShowChat(true);
-    setChatCaronaId(caronaId); // Define o ID da carona para o chat
-    setIsChatMinimized(false); // Abre o chat se estiver minimizado
-  
-    // Envia ao servidor o caronaId e os dados do usuário ao abrir o chat
+    setChatCaronaId(caronaId);
+    setIsChatMinimized(false); 
+    
     socket.emit("entrarCarona", caronaId, {
       name: usuario.name,
       id: usuario.id,
@@ -183,6 +194,16 @@ function Dashboard() {
     setIsChatMinimized(!isChatMinimized);
   };
 
+  useEffect(() => {
+    if (showNotificacao) {
+      const timer = setTimeout(() => {
+        setNovaMensagem(false); // Esconde a notificação após 3 segundos
+        setMinhaMensagem(false);
+      }, 4000); 
+      return () => clearTimeout(timer);
+    }
+  }, [showNotificacao]);
+  
   return (
     <div
       className="d-flex flex-column align-items-center vh-100"
@@ -218,6 +239,38 @@ function Dashboard() {
                         Ver Histórico
                     </Link>
                 </div>
+                {novaMensagem && (
+                  <div 
+                    style={{
+                      position: "fixed", // Fixa a posição na tela
+                      top: "20px",       // Distância do topo
+                      right: "20px",     // Distância da borda direita
+                      backgroundColor: MinhaMensagem === true? "#006aff":"#ff9800" ,
+                      color: "#fff",     // Cor do texto
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Sombra para destacar
+                      fontWeight: "bold",
+                      zIndex: 1000,      // Certifica-se de que a notificação estará por cima de outros elementos
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ marginRight: "10px" }}>💬 {MinhaMensagem == true?"Mensagem enviada!": "Nova mensagem recebida!"}</span>
+                    <button 
+                      onClick={() => setNovaMensagem(false)} // Fecha a notificação ao clicar
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        color: "#fff",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ✖
+                    </button>
+                  </div>
+                )}
                 <button className="btn btn-outline-danger" onClick={handleLogout}>
                     Logout
                 </button>
@@ -322,48 +375,48 @@ function Dashboard() {
           </div>
         </div>
         {/* Caronas Disponíveis */}
-<div className="row mb-4">
-  <div className="col-12">
-    <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
-      <h3>Caronas Disponíveis</h3>
-      {filteredCaronas.length > 0 ? (
-        filteredCaronas.map((carona) => (
-          <div key={carona.id} className="card mb-3 shadow-sm">
-            <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
-              <h5 className="card-title">Destino: {carona.destino}</h5>
-              <p className="card-text">
-                Partida: {carona.partida}
-                <br />
-                Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-                <br />
-                Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
-                <br />
-                Motorista: {carona.motorista.nome}
-                <br />
-                Vagas disponíveis: {carona.vagas_disponiveis}
-                <br />
-                Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
-                <br />
-                Música: {carona.musica}
-              </p>
-              <button
-                className="btn btn-success me-2"
-                onClick={() => solicitarCarona(carona.id)}
-              >
-                Solicitar Carona
-              </button>
+        <div className="row mb-4">
+          <div className="col-12">
+            <div className="p-4 rounded" style={{ backgroundColor: "#1f3b4d" }}>
+              <h3>Caronas Disponíveis</h3>
+              {filteredCaronas.length > 0 ? (
+                filteredCaronas.map((carona) => (
+                  <div key={carona.id} className="card mb-3 shadow-sm">
+                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
+                      <h5 className="card-title">Destino: {carona.destino}</h5>
+                      <p className="card-text">
+                        Partida: {carona.partida}
+                        <br />
+                        Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                        <br />
+                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                        <br />
+                        Motorista: {carona.motorista.nome}
+                        <br />
+                        Vagas disponíveis: {carona.vagas_disponiveis}
+                        <br />
+                        Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
+                        <br />
+                        Música: {carona.musica}
+                      </p>
+                      <button
+                        className="btn btn-success me-2"
+                        onClick={() => solicitarCarona(carona.id)}
+                      >
+                        Solicitar Carona
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Nenhuma carona disponível corresponde a pesquisa feita.</p>
+              )}
             </div>
           </div>
-        ))
-      ) : (
-        <p>Nenhuma carona disponível corresponde a pesquisa feita.</p>
-      )}
-    </div>
-  </div>
-</div>
+        </div>
         {/* Minhas Caronas */}
         <div className="row mb-4">
           <div className="col-12">
@@ -478,22 +531,22 @@ function Dashboard() {
               >
                 {historicoMensagens.length > 0 ? (
                   historicoMensagens.map((msg, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        marginBottom: "8px",
-                        backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
-                        padding: "8px",
-                        borderRadius: "5px",
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      <strong>{msg.usuarioId === usuario.id ? "Você" : msg.autor?.nome || "Desconhecido"}:</strong> {msg.mensagem}
-                    </div>
+                      <div
+                          key={index}
+                          style={{
+                              marginBottom: "8px",
+                              backgroundColor: msg.usuarioId === usuario.id ? "#d4edda" : "#f1f1f1",
+                              padding: "8px",
+                              borderRadius: "5px",
+                              wordBreak: "break-word",
+                          }}
+                      >
+                          <strong>{msg.usuarioId === usuario.id ? "Você" : msg.usuario}:</strong> {msg.mensagem}
+                      </div>
                   ))
-                ) : (
+              ) : (
                   <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
-                )}
+              )}
               </div>
               <div
                 style={{
