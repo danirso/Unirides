@@ -3,7 +3,7 @@ const path = require("path");
 const app = express();
 const port = 3000;
 const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
-const { Op, where, Model } = require("sequelize");
+const { Op, where, Model,Sequelize } = require("sequelize");
 const http = require('http');
 const cors = require('cors');
 
@@ -111,13 +111,24 @@ const usuarioRoutes = require('./routes/usuario');
 
 app.use('/api/usuario', usuarioRoutes);
 
-// Rota de API para buscar caronas disponíveis
 app.get("/api/caronas", async (req, res) => {
   try {
+    const userId = req.query.userId;
     const caronas = await Carona.findAll({
       where: {
         vagas_disponiveis: { [Op.gt]: 0 },
         horario: { [Op.gte]: new Date() },
+        ...(userId && {
+          [Op.and]: [
+            Sequelize.literal(`NOT EXISTS (
+              SELECT 1 
+              FROM PassageirosCaronas 
+              WHERE 
+                PassageirosCaronas.id_carona= Carona.id 
+                AND PassageirosCaronas.id_passageiro = ${userId}
+            )`)
+          ]
+        })
       },
       include: [
         {

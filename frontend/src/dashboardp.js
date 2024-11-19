@@ -26,6 +26,7 @@ function Dashboard() {
   const inputRef = useRef(null);
   const [novaMensagem, setNovaMensagem] = useState(null);
   const [showNotificacao, setShowNotificacao] = useState(false);
+  const [MinhaMensagem,setMinhaMensagem] = useState(false);
 
 
   
@@ -35,7 +36,12 @@ function Dashboard() {
         setHistoricoMensagens((prev) => [...prev, mensagemComNome]);
 
       if (data.usuarioId != usuario.id) {
-        setNovaMensagem(data);
+        setNovaMensagem(true);
+        setShowNotificacao(true);
+      }
+      else{
+        setMinhaMensagem(true)
+        setNovaMensagem(true);
         setShowNotificacao(true);
       }
     });
@@ -112,11 +118,11 @@ function Dashboard() {
     setMusica("");
   };
   useEffect(() => {
-    fetch("http://localhost:3000/api/caronas")
+    fetch(`http://localhost:3000/api/caronas?userId=${usuario.id}`)
       .then((response) => response.json())
       .then((data) => setCaronas(data))
       .catch((error) => console.error("Erro ao buscar caronas:", error));
-  }, []);
+  }, [usuario.id]);
 
   const fetchMinhasCaronas = (idPassageiro) => {
     fetch(`http://localhost:3000/api/caronas/minhas?id_passageiro=${idPassageiro}`)
@@ -172,10 +178,9 @@ function Dashboard() {
 
   const abrirChat = (caronaId) => {
     setShowChat(true);
-    setChatCaronaId(caronaId); // Define o ID da carona para o chat
-    setIsChatMinimized(false); // Abre o chat se estiver minimizado
-  
-    // Envia ao servidor o caronaId e os dados do usuário ao abrir o chat
+    setChatCaronaId(caronaId);
+    setIsChatMinimized(false); 
+    
     socket.emit("entrarCarona", caronaId, {
       name: usuario.name,
       id: usuario.id,
@@ -190,7 +195,8 @@ function Dashboard() {
   useEffect(() => {
     if (showNotificacao) {
       const timer = setTimeout(() => {
-        setNovaMensagem(false); 
+        setNovaMensagem(false); // Esconde a notificação após 3 segundos
+        setMinhaMensagem(false);
       }, 4000); 
       return () => clearTimeout(timer);
     }
@@ -237,7 +243,7 @@ function Dashboard() {
                       position: "fixed", // Fixa a posição na tela
                       top: "20px",       // Distância do topo
                       right: "20px",     // Distância da borda direita
-                      backgroundColor: "#ff9800", // Cor de fundo
+                      backgroundColor: MinhaMensagem === true? "#006aff":"#ff9800" ,
                       color: "#fff",     // Cor do texto
                       padding: "10px 15px",
                       borderRadius: "8px",
@@ -248,7 +254,7 @@ function Dashboard() {
                       alignItems: "center",
                     }}
                   >
-                    <span style={{ marginRight: "10px" }}>💬 Nova mensagem recebida!</span>
+                    <span style={{ marginRight: "10px" }}>💬 {MinhaMensagem == true?"Mensagem enviada!": "Nova mensagem recebida!"}</span>
                     <button 
                       onClick={() => setNovaMensagem(false)} // Fecha a notificação ao clicar
                       style={{

@@ -30,6 +30,7 @@ function DashboardMotorista() {
   const inputRef = useRef(null);
   const [novaMensagem, setNovaMensagem] = useState(null);
   const [showNotificacao, setShowNotificacao] = useState(false);
+  const [MinhaMensagem,setMinhaMensagem] = useState(false);
 
   useEffect(() => {
     socket.on("mensagem", (data) => {
@@ -37,7 +38,12 @@ function DashboardMotorista() {
         setHistoricoMensagens((prev) => [...prev, mensagemComNome]);
 
       if (data.usuarioId != usuario.id) {
-        setNovaMensagem(data);
+        setNovaMensagem(true);
+        setShowNotificacao(true);
+      }
+      else{
+        setMinhaMensagem(true)
+        setNovaMensagem(true);
         setShowNotificacao(true);
       }
     });
@@ -176,7 +182,7 @@ function DashboardMotorista() {
     setChatCaronaId(caronaId);
     setIsChatMinimized(false);
   
-    // Envia ao servidor o caronaId e os dados do usuário ao abrir o chat
+    
     socket.emit("entrarCarona", caronaId, {
       name: usuario.name,
       id: usuario.id,
@@ -190,7 +196,8 @@ function DashboardMotorista() {
   useEffect(() => {
     if (showNotificacao) {
       const timer = setTimeout(() => {
-        setNovaMensagem(false); // Esconde a notificação após 3 segundos
+        setNovaMensagem(false);
+        setMinhaMensagem(false);
       }, 4000); 
       return () => clearTimeout(timer);
     }
@@ -237,7 +244,7 @@ function DashboardMotorista() {
                       position: "fixed", // Fixa a posição na tela
                       top: "20px",       // Distância do topo
                       right: "20px",     // Distância da borda direita
-                      backgroundColor: "#ff9800", // Cor de fundo
+                      backgroundColor: MinhaMensagem === true? "#006aff":"#ff9800" ,
                       color: "#fff",     // Cor do texto
                       padding: "10px 15px",
                       borderRadius: "8px",
@@ -248,7 +255,7 @@ function DashboardMotorista() {
                       alignItems: "center",
                     }}
                   >
-                    <span style={{ marginRight: "10px" }}>💬 Nova mensagem recebida!</span>
+                    <span style={{ marginRight: "10px" }}>💬 {MinhaMensagem == true?"Mensagem enviada!": "Nova mensagem recebida!"}</span>
                     <button 
                       onClick={() => setNovaMensagem(false)} // Fecha a notificação ao clicar
                       style={{
