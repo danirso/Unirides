@@ -392,7 +392,7 @@ function Dashboard() {
                           minute: "2-digit",
                         })}
                         <br />
-                        Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ? carona.motorista.avaliacoes[0].media.toFixed(1) : "N/A"}
+                        Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ? (<>{carona.motorista.avaliacoes[0].media.toFixed(1)}⭐</>) : "N/A"}
                         <br />
                         Vagas disponíveis: {carona.vagas_disponiveis}
                         <br />
@@ -452,7 +452,7 @@ function Dashboard() {
                             <br />
                             Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
                             <br />
-                            Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ? carona.motorista.avaliacoes[0].media.toFixed(1) : "N/A"}
+                            Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ?(<>{carona.motorista.avaliacoes[0].media.toFixed(1)}⭐</>) : "N/A"}
                             <br />
                             Vagas disponíveis: {carona.vagas_disponiveis}
                             <br />
