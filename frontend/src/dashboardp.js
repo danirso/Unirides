@@ -151,13 +151,13 @@ function Dashboard() {
     setSelectedMotorista("");
     setMusica("");
   };
-
+  
   useEffect(() => {
-    fetch("http://localhost:3000/api/caronas")
+    fetch(`http://localhost:3000/api/caronas?userId=${usuario.id}`)
       .then((response) => response.json())
       .then((data) => setCaronas(data))
       .catch((error) => console.error("Erro ao buscar caronas:", error));
-  }, []);
+  }, [usuario.id]);
 
   const fetchMinhasCaronas = (idPassageiro) => {
     fetch(
@@ -473,7 +473,9 @@ function Dashboard() {
                     >
                       <h5 className="card-title">Destino: {carona.destino}</h5>
                       <p className="card-text">
-                        Partida: {carona.partida}
+                        Local de Partida: {carona.partida}
+                        <br />
+                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
                         <br />
                         Horário:{" "}
                         {new Date(carona.horario).toLocaleTimeString("pt-BR", {
@@ -484,7 +486,7 @@ function Dashboard() {
                         Data:{" "}
                         {new Date(carona.horario).toLocaleDateString("pt-BR")}
                         <br />
-                        Motorista: {carona.motorista.nome}
+                        Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ? (<>{carona.motorista.avaliacoes[0].media.toFixed(1)}⭐</>) : "N/A"}
                         <br />
                         Vagas disponíveis: {carona.vagas_disponiveis}
                         <br />
@@ -498,6 +500,13 @@ function Dashboard() {
                       >
                         Solicitar Carona
                       </button>
+                      <button
+                            className="btn btn-info me-2"
+                            style={{ backgroundColor: "#add8e6", color: "#000" }}
+                            onClick={() => navigate(`/detalhescaronap?id=${carona.id}`)}
+                          >
+                            Ver Detalhes
+                          </button>
                     </div>
                   </div>
                 ))
@@ -552,7 +561,7 @@ function Dashboard() {
                               "pt-BR"
                             )}
                             <br />
-                            Motorista: {carona.motorista.nome}
+                            Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ?(<>{carona.motorista.avaliacoes[0].media.toFixed(1)}⭐</>) : "N/A"}
                             <br />
                             Vagas disponíveis: {carona.vagas_disponiveis}
                             <br />
@@ -568,10 +577,17 @@ function Dashboard() {
                             Sair da Carona
                           </button>
                           <button
-                            className="btn btn-warning"
+                            className="btn btn-warning me-2"
                             onClick={() => abrirChat(carona.id)}
                           >
                             Falar com o Motorista
+                          </button>
+                          <button
+                            className="btn btn-info me-2"
+                            style={{ backgroundColor: "#add8e6", color: "#000" }}
+                            onClick={() => navigate(`/detalhescaronap?id=${carona.id}`)}
+                          >
+                            Ver Detalhes
                           </button>
                         </div>
                       </div>

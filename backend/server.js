@@ -2,17 +2,10 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 3000;
-const {
-  Carona,
-  Usuario,
-  CarInfo,
-  PassageirosCaronas,
-  Avaliacoes,
-  MensagemCarona,
-} = require("./models");
-const { Op, where, Model } = require("sequelize");
-const http = require("http");
-const cors = require("cors");
+const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
+const { Op, where, Model,Sequelize } = require("sequelize");
+const http = require('http');
+const cors = require('cors');
 
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
@@ -189,16 +182,41 @@ const usuarioRoutes = require("./routes/usuario");
 
 app.use("/api/usuario", usuarioRoutes);
 
-// Rota de API para buscar caronas disponíveis
 app.get("/api/caronas", async (req, res) => {
   try {
+    const userId = req.query.userId;
     const caronas = await Carona.findAll({
       where: {
         vagas_disponiveis: { [Op.gt]: 0 },
         horario: { [Op.gte]: new Date() },
+        ...(userId && {
+          [Op.and]: [
+            Sequelize.literal(`NOT EXISTS (
+              SELECT 1 
+              FROM PassageirosCaronas 
+              WHERE 
+                PassageirosCaronas.id_carona= Carona.id 
+                AND PassageirosCaronas.id_passageiro = ${userId}
+            )`)
+          ]
+        })
       },
-      include: [{ model: Usuario, as: "motorista", attributes: ["nome"] }],
+      include: [
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
+      ],
     });
+
     res.json(caronas);
   } catch (error) {
     console.error("Erro ao buscar caronas disponíveis:", error);
@@ -252,6 +270,20 @@ app.get("/api/motorista/:id/caronas", async (req, res) => {
         id_motorista: id,
         horario: { [Op.gte]: new Date() },
       },
+      include: [
+        {
+          model: Usuario,
+          as: "passageiros",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
+      ],
     });
 
     if (caronasMotorista.length === 0) {
@@ -265,6 +297,80 @@ app.get("/api/motorista/:id/caronas", async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar caronas do motorista:", error);
     res.status(500).send("Erro ao buscar caronas");
+  }
+});
+
+// Rota de API para buscar detalhes da carona
+app.get("/api/detalhes/:id/caronas", async (req, res) => {
+  try {
+    const caronaId = req.params.id;
+    const carona = await Carona.findOne({
+      where: { id: caronaId },
+      include: [
+        {
+          model: Usuario,
+          as: "passageiros",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"], // Inclui o nome do motorista para exibir na página
+        },
+      ],
+    });
+
+    if (!carona) {
+      return res.status(404).json({ error: "Carona não encontrada" });
+    }
+
+    res.json(carona);
+  } catch (error) {
+    console.error("Erro ao buscar detalhes da carona:", error);
+    res.status(500).send("Erro ao buscar detalhes da carona");
+  }
+});
+
+app.get("/api/detalhesp/:id/caronas", async (req, res) => {
+  try {
+    const caronaId = req.params.id;
+    const carona = await Carona.findOne({
+      where: { id: caronaId },
+      include: [
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media","texto_avaliativo"],
+            },
+            {
+              model: CarInfo,
+              as:"veiculo",
+            }
+          ],
+        },
+        
+      ],
+    });
+    if (!carona) {
+      return res.status(404).json({ error: "Carona não encontrada" });
+    }
+
+    res.json(carona);
+  } catch (error) {
+    console.error("Erro ao buscar detalhes da carona:", error);
+    res.status(500).send("Erro ao buscar detalhes da carona");
   }
 });
 
@@ -348,7 +454,13 @@ app.get("/api/caronas/minhas", async (req, res) => {
         horario: { [Op.gte]: new Date() },
       },
       include: [
-        { model: Usuario, as: "motorista", attributes: ["nome"] },
+        { model: Usuario, as: "motorista", attributes: ["nome"],include: [
+          {
+            model: Avaliacoes,
+            as: "avaliacoes",
+            attributes: ["media"],
+          },
+        ],  },
         {
           model: Usuario,
           as: "passageiros",

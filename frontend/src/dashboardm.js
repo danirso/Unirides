@@ -466,6 +466,31 @@ function DashboardMotorista() {
                         Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
                         <br />
                         Música: {carona.musica}
+                        <br />
+                        Passageiros:
+                        <br />
+                        {carona.passageiros && carona.passageiros.length > 0 ? (
+                          carona.passageiros.map((passageiro) => (
+                            <span
+                              key={passageiro.id}
+                              style={{
+                                display: "block",
+                                paddingLeft: "20px", // Espaço da borda esquerda
+                              }}
+                            >
+                              {passageiro.nome} - Nota:{" "}
+                              {passageiro.avaliacoes[0] ? (
+                                <>
+                                  {passageiro.avaliacoes[0].media.toFixed(1)} ⭐
+                                </>
+                              ) : (
+                                "N/A"
+                              )}
+                            </span>
+                          ))
+                        ) : (
+                          <span>Sem passageiros no momento.</span>
+                        )}
                       </p>
                       <button
                         className="btn btn-danger me-2"
@@ -481,7 +506,7 @@ function DashboardMotorista() {
                       </button>
                       {mostrarBotaoCheguei ? (
                         <button
-                          className="btn"
+                          className="btn me-2"
                           style={{backgroundColor:"#76ad96"}}
                           onClick={() => handleCheguei(caronas[0]?.id)}
                         >
@@ -489,7 +514,7 @@ function DashboardMotorista() {
                         </button>
                       ) : (
                         <button
-                          className="btn"
+                          className="btn me-2"
                           style={{backgroundColor:"#8fdcbc"}}
                           onClick={() =>
                             handleNotificarPassageiro(caronas[0]?.id)
@@ -498,6 +523,13 @@ function DashboardMotorista() {
                           Notificar Passageiro
                         </button>
                       )}
+                      <button
+                        className="btn btn-info me-2"
+                        style={{ backgroundColor: "#add8e6", color: "#000" }}
+                        onClick={() => navigate(`/detalhescaronam?id=${carona.id}`)}
+                      >
+                        Ver Detalhes
+                      </button>
                     </div>
                   </div>
                 ))
