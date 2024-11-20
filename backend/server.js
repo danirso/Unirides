@@ -118,16 +118,62 @@ io.on("connection", (socket) => {
     console.log("Usuário desconectado:", socket.id);
   });
 
-  socket.on("notificarPassageiro", ({ caronaId, motorista }) => {
-    // Simula a lógica para encontrar o passageiro relacionado à carona
-    const passageiroSocketId = obterSocketDoPassageiro(caronaId);
-    if (passageiroSocketId) {
-      io.to(passageiroSocketId).emit("notificacao", {
-        mensagem: `${motorista} saiu para o local combinado!`,
+  // Lógica de notificação para os passageiros no servidor
+  socket.on("notificarPassageiro", async ({ caronaId, motorista }) => {
+    try {
+      // Encontrar todos os passageiros da carona
+      const passageiros = await PassageirosCaronas.findAll({
+        where: { id_carona: caronaId },
+        include: [
+          { model: Usuario, as: "passageiro", attributes: ["id", "nome"] },
+        ],
       });
-      console.log("Notificação enviada para o passageiro.");
-    } else {
-      console.error("Passageiro não encontrado para a carona:", caronaId);
+
+      if (passageiros.length > 0) {
+        passageiros.forEach((passageiro) => {
+          // Envia a notificação para cada passageiro
+          io.to(passageiro.passageiro.id).emit("motoristaAcaminho", {
+            mensagem: `${motorista} saiu para o local combinado e está a caminho!`,
+          });
+        });
+        console.log("Notificação enviada para todos os passageiros.");
+      } else {
+        console.error("Nenhum passageiro encontrado para esta carona.");
+      }
+    } catch (error) {
+      console.error("Erro ao enviar notificação para os passageiros:", error);
+    }
+  });
+
+  // Evento para notificar quando o motorista chegou no local
+  socket.on("motoristaChegou", async ({ caronaId, motorista }) => {
+    try {
+      // Encontrar todos os passageiros da carona
+      const passageiros = await PassageirosCaronas.findAll({
+        where: { id_carona: caronaId },
+        include: [
+          { model: Usuario, as: "passageiro", attributes: ["id", "nome"] },
+        ],
+      });
+
+      if (passageiros.length > 0) {
+        passageiros.forEach((passageiro) => {
+          // Envia a notificação para cada passageiro
+          io.to(passageiro.passageiro.id).emit("motoristaChegouNotificacao", {
+            mensagem: `${motorista} chegou ao local combinado!`,
+          });
+        });
+        console.log(
+          "Notificação de chegada enviada para todos os passageiros."
+        );
+      } else {
+        console.error("Nenhum passageiro encontrado para esta carona.");
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao enviar notificação de chegada para os passageiros:",
+        error
+      );
     }
   });
 });
@@ -157,6 +203,42 @@ app.get("/api/caronas", async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar caronas disponíveis:", error);
     res.status(500).send("Erro ao buscar caronas");
+  }
+});
+
+//Atualiza o status do motorista para gerar a notificação de aviso
+app.put("/caronas/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status_motorista } = req.body;
+
+  try {
+    // Atualiza o status no banco de dados
+    const [rowsUpdated, [caronaAtualizada]] = await Carona.update(
+      { status_motorista },
+      {
+        where: { id },
+        returning: true,
+      }
+    );
+
+    if (rowsUpdated === 0) {
+      return res.status(404).json({ message: "Carona não encontrada." });
+    }
+
+    // Emitir evento via Socket.IO
+    const io = req.app.get("socketio");
+    io.emit("caronaAtualizada", {
+      id: caronaAtualizada.id,
+      status_motorista: caronaAtualizada.status_motorista,
+    });
+
+    res.status(200).json({
+      message: "Status atualizado com sucesso.",
+      carona: caronaAtualizada,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao atualizar o status." });
   }
 });
 

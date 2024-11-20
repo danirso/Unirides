@@ -27,7 +27,10 @@ function DashboardMotorista() {
   const [showChat, setShowChat] = useState(false);
   const [chatCaronaId, setChatCaronaId] = useState(null);
   const [isChatMinimized, setIsChatMinimized] = useState(true);
+  const [notificarChegada, setNotificarChegada] = useState(false);
+  const [mensagemMotorista, setMensagemMotorista] = useState(""); // Para armazenar a mensagem
   const inputRef = useRef(null);
+  const [mostrarBotaoCheguei, setMostrarBotaoCheguei] = useState(false);
   const [novaMensagem, setNovaMensagem] = useState(null);
   const [showNotificacao, setShowNotificacao] = useState(false);
   const [MinhaMensagem, setMinhaMensagem] = useState(false);
@@ -58,11 +61,29 @@ function DashboardMotorista() {
       setHistoricoMensagens(mensagensComNomes);
     });
 
+    socket.on("motoristaChegouNotificacao", (data) => {
+      setMensagemMotorista(data.mensagem);
+      setShowNotificacao(true); // Mostrar a notificação
+      setTimeout(() => setShowNotificacao(false), 4000); // Esconder após 4 segundos
+    });
+
     return () => {
       socket.off("mensagem");
       socket.off("historicoMensagens");
+      socket.off("motoristaChegouNotificacao");
     };
   }, [usuario.id]);
+
+  const handleCheguei = (caronaId) => {
+    socket.emit("motoristaChegou", { caronaId, motorista: usuario.name });
+    setMostrarBotaoCheguei(false); // Desativar o botão "Cheguei" após o envio
+  };
+
+  // Função para notificar que o motorista está a caminho
+  const handleNotificarPassageiro = (caronaId) => {
+    socket.emit("notificarPassageiro", { caronaId, motorista: usuario.name });
+    setMostrarBotaoCheguei(true); // Mostrar o botão "Cheguei"
+  };
 
   const enviarMensagem = () => {
     const mensagemData = {
@@ -77,14 +98,11 @@ function DashboardMotorista() {
   };
 
   const notificarPassageiro = (caronaId) => {
-    const notificacao = {
-      mensagem: "O motorista saiu para o local combinado e está a caminho!",
-      usuario: usuario.name,
-      usuarioId: usuario.id,
+    socket.emit("notificarPassageiro", {
       caronaId,
-    };
-    socket.emit("notificacaoPassageiro", notificacao);
-    alert("Notificação enviada ao passageiro!");
+      motorista: usuario.name,
+    });
+    alert("Notificação enviada ao(s) passageiro(s)!");
   };
 
   useEffect(() => {
@@ -461,12 +479,23 @@ function DashboardMotorista() {
                       >
                         Falar com o Passageiro
                       </button>
-                      <button
-                        className="btn btn-success"
-                        onClick={() => notificarPassageiro(carona.id)}
-                      >
-                        Notificar Passageiro
-                      </button>
+                      {mostrarBotaoCheguei ? (
+                        <button
+                          className="btn btn-success"
+                          onClick={() => handleCheguei(caronas[0]?.id)}
+                        >
+                          Cheguei ao local!
+                        </button>
+                      ) : (
+                        <button
+                          className="btn"
+                          onClick={() =>
+                            handleNotificarPassageiro(caronas[0]?.id)
+                          }
+                        >
+                          Notificar Passageiro
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))

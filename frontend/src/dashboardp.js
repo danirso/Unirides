@@ -60,10 +60,18 @@ function Dashboard() {
       setNotificacaoMotorista(true);
       setShowNotificacao(true);
     });
+
+    socket.on("motoristaChegouNotificacao", (data) => {
+      setMensagemMotorista(data.mensagem);
+      setShowNotificacao(true); // Mostrar a notificação quando o motorista chegar
+      setTimeout(() => setShowNotificacao(false), 4000); // Esconder a notificação após 4 segundos
+    });
+
     return () => {
       socket.off("mensagem");
       socket.off("historicoMensagens");
-      socket.off("motoristaAcaminho")
+      socket.off("motoristaAcaminho");
+      socket.off("motoristaChegouNotificacao");
     };
   }, [usuario.id]);
 
@@ -314,12 +322,13 @@ function Dashboard() {
                   <div
                     style={{
                       position: "fixed",
-                      top: "80px",
+                      top: "20px",
                       right: "20px",
-                      backgroundColor: "#28a745",
+                      backgroundColor: "#8fdcbc",
                       color: "#fff",
                       padding: "10px 15px",
                       borderRadius: "8px",
+                      fontWeight: "bold",
                       zIndex: 1000,
                       display: "flex",
                       alignItems: "center",
