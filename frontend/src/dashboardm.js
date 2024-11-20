@@ -481,7 +481,8 @@ function DashboardMotorista() {
                       </button>
                       {mostrarBotaoCheguei ? (
                         <button
-                          className="btn btn-success"
+                          className="btn"
+                          style={{backgroundColor:"#76ad96"}}
                           onClick={() => handleCheguei(caronas[0]?.id)}
                         >
                           Cheguei ao local!
@@ -489,6 +490,7 @@ function DashboardMotorista() {
                       ) : (
                         <button
                           className="btn"
+                          style={{backgroundColor:"#8fdcbc"}}
                           onClick={() =>
                             handleNotificarPassageiro(caronas[0]?.id)
                           }
