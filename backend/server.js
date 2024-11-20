@@ -26,7 +26,13 @@ app.get("/test", (req, res) => {
   res.json({ message: "all working, buddy" });
 });
 
+const userSocketMap = {};
 io.on("connection", (socket) => {
+  
+  socket.on("registrarUsuario", ({ userId }) => {
+    userSocketMap[userId] = socket.id;
+});
+
   console.log("Usuário conectado:", socket.id);
 
   // Entrar na sala da carona específica
@@ -108,9 +114,13 @@ io.on("connection", (socket) => {
 
   // Escuta a desconexão
   socket.on("disconnect", () => {
-    console.log("Usuário desconectado:", socket.id);
-  });
-
+    for (const [userId, socketId] of Object.entries(userSocketMap)) {
+        if (socketId === socket.id) {
+            delete userSocketMap[userId];
+            break;
+        }
+    }
+});
   // Lógica de notificação para os passageiros no servidor
   socket.on("notificarPassageiro", async ({ caronaId, motorista }) => {
     try {
@@ -124,11 +134,13 @@ io.on("connection", (socket) => {
 
       if (passageiros.length > 0) {
         passageiros.forEach((passageiro) => {
-          // Envia a notificação para cada passageiro
-          io.to(passageiro.passageiro.id).emit("motoristaAcaminho", {
-            mensagem: `${motorista} saiu para o local combinado e está a caminho!`,
-          });
-        });
+          const socketId = userSocketMap[passageiro.passageiro.id];
+          if (socketId) {
+              io.to(socketId).emit("motoristaAcaminho", {
+                  mensagem: `${motorista} saiu para o local combinado e está a caminho!`,
+              });
+            }
+          })
         console.log("Notificação enviada para todos os passageiros.");
       } else {
         console.error("Nenhum passageiro encontrado para esta carona.");
@@ -151,11 +163,13 @@ io.on("connection", (socket) => {
 
       if (passageiros.length > 0) {
         passageiros.forEach((passageiro) => {
-          // Envia a notificação para cada passageiro
-          io.to(passageiro.passageiro.id).emit("motoristaChegouNotificacao", {
-            mensagem: `${motorista} chegou ao local combinado!`,
-          });
-        });
+          const socketId = userSocketMap[passageiro.passageiro.id];
+          if (socketId) {
+              io.to(socketId).emit("motoristaChegouNotificacao", {
+                  mensagem: `${motorista} chegou ao local combinado!`,
+              });
+            }
+          })
         console.log(
           "Notificação de chegada enviada para todos os passageiros."
         );

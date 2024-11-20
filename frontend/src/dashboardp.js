@@ -31,6 +31,8 @@ function Dashboard() {
   const [MinhaMensagem, setMinhaMensagem] = useState(false);
 
   useEffect(() => {
+    socket.emit("registrarUsuario", { userId: usuario.id });
+
     socket.on("mensagem", (data) => {
       const mensagemComNome = {
         ...data,
@@ -56,15 +58,17 @@ function Dashboard() {
     });
 
     socket.on("motoristaAcaminho", (data) => {
+      console.log("Notificação recebida:", data);
       setMensagemMotorista(data.mensagem);
       setNotificacaoMotorista(true);
-      setShowNotificacao(true);
+      setTimeout(() => setNotificacaoMotorista(false), 4000);
     });
 
     socket.on("motoristaChegouNotificacao", (data) => {
+      console.log("Notificação de chegada recebida:", data);
       setMensagemMotorista(data.mensagem);
-      setShowNotificacao(true); // Mostrar a notificação quando o motorista chegar
-      setTimeout(() => setShowNotificacao(false), 4000); // Esconder a notificação após 4 segundos
+      setNotificacaoMotorista(true)
+      setTimeout(() => setNotificacaoMotorista(false), 4000);
     });
 
     return () => {
