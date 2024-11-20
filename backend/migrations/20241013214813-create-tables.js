@@ -115,6 +115,11 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
+      },
+      status_motorista: {
+        type:Sequelize.INTEGER,
+        allowNull:false,
+        defaultValue:0
       }
     });
 
