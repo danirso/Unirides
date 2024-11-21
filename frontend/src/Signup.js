@@ -32,7 +32,7 @@ function Signup() {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      fetch("/api/signup", {  // Corrigido o caminho da rota
+      fetch("/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

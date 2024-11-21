@@ -417,7 +417,7 @@ function LandPage() {
           
           <p style={{ fontSize: '1rem', color: '#f7f9fc' }}>
             Entre em contato conosco pelo email: <br />
-            <strong>contato@sistemadecaronas.com</strong>
+            <strong>contato@unirides.com</strong>
           </p>
 
           {/* Formulário de contato */}

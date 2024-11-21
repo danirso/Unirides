@@ -115,6 +115,11 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
+      },
+      status_motorista: {
+        type:Sequelize.INTEGER,
+        allowNull:false,
+        defaultValue:0
       }
     });
 
@@ -189,6 +194,11 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true
       },
+      media: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0,
+        allowNull: false
+      },
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
@@ -198,10 +208,55 @@ module.exports = {
         defaultValue: Sequelize.NOW
       }
     });
+    //cria a tabela de mensagens de chat
+    await queryInterface.createTable("MensagemCaronas", {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      caronaId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Caronas", // Nome da tabela de caronas
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+      usuarioId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Usuarios", // Nome da tabela de usuários
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+      mensagem: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      }
+    });
+
+
   },
 
   down: async (queryInterface, Sequelize) => {
     // Deletar as tabelas na ordem inversa de criação
+    await queryInterface.dropTable('MensagemCaronas');
     await queryInterface.dropTable('Avaliacoes');
     await queryInterface.dropTable('PassageirosCaronas');
     await queryInterface.dropTable('Caronas');

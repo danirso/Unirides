@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:3001"); // Conectando ao backend na porta 3001
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState({ name: "", id: "" });
+  const [usuario, setUsuario] = useState({ name: "", id: "", role: "" });
   const [caronas, setCaronas] = useState([]);
   const [minhasCaronas, setMinhasCaronas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +18,78 @@ function Dashboard() {
   const [musica, setMusica] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showMinhasCaronas, setShowMinhasCaronas] = useState(true);
+  const [mensagem, setMensagem] = useState("");
+  const [mensagemMotorista, setMensagemMotorista] = useState("");
+  const [historicoMensagens, setHistoricoMensagens] = useState([]);
+  const [showChat, setShowChat] = useState(false);
+  const [chatCaronaId, setChatCaronaId] = useState(null);
+  const [notificacaoMotorista, setNotificacaoMotorista] = useState(false); // Notificação do motorista
+  const [isChatMinimized, setIsChatMinimized] = useState(true);
+  const inputRef = useRef(null);
+  const [novaMensagem, setNovaMensagem] = useState(null);
+  const [showNotificacao, setShowNotificacao] = useState(false);
+  const [MinhaMensagem, setMinhaMensagem] = useState(false);
+
+  useEffect(() => {
+    socket.emit("registrarUsuario", { userId: usuario.id });
+
+    socket.on("mensagem", (data) => {
+      const mensagemComNome = {
+        ...data,
+        usuario: data.usuario || "Desconhecido",
+      };
+      setHistoricoMensagens((prev) => [...prev, mensagemComNome]);
+
+      if (data.usuarioId !== usuario.id) {
+        setNovaMensagem(true);
+        setShowNotificacao(true);
+      } else {
+        setMinhaMensagem(true);
+        setNovaMensagem(true);
+        setShowNotificacao(true);
+      }
+    });
+    socket.on("historicoMensagens", (mensagens) => {
+      const mensagensComNomes = mensagens.map((msg) => ({
+        ...msg,
+        usuario: msg.autor ? msg.autor.nome : "Desconhecido",
+      }));
+      setHistoricoMensagens(mensagensComNomes);
+    });
+
+    socket.on("motoristaAcaminho", (data) => {
+      console.log("Notificação recebida:", data);
+      setMensagemMotorista(data.mensagem);
+      setNotificacaoMotorista(true);
+      setTimeout(() => setNotificacaoMotorista(false), 4000);
+    });
+
+    socket.on("motoristaChegouNotificacao", (data) => {
+      console.log("Notificação de chegada recebida:", data);
+      setMensagemMotorista(data.mensagem);
+      setNotificacaoMotorista(true)
+      setTimeout(() => setNotificacaoMotorista(false), 4000);
+    });
+
+    return () => {
+      socket.off("mensagem");
+      socket.off("historicoMensagens");
+      socket.off("motoristaAcaminho");
+      socket.off("motoristaChegouNotificacao");
+    };
+  }, [usuario.id]);
+
+  const enviarMensagem = () => {
+    const mensagemData = {
+      mensagem,
+      usuario: usuario.name,
+      usuarioId: usuario.id,
+      caronaId: chatCaronaId,
+    };
+    socket.emit("mensagem", mensagemData);
+    setMensagem("");
+    inputRef.current.focus();
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -22,6 +97,7 @@ function Dashboard() {
       setUsuario({
         name: user.nome,
         id: user.id,
+        role: user.role,
       });
       fetchMinhasCaronas(user.id);
     } else {
@@ -35,13 +111,31 @@ function Dashboard() {
 
   // Filtra as caronas com base nos filtros
   const filteredCaronas = caronas.filter((carona) => {
-    const matchesDestino = searchTerm ? carona.destino.toLowerCase().includes(searchTerm.toLowerCase()) : true;
-    const matchesMotorista = selectedMotorista ? carona.motorista.nome.toLowerCase().includes(selectedMotorista.toLowerCase()) : true;
-    const matchesPartida = SelectedPartida ? carona.partida.toLowerCase().includes(SelectedPartida.toLowerCase()) : true;
-    const matchesData = selectedData ? new Date(carona.horario).toISOString().split("T")[0] === selectedData : true;
-    const matchesHorario = selectedHorario ? new Date(carona.horario).toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit",}).startsWith(selectedHorario) : true;
-    const matchesArCondicionado = selectArCondicionado ? carona.ar.toString() === selectArCondicionado : true;
-    const matchesMusica = musica ? carona.musica.toLowerCase().includes(musica.toLowerCase()) : true;
+    const matchesDestino = searchTerm
+      ? carona.destino.toLowerCase().includes(searchTerm.toLowerCase())
+      : true;
+    const matchesMotorista = selectedMotorista
+      ? carona.motorista.nome
+          .toLowerCase()
+          .includes(selectedMotorista.toLowerCase())
+      : true;
+    const matchesPartida = SelectedPartida
+      ? carona.partida.toLowerCase().includes(SelectedPartida.toLowerCase())
+      : true;
+    const matchesData = selectedData
+      ? new Date(carona.horario).toISOString().split("T")[0] === selectedData
+      : true;
+    const matchesHorario = selectedHorario
+      ? new Date(carona.horario)
+          .toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+          .startsWith(selectedHorario)
+      : true;
+    const matchesArCondicionado = selectArCondicionado
+      ? carona.ar.toString() === selectArCondicionado
+      : true;
+    const matchesMusica = musica
+      ? carona.musica.toLowerCase().includes(musica.toLowerCase())
+      : true;
     return (
       matchesDestino &&
       matchesMotorista &&
@@ -62,16 +156,17 @@ function Dashboard() {
     setMusica("");
   };
   
-
   useEffect(() => {
-    fetch("http://localhost:3000/api/caronas")
+    fetch(`http://localhost:3000/api/caronas?userId=${usuario.id}`)
       .then((response) => response.json())
       .then((data) => setCaronas(data))
       .catch((error) => console.error("Erro ao buscar caronas:", error));
-  }, []);
+  }, [usuario.id]);
 
   const fetchMinhasCaronas = (idPassageiro) => {
-    fetch(`http://localhost:3000/api/caronas/minhas?id_passageiro=${idPassageiro}`)
+    fetch(
+      `http://localhost:3000/api/caronas/minhas?id_passageiro=${idPassageiro}`
+    )
       .then((response) => response.json())
       .then((data) => setMinhasCaronas(data))
       .catch((error) => console.error("Erro ao buscar minhas caronas:", error));
@@ -109,7 +204,9 @@ function Dashboard() {
       .then((response) => {
         if (response.ok) {
           alert("Você saiu da carona com sucesso!");
-          setMinhasCaronas(minhasCaronas.filter((carona) => carona.id !== caronaId));
+          setMinhasCaronas(
+            minhasCaronas.filter((carona) => carona.id !== caronaId)
+          );
         } else {
           alert("Erro ao sair da carona.");
         }
@@ -121,6 +218,32 @@ function Dashboard() {
     localStorage.removeItem("user");
     navigate("/login");
   };
+
+  const abrirChat = (caronaId) => {
+    setShowChat(true);
+    setChatCaronaId(caronaId);
+    setIsChatMinimized(false);
+
+    socket.emit("entrarCarona", caronaId, {
+      name: usuario.name,
+      id: usuario.id,
+      role: usuario.role,
+    });
+  };
+
+  const minimizarChat = () => {
+    setIsChatMinimized(!isChatMinimized);
+  };
+
+  useEffect(() => {
+    if (showNotificacao) {
+      const timer = setTimeout(() => {
+        setNovaMensagem(false); // Esconde a notificação após 3 segundos
+        setMinhaMensagem(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showNotificacao]);
 
   return (
     <div
@@ -150,15 +273,93 @@ function Dashboard() {
               <h2>Bem-vindo, {usuario.name}!</h2>
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <Link to="/perfil-passageiro" className="btn btn-success me-2">
-                        Ver Perfil Completo
-                    </Link>
-                    <Link to="/historico" className="btn btn-info me-2">
-                        Ver Histórico
-                    </Link>
+                  <Link
+                    to="/perfil-passageiro"
+                    className="btn btn-success me-2"
+                  >
+                    Ver Perfil Completo
+                  </Link>
+                  <Link to="/historico" className="btn btn-info me-2">
+                    Ver Histórico
+                  </Link>
                 </div>
-                <button className="btn btn-outline-danger" onClick={handleLogout}>
-                    Logout
+                {novaMensagem && (
+                  <div
+                    style={{
+                      position: "fixed", // Fixa a posição na tela
+                      top: "20px", // Distância do topo
+                      right: "20px", // Distância da borda direita
+                      backgroundColor:
+                        MinhaMensagem === true ? "#006aff" : "#ff9800",
+                      color: "#fff", // Cor do texto
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Sombra para destacar
+                      fontWeight: "bold",
+                      zIndex: 1000, // Certifica-se de que a notificação estará por cima de outros elementos
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ marginRight: "10px" }}>
+                      💬{" "}
+                      {MinhaMensagem === true
+                        ? "Mensagem enviada!"
+                        : "Nova mensagem recebida!"}
+                    </span>
+                    <button
+                      onClick={() => setNovaMensagem(false)} // Fecha a notificação ao clicar
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        color: "#fff",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ✖
+                    </button>
+                  </div>
+                )}
+                {/* Notificação de motorista */}
+                {notificacaoMotorista && (
+                  <div
+                    style={{
+                      position: "fixed",
+                      top: "20px",
+                      right: "20px",
+                      backgroundColor: "#8fdcbc",
+                      color: "#fff",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      fontWeight: "bold",
+                      zIndex: 1000,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ marginRight: "10px" }}>
+                      🚗 {mensagemMotorista}
+                    </span>
+                    <button
+                      onClick={() => setNotificacaoMotorista(false)}
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        color: "#fff",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ✖
+                    </button>
+                  </div>
+                )}
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={handleLogout}
+                >
+                  Logout
                 </button>
               </div>
             </div>
@@ -177,12 +378,16 @@ function Dashboard() {
               />
               <button
                 className="btn btn-outline-light mb-2"
-                onClick={() => setShowFilters(!showFilters)}>
+                onClick={() => setShowFilters(!showFilters)}
+              >
                 {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
               </button>
               {showFilters && (
                 <div className="card mb-3 shadow-sm">
-                  <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
+                  <div
+                    className="card-body p-4 rounded"
+                    style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}
+                  >
                     <h4 className="mb-3">Filtros</h4>
                     <div className="mb-2">
                       <label className="form-label">Local de partida:</label>
@@ -225,7 +430,7 @@ function Dashboard() {
                         onChange={(e) => setSelectedHorario(e.target.value)}
                         className="form-control"
                         required
-                     />
+                      />
                     </div>
                     <div className="mb-2">
                       <label className="form-label">Ar-condicionado:</label>
@@ -249,9 +454,7 @@ function Dashboard() {
                         onChange={(e) => setMusica(e.target.value)}
                       />
                     </div>
-                    <button
-                      className="btn btn-warning"
-                      onClick={limparFiltros}>
+                    <button className="btn btn-warning" onClick={limparFiltros}>
                       Limpar filtros
                     </button>
                   </div>
@@ -268,32 +471,46 @@ function Dashboard() {
               {filteredCaronas.length > 0 ? (
                 filteredCaronas.map((carona) => (
                   <div key={carona.id} className="card mb-3 shadow-sm">
-                    <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}> 
+                    <div
+                      className="card-body p-4 rounded"
+                      style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}
+                    >
                       <h5 className="card-title">Destino: {carona.destino}</h5>
                       <p className="card-text">
-                        Partida: {carona.partida}
+                        Local de Partida: {carona.partida}
                         <br />
-                        Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
+                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                        <br />
+                        Horário:{" "}
+                        {new Date(carona.horario).toLocaleTimeString("pt-BR", {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                         <br />
-                        Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                        Data:{" "}
+                        {new Date(carona.horario).toLocaleDateString("pt-BR")}
                         <br />
-                        Motorista: {carona.motorista.nome}
+                        Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ? (<>{carona.motorista.avaliacoes[0].media.toFixed(1)}⭐</>) : "N/A"}
                         <br />
                         Vagas disponíveis: {carona.vagas_disponiveis}
                         <br />
                         Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
-                        <br /> 
+                        <br />
                         Música: {carona.musica}
                       </p>
                       <button
-                        className="btn btn-success"
+                        className="btn btn-success me-2"
                         onClick={() => solicitarCarona(carona.id)}
                       >
                         Solicitar Carona
                       </button>
+                      <button
+                            className="btn btn-info me-2"
+                            style={{ backgroundColor: "#add8e6", color: "#000" }}
+                            onClick={() => navigate(`/detalhescaronap?id=${carona.id}`)}
+                          >
+                            Ver Detalhes
+                          </button>
                     </div>
                   </div>
                 ))
@@ -321,31 +538,60 @@ function Dashboard() {
                   {minhasCaronas.length > 0 ? (
                     minhasCaronas.map((carona) => (
                       <div key={carona.id} className="card mb-3 shadow-sm">
-                        <div className="card-body p-4 rounded" style={{ backgroundColor: "#343a40", color: "#f7f9fc" }}>
-                          <h5 className="card-title">Destino: {carona.destino}</h5>
+                        <div
+                          className="card-body p-4 rounded"
+                          style={{
+                            backgroundColor: "#343a40",
+                            color: "#f7f9fc",
+                          }}
+                        >
+                          <h5 className="card-title">
+                            Destino: {carona.destino}
+                          </h5>
                           <p className="card-text">
                             Partida: {carona.partida}
                             <br />
-                            Horário: {new Date(carona.horario).toLocaleTimeString("pt-BR", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            Horário:{" "}
+                            {new Date(carona.horario).toLocaleTimeString(
+                              "pt-BR",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
                             <br />
-                            Data: {new Date(carona.horario).toLocaleDateString("pt-BR")}
+                            Data:{" "}
+                            {new Date(carona.horario).toLocaleDateString(
+                              "pt-BR"
+                            )}
                             <br />
-                            Motorista: {carona.motorista.nome}
+                            Motorista: {carona.motorista.nome} - Nota: {carona.motorista.avaliacoes[0] ?(<>{carona.motorista.avaliacoes[0].media.toFixed(1)}⭐</>) : "N/A"}
                             <br />
                             Vagas disponíveis: {carona.vagas_disponiveis}
                             <br />
-                            Ar-condicionado: {carona.ar ? "Ligado" : "Desligado"}
+                            Ar-condicionado:{" "}
+                            {carona.ar ? "Ligado" : "Desligado"}
                             <br />
                             Música: {carona.musica}
                           </p>
                           <button
-                            className="btn btn-danger"
+                            className="btn btn-danger me-2"
                             onClick={() => sairDaCarona(carona.id)}
                           >
                             Sair da Carona
+                          </button>
+                          <button
+                            className="btn btn-warning me-2"
+                            onClick={() => abrirChat(carona.id)}
+                          >
+                            Falar com o Motorista
+                          </button>
+                          <button
+                            className="btn btn-info me-2"
+                            style={{ backgroundColor: "#add8e6", color: "#000" }}
+                            onClick={() => navigate(`/detalhescaronap?id=${carona.id}`)}
+                          >
+                            Ver Detalhes
                           </button>
                         </div>
                       </div>
@@ -358,9 +604,134 @@ function Dashboard() {
             </div>
           </div>
         </div>
+        {/* Componente de Chat */}
+        {showChat && (
+          <div
+            style={{
+              position: "fixed",
+              bottom: "20px",
+              right: "20px",
+              width: "350px",
+              zIndex: 1000,
+              backgroundColor: "#fff",
+              borderRadius: "8px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "#343a40",
+                color: "#fff",
+                padding: "10px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <h5 style={{ margin: 0 }}>Chat com o Motorista</h5>
+              <button
+                onClick={() => setIsChatMinimized(!isChatMinimized)}
+                style={{
+                  padding: "5px",
+                  backgroundColor: "#6c757d",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                }}
+              >
+                {isChatMinimized ? "Expandir" : "Minimizar"}
+              </button>
+            </div>
+            {!isChatMinimized && (
+              <>
+                <div
+                  style={{
+                    maxHeight: "400px",
+                    overflowY: "auto",
+                    padding: "10px",
+                    backgroundColor: "#f8f9fa",
+                    color: "#000",
+                  }}
+                >
+                  {historicoMensagens.length > 0 ? (
+                    historicoMensagens.map((msg, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          marginBottom: "8px",
+                          backgroundColor:
+                            msg.usuarioId === usuario.id
+                              ? "#d4edda"
+                              : "#f1f1f1",
+                          padding: "8px",
+                          borderRadius: "5px",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        <strong>
+                          {msg.usuarioId === usuario.id ? "Você" : msg.usuario}:
+                        </strong>{" "}
+                        {msg.mensagem}
+                      </div>
+                    ))
+                  ) : (
+                    <p style={{ color: "#ccc" }}>Nenhuma mensagem ainda.</p>
+                  )}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    padding: "10px",
+                    borderTop: "1px solid #ccc",
+                  }}
+                >
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={mensagem}
+                    onChange={(e) => setMensagem(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && mensagem.trim() !== "") {
+                        enviarMensagem();
+                      }
+                    }}
+                    placeholder="Digite sua mensagem..."
+                    style={{
+                      flex: 1,
+                      padding: "8px",
+                      marginRight: "8px",
+                      border: "1px solid #ced4da",
+                      borderRadius: "4px",
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (mensagem.trim() !== "") {
+                        // verifica se a mensagem não está vazia
+                        enviarMensagem();
+                      }
+                    }}
+                    style={{
+                      padding: "8px 12px",
+                      backgroundColor: "#007bff",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Enviar
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
-  );  
+  );
 }
 
 export default Dashboard;
