@@ -11,6 +11,10 @@ function Login() {
   const [errors, setErrors] = useState({});
   const [backendError, setBackendError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [showCodeVerification, setShowCodeVerification] = useState(false);
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const navigate = useNavigate();
 
   const handleInput = (e) => {
@@ -23,6 +27,20 @@ function Login() {
 
   const handleBackTolandPage = () => {
     navigate("/");
+  };
+
+  const handleSendEmail = () => {
+    // Aqui você deve implementar o envio do e-mail com o token de recuperação.
+    // Assim que o e-mail for enviado, exibe o campo para inserir o código.
+    setShowRecovery(false);  // Esconde a tela de recuperação de senha.
+    setShowCodeVerification(true);  // Exibe a tela para inserir o código.
+  };
+
+  const handleVerifyCode = () => {
+    // Aqui você deve verificar o código enviado e permitir que o usuário
+    // redefina a senha.
+    // Se o código for válido, você pode exibir a tela de redefinir senha.
+    console.log("Código verificado:", code);
   };
 
   const handleSubmit = (e) => {
@@ -159,7 +177,7 @@ function Login() {
               onClick={togglePasswordVisibility}
               style={{
                 position: "absolute",
-                top: "50%",
+                top: "72%",
                 right: "10px",
                 transform: "translateY(-50%)",
                 background: "none",
@@ -169,6 +187,7 @@ function Login() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                height: "55%",
             }}
             >
               {showPassword ? (
@@ -223,6 +242,19 @@ function Login() {
           >
             Login
           </button>
+
+          <p className="text-center mb-0">
+            Esqueceu a senha?{" "}
+            <button
+              type="button"
+              className="btn text-primary p-0"
+              style={{ background: "none", border: "none", textDecoration: "underline", }}
+              onClick={() => setShowRecovery(true)}
+            >
+              Recuperar senha
+            </button>
+          </p>
+
           <p></p>
           <Link
             to="/signup"
@@ -242,8 +274,141 @@ function Login() {
           </Link>
         </form>
       </div>
+      {showRecovery && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
+              padding: "20px",
+              borderRadius: "8px",
+              width: "300px",
+            }}
+          >
+            <h5 className="text-center"  
+            style={{
+              color: "#fff",
+            }}
+            >Recuperar Senha</h5>
+            <form>
+              <input
+                type="email"
+                placeholder="Digite seu email"
+                className="form-control mb-3"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button
+                className="btn w-100"
+                style={{
+                  backgroundColor: "#8fdcbc",
+                  color: "#fff",
+                  padding: "10px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                }}
+                onClick={handleSendEmail}
+
+              >
+                Enviar
+              </button>
+              <button
+                className="btn w-100 mt-3"
+                style={{
+                  backgroundColor: "#D3D3D3",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                }}
+                onClick={() => setShowRecovery(false)}
+              >
+                Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+   {/* Tela de Inserir Código de Recuperação */}
+   {showCodeVerification && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
+              padding: "20px",
+              borderRadius: "8px",
+              width: "300px",
+            }}
+          >
+            <h5 className="text-center" style={{ color: "#fff" }}>
+              Inserir Código de Recuperação
+            </h5>
+            <form>
+              <input
+                type="text"
+                placeholder="Digite o código"
+                className="form-control mb-3"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+              <button
+                className="btn w-100"
+                style={{
+                  backgroundColor: "#8fdcbc",
+                  color: "#fff",
+                  padding: "10px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                }}
+                onClick={handleVerifyCode}
+              >
+                Verificar Código
+              </button>
+              <button
+                className="btn w-100 mt-3"
+                style={{
+                  backgroundColor: "#D3D3D3",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                }}
+                onClick={() => setShowCodeVerification(false)}
+              >
+                Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default Login;
