@@ -196,6 +196,7 @@ const usuarioRoutes = require("./routes/usuario");
 
 app.use("/api/usuario", usuarioRoutes);
 
+
 app.get("/api/caronas", async (req, res) => {
   try {
     const userId = req.query.userId;
@@ -610,6 +611,21 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: "Erro interno no servidor!" });
   }
 });
+
+const recuperarSenhaRoutes = require('./routes/recuperarSenha');
+
+// Usar as rotas de recuperação de senha
+app.use('/api/recuperacao-senha', recuperarSenhaRoutes);
+
+// Sincronizar o banco de dados com o modelo
+db.sequelize.sync()
+    .then(() => {
+        console.log('Banco de dados sincronizado!');
+    })
+    .catch((err) => {
+        console.error('Erro ao sincronizar o banco de dados:', err);
+    });
+
 
 app.get("/api/historico/:userId/passageiro", async (req, res) => {
   const { userId } = req.params;
