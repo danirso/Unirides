@@ -1,16 +1,32 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const enviarCodigo = require('../utils/enviarCodigo'); // Função para enviar o código por email
+const bcrypt = require('bcryptjs');
+const enviarCodigo = require('../utils/enviar_codigo'); // Função para enviar o código por email
 const db = require('../models'); // ORM para interagir com o banco de dados (ex.: Sequelize)
 const router = express.Router();
 
-// POST: Enviar o código de recuperação
-router.post('/recuperar-senha', async (req, res) => {
-    const { email } = req.body;
-
-    if (!email) {
+// Middleware para validar se o email está presente
+const validarEmail = (req, res, next) => {
+    if (!req.body.email) {
         return res.status(400).json({ message: 'Email é obrigatório.' });
     }
+    next();  // Se o email estiver presente, passa para a próxima função
+};
+
+const validarSenhas = (req, res, next) => {
+    const { novaSenha, confirmarSenha } = req.body;
+    if (!novaSenha || !confirmarSenha) {
+        return res.status(400).json({ message: 'As senhas são obrigatórias.' });
+    }
+    if (novaSenha !== confirmarSenha) {
+        return res.status(400).json({ message: 'As senhas precisam ser iguais.' });
+    }
+    next();
+};
+
+
+// POST: Enviar o código de recuperação
+router.post('/recuperar-senha', validarEmail, async (req, res) => {
+    const { email } = req.body;
 
     try {
         // Gerar código aleatório de 6 dígitos e definir validade de 10 minutos
@@ -37,12 +53,8 @@ router.post('/recuperar-senha', async (req, res) => {
 });
 
 // POST: Verificar o código
-router.post('/verificar-codigo', async (req, res) => {
+router.post('/verificar-codigo', validarEmail, async (req, res) => {
     const { email, codigo } = req.body;
-
-    if (!email || !codigo) {
-        return res.status(400).json({ message: 'Email e código são obrigatórios.' });
-    }
 
     try {
         // Buscar o código no banco
@@ -65,16 +77,8 @@ router.post('/verificar-codigo', async (req, res) => {
 });
 
 // POST: Trocar a senha
-router.post('/trocar-senha', async (req, res) => {
+router.post('/trocar-senha', validarEmail, validarSenhas, async (req, res) => {
     const { email, novaSenha, confirmarSenha } = req.body;
-
-    if (!email || !novaSenha || !confirmarSenha) {
-        return res.status(400).json({ message: 'Email e senhas são obrigatórios.' });
-    }
-
-    if (novaSenha !== confirmarSenha) {
-        return res.status(400).json({ message: 'As senhas precisam ser iguais.' });
-    }
 
     try {
         // Hash da nova senha

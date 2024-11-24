@@ -617,15 +617,6 @@ const recuperarSenhaRoutes = require('./routes/recuperarSenha');
 // Usar as rotas de recuperação de senha
 app.use('/api/recuperacao-senha', recuperarSenhaRoutes);
 
-// Sincronizar o banco de dados com o modelo
-db.sequelize.sync()
-    .then(() => {
-        console.log('Banco de dados sincronizado!');
-    })
-    .catch((err) => {
-        console.error('Erro ao sincronizar o banco de dados:', err);
-    });
-
 
 app.get("/api/historico/:userId/passageiro", async (req, res) => {
   const { userId } = req.params;
