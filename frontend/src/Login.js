@@ -13,6 +13,8 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
   const [showCodeVerification, setShowCodeVerification] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const navigate = useNavigate();
@@ -29,19 +31,63 @@ function Login() {
     navigate("/");
   };
 
-  const handleSendEmail = () => {
-    // Aqui você deve implementar o envio do e-mail com o token de recuperação.
-    // Assim que o e-mail for enviado, exibe o campo para inserir o código.
-    setShowRecovery(false);  // Esconde a tela de recuperação de senha.
-    setShowCodeVerification(true);  // Exibe a tela para inserir o código.
+  const handleSendEmail = async (e) => {
+    e.preventDefault();
+  
+    // Limpa mensagens anteriores
+    setSuccessMessage('');
+    setErrorMessage('');
+  
+    try {
+      const response = await fetch('/api/recuperacao-senha', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        setSuccessMessage('Código de recuperação enviado com sucesso!');
+      } else {
+        setErrorMessage('Erro ao enviar o código. Email inválido!');
+      }
+    } catch (error) {
+      setErrorMessage('Email inválido. Tente novamente!');
+    }
   };
-
-  const handleVerifyCode = () => {
-    // Aqui você deve verificar o código enviado e permitir que o usuário
-    // redefina a senha.
-    // Se o código for válido, você pode exibir a tela de redefinir senha.
-    console.log("Código verificado:", code);
-  };
+  
+  const handleVerifyCode = async (e) => {
+    e.preventDefault();
+  
+    // Limpa mensagens anteriores
+    setSuccessMessage('');
+    setErrorMessage('');
+  
+    try {
+      const response = await fetch('/api/verificar-codigo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, code }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        setSuccessMessage('Código verificado com sucesso!');
+        // Redireciona para a tela de troca de senha ou outro fluxo
+      } else {
+        setErrorMessage('Código inválido. Tente novamente.');
+      }
+    } catch (error) {
+      setErrorMessage('Erro ao verificar o código. Tente novamente.');
+    }
+  };  
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -311,6 +357,16 @@ function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
+              {successMessage && (
+                <div style={{ color: "green", marginBottom: "10px" }}>
+                  {successMessage}
+                </div>
+              )}
+              {errorMessage && (
+                <div style={{ color: "red", marginBottom: "10px" }}>
+                  {errorMessage}
+                </div>
+              )}
               <button
                 className="btn w-100"
                 style={{
@@ -378,6 +434,16 @@ function Login() {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
               />
+              {successMessage && (
+                <div style={{ color: "green", marginBottom: "10px" }}>
+                  {successMessage}
+                </div>
+              )}
+              {errorMessage && (
+                <div style={{ color: "red", marginBottom: "10px" }}>
+                  {errorMessage}
+                </div>
+              )}
               <button
                 className="btn w-100"
                 style={{
