@@ -13,6 +13,9 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
   const [showCodeVerification, setShowCodeVerification] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [email, setEmail] = useState("");
@@ -78,15 +81,44 @@ function Login() {
       const data = await response.json();
   
       if (data.success) {
-        setSuccessMessage('Código verificado com sucesso!');
-        // Redireciona para a tela de troca de senha ou outro fluxo
+        setShowCodeVerification(false);
+        setShowResetPassword(true);
       } else {
-        setErrorMessage('Código inválido. Tente novamente.');
+        setErrorMessage(data.message || "Código inválido.");
       }
     } catch (error) {
-      setErrorMessage('Erro ao verificar o código. Tente novamente.');
+      setErrorMessage("Erro ao conectar ao servidor.");
     }
   };  
+  
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+  
+    if (newPassword !== confirmPassword) {
+      setErrorMessage("As senhas não coincidem.");
+      return;
+    }
+  
+    try {
+      const response = await fetch("/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, newPassword }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        setSuccessMessage("Senha redefinida com sucesso!");
+        setShowResetPassword(false);
+      } else {
+        setErrorMessage(data.message || "Erro ao redefinir senha.");
+      }
+    } catch (error) {
+      setErrorMessage("Erro ao conectar ao servidor.");
+    }
+  };
   
 
   const handleSubmit = (e) => {
@@ -473,6 +505,89 @@ function Login() {
           </div>
         </div>
       )}
+
+{showResetPassword && (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 1000,
+        }}
+      >
+        <div
+          style={{
+            background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
+            padding: "20px",
+            borderRadius: "8px",
+            width: "300px",
+          }}
+        >
+          <h5 className="text-center" style={{ color: "#fff" }}>
+            Redefinir Senha
+          </h5>
+          <form>
+            <input
+              type="password"
+              placeholder="Nova senha"
+              className="form-control mb-3"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Confirmar nova senha"
+              className="form-control mb-3"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            {successMessage && (
+              <div style={{ color: "green", marginBottom: "10px" }}>
+                {successMessage}
+              </div>
+            )}
+            {errorMessage && (
+              <div style={{ color: "red", marginBottom: "10px" }}>
+                {errorMessage}
+              </div>
+            )}
+            <button
+              className="btn w-100"
+              style={{
+                backgroundColor: "#8fdcbc",
+                color: "#fff",
+                padding: "10px",
+                fontWeight: "bold",
+                borderRadius: "8px",
+              }}
+              onClick={handleResetPassword}
+            >
+              Redefinir Senha
+            </button>
+            <button
+              className="btn w-100 mt-3"
+              style={{
+                backgroundColor: "#D3D3D3",
+                padding: "10px",
+                borderRadius: "8px",
+                fontWeight: "bold",
+              }}
+              onClick={() => setShowResetPassword(false)}
+            >
+              Cancelar
+            </button>
+          </form>
+        </div>
+      </div>
+    )}
+
     </div>
   );
 };
