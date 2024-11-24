@@ -35,7 +35,7 @@ module.exports = {
       { nome: 'Guto', ra: 22008248, celular: '16994557100', email: 'guto@passageiro.com', role: 0, senha: 'password', createdAt: new Date(), updatedAt: new Date() },
       { nome: 'Leo', ra: 22017958, celular: '19999776399', email: 'leo@passageiro.com', role: 0, senha: 'password', createdAt: new Date(), updatedAt: new Date() },
       { nome: 'Galassi', ra: 22005768, celular: '19999135763', email: 'galassi@passageiro.com', role: 0, senha: 'password', createdAt: new Date(), updatedAt: new Date() },
-      { nome: 'Matue', ra: 22011982, celular: '19971063947', email: 'matue@passageiro.com', role: 0, senha: 'password', createdAt: new Date(), updatedAt: new Date() }
+      { nome: 'Matue', ra: 22011982, celular: '19971063947', email: 'mattanitelli4@gmail.com', role: 0, senha: 'password', createdAt: new Date(), updatedAt: new Date() }
     ], {});
 
     // Recuperar IDs dos passageiros

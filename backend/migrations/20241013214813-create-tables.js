@@ -252,7 +252,35 @@ module.exports = {
     });
 
 
+// Criar tabela CodigosRecuperacao
+await queryInterface.createTable('CodigosRecuperacao', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
   },
+  email: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  codigo: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  },
+  expiracao: {
+    type: Sequelize.DATE,
+    allowNull: false
+  },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW
+  },
+  updatedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW
+  }
+});
+},
 
   down: async (queryInterface, Sequelize) => {
     // Deletar as tabelas na ordem inversa de criação
@@ -262,5 +290,6 @@ module.exports = {
     await queryInterface.dropTable('Caronas');
     await queryInterface.dropTable('CarInfo');
     await queryInterface.dropTable('Usuarios');
+    await queryInterface.dropTable('CodigosRecuperacao');
   }
 };

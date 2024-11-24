@@ -55,6 +55,13 @@ module.exports = (sequelize, DataTypes) => {
       as:'veiculo'
     });
     
+    Usuario.associate = function(models) {
+      // Um usuário pode ter muitos códigos de recuperação
+      Usuario.hasMany(models.CodigosRecuperacao, {
+        foreignKey: 'email', // Chave estrangeira em CodigosRecuperacao
+        sourceKey: 'email'   // Chave primária no modelo Usuario (também usando o email)
+      });
+    };
   };
   return Usuario;
 };
