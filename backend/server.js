@@ -6,6 +6,9 @@ const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona }
 const { Op, where, Model,Sequelize } = require("sequelize");
 const http = require('http');
 const cors = require('cors');
+const nodemailer = require("nodemailer");
+const crypto = require('crypto');
+const router = express.Router();
 
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
@@ -613,9 +616,18 @@ app.post("/login", async (req, res) => {
 });
 
 const recuperarSenhaRoutes = require('./routes/recuperarSenha');
+const transporter =nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth:{
+    user: process.env.SMTP_USER, 
+    pass: process.env.SMTP_PASS,
+  }
+})
 
 // Usar as rotas de recuperação de senha
-app.use('/api/recuperacao-senha', recuperarSenhaRoutes);
+app.use('/recuperar-senha', recuperarSenhaRoutes);
 
 
 app.get("/api/historico/:userId/passageiro", async (req, res) => {

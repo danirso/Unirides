@@ -27,6 +27,7 @@ const validarSenhas = (req, res, next) => {
 // POST: Enviar o código de recuperação
 router.post('/recuperar-senha', validarEmail, async (req, res) => {
     const { email } = req.body;
+    console.log('Requisição recebida para /recuperar-senha', req.body);
 
     try {
         // Gerar código aleatório de 6 dígitos e definir validade de 10 minutos
@@ -81,6 +82,11 @@ router.post('/trocar-senha', validarEmail, validarSenhas, async (req, res) => {
     const { email, novaSenha, confirmarSenha } = req.body;
 
     try {
+
+        if (novaSenha !== confirmarSenha) {
+            return res.status(400).json({ message: 'As senhas precisam ser iguais.' });
+        }
+
         // Hash da nova senha
         const hashedPassword = await bcrypt.hash(novaSenha, 10);
 
