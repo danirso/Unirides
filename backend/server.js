@@ -2,10 +2,17 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 3000;
-const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
-const { Op, where, Model,Sequelize } = require("sequelize");
-const http = require('http');
-const cors = require('cors');
+const {
+  Carona,
+  Usuario,
+  CarInfo,
+  PassageirosCaronas,
+  Avaliacoes,
+  MensagemCarona,
+} = require("./models");
+const { Op, where, Model, Sequelize } = require("sequelize");
+const http = require("http");
+const cors = require("cors");
 
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
@@ -28,10 +35,9 @@ app.get("/test", (req, res) => {
 
 const userSocketMap = {};
 io.on("connection", (socket) => {
-  
   socket.on("registrarUsuario", ({ userId }) => {
     userSocketMap[userId] = socket.id;
-});
+  });
 
   console.log("Usuário conectado:", socket.id);
 
@@ -115,12 +121,12 @@ io.on("connection", (socket) => {
   // Escuta a desconexão
   socket.on("disconnect", () => {
     for (const [userId, socketId] of Object.entries(userSocketMap)) {
-        if (socketId === socket.id) {
-            delete userSocketMap[userId];
-            break;
-        }
+      if (socketId === socket.id) {
+        delete userSocketMap[userId];
+        break;
+      }
     }
-});
+  });
   // Lógica de notificação para os passageiros no servidor
   socket.on("notificarPassageiro", async ({ caronaId, motorista }) => {
     try {
@@ -136,11 +142,11 @@ io.on("connection", (socket) => {
         passageiros.forEach((passageiro) => {
           const socketId = userSocketMap[passageiro.passageiro.id];
           if (socketId) {
-              io.to(socketId).emit("motoristaAcaminho", {
-                  mensagem: `${motorista} saiu para o local combinado e está a caminho!`,
-              });
-            }
-          })
+            io.to(socketId).emit("motoristaAcaminho", {
+              mensagem: `${motorista} saiu para o local combinado e está a caminho!`,
+            });
+          }
+        });
         console.log("Notificação enviada para todos os passageiros.");
       } else {
         console.error("Nenhum passageiro encontrado para esta carona.");
@@ -165,11 +171,11 @@ io.on("connection", (socket) => {
         passageiros.forEach((passageiro) => {
           const socketId = userSocketMap[passageiro.passageiro.id];
           if (socketId) {
-              io.to(socketId).emit("motoristaChegouNotificacao", {
-                  mensagem: `${motorista} chegou ao local combinado!`,
-              });
-            }
-          })
+            io.to(socketId).emit("motoristaChegouNotificacao", {
+              mensagem: `${motorista} chegou ao local combinado!`,
+            });
+          }
+        });
         console.log(
           "Notificação de chegada enviada para todos os passageiros."
         );
@@ -211,9 +217,9 @@ app.get("/api/caronas", async (req, res) => {
               WHERE 
                 PassageirosCaronas.id_carona= Carona.id 
                 AND PassageirosCaronas.id_passageiro = ${userId}
-            )`)
-          ]
-        })
+            )`),
+          ],
+        }),
       },
       include: [
         {
@@ -237,6 +243,33 @@ app.get("/api/caronas", async (req, res) => {
     res.status(500).send("Erro ao buscar caronas");
   }
 });
+
+// Rota para remover um passageiro de uma carona
+app.delete(
+  "/api/caronas/:caronaId/passageiros/:passageiroId",
+  async (req, res) => {
+    const { caronaId, passageiroId } = req.params;
+
+    try {
+      const passageiroRemovido = await PassageirosCaronas.findOne({
+        where: { id_carona: caronaId, id_passageiro: passageiroId },
+      });
+
+      if (!passageiroRemovido) {
+        return res
+          .status(404)
+          .json({ error: "Passageiro não encontrado na carona." });
+      }
+
+      await passageiroRemovido.destroy();
+
+      res.status(200).json({ message: "Passageiro removido com sucesso." });
+    } catch (error) {
+      console.error("Erro ao remover passageiro:", error);
+      res.status(500).json({ error: "Erro interno ao remover passageiro." });
+    }
+  }
+);
 
 //Atualiza o status do motorista para gerar a notificação de aviso
 app.put("/caronas/:id/status", async (req, res) => {
@@ -324,7 +357,7 @@ app.get("/api/detalhes/:id/caronas", async (req, res) => {
         {
           model: Usuario,
           as: "passageiros",
-          attributes: ["nome"],
+          attributes: ["id","nome"],
           include: [
             {
               model: Avaliacoes,
@@ -366,15 +399,14 @@ app.get("/api/detalhesp/:id/caronas", async (req, res) => {
             {
               model: Avaliacoes,
               as: "avaliacoes",
-              attributes: ["media","texto_avaliativo"],
+              attributes: ["media", "texto_avaliativo"],
             },
             {
               model: CarInfo,
-              as:"veiculo",
-            }
+              as: "veiculo",
+            },
           ],
         },
-        
       ],
     });
     if (!carona) {
@@ -468,13 +500,18 @@ app.get("/api/caronas/minhas", async (req, res) => {
         horario: { [Op.gte]: new Date() },
       },
       include: [
-        { model: Usuario, as: "motorista", attributes: ["nome"],include: [
-          {
-            model: Avaliacoes,
-            as: "avaliacoes",
-            attributes: ["media"],
-          },
-        ],  },
+        {
+          model: Usuario,
+          as: "motorista",
+          attributes: ["nome"],
+          include: [
+            {
+              model: Avaliacoes,
+              as: "avaliacoes",
+              attributes: ["media"],
+            },
+          ],
+        },
         {
           model: Usuario,
           as: "passageiros",

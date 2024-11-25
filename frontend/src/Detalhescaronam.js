@@ -31,6 +31,32 @@ function Detalhescaronam() {
     navigate("/motorista");
   };
 
+  const removerPassageiro = (passageiroId) => {
+    console.log("Removendo passageiro com ID:", passageiroId, "da carona:", caronaId);
+    fetch(`http://localhost:3000/api/caronas/${caronaId}/passageiros/${passageiroId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          alert("Passageiro removido com sucesso!");
+          // Atualiza a lista de passageiros
+          setCaronaDetalhes((prev) => ({
+            ...prev,
+            passageiros: prev.passageiros.filter((p) => p.id !== passageiroId),
+          }));
+        } else {
+          alert("Erro ao remover passageiro.");
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao remover passageiro:", error);
+      });
+  };
+  
+
   return (
     <div
       className="d-flex flex-column align-items-center vh-100"
@@ -77,45 +103,62 @@ function Detalhescaronam() {
                     <strong>Destino:</strong> {caronaDetalhes.destino}
                   </p>
                   <p style={{ color: "white" }}>
-                    <strong>Data:</strong> {new Date(caronaDetalhes.horario).toLocaleDateString("pt-BR")}
+                    <strong>Data:</strong>{" "}
+                    {new Date(caronaDetalhes.horario).toLocaleDateString(
+                      "pt-BR"
+                    )}
                   </p>
                   <p style={{ color: "white" }}>
-                    <strong>Horário:{" "}</strong>
-                        {new Date(caronaDetalhes.horario).toLocaleTimeString("pt-BR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          timeZone: "America/Sao_Paulo",
-                        })}
+                    <strong>Horário: </strong>
+                    {new Date(caronaDetalhes.horario).toLocaleTimeString(
+                      "pt-BR",
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "America/Sao_Paulo",
+                      }
+                    )}
                   </p>
                 </div>
 
                 <div>
                   <h5 style={{ color: "white" }}>Passageiros</h5>
                   <hr style={{ borderColor: "white" }} />
-                  {caronaDetalhes.passageiros && caronaDetalhes.passageiros.length > 0 ? (
+                  {caronaDetalhes.passageiros &&
+                  caronaDetalhes.passageiros.length > 0 ? (
                     caronaDetalhes.passageiros.map((passageiro, index) => (
-                      <div 
-                        key={index} 
+                      <div
+                        key={index}
                         className="mb-3 p-3 rounded"
-                        style={{ 
-                          backgroundColor: "#2c3e50", 
-                          color: "white" 
+                        style={{
+                          backgroundColor: "#2c3e50",
+                          color: "white",
                         }}
                       >
                         <div className="d-flex justify-content-between align-items-center">
-                          <strong>{passageiro.nome} - Nota:{" "}
-                              {passageiro.avaliacoes[0] ? (
-                                <>
-                                  {passageiro.avaliacoes[0].media.toFixed(1)} ⭐
-                                </>
-                              ) : (
-                                "N/A"
-                              )}</strong>
+                          <strong>
+                            {passageiro.nome} - Nota:{" "}
+                            {passageiro.avaliacoes[0] ? (
+                              <>
+                                {passageiro.avaliacoes[0].media.toFixed(1)} ⭐
+                              </>
+                            ) : (
+                              "N/A"
+                            )}
+                          </strong>
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => removerPassageiro(passageiro.id)}
+                          >
+                            Remover
+                          </button>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p style={{ color: "white" }}>Nenhum passageiro cadastrado</p>
+                    <p style={{ color: "white" }}>
+                      Nenhum passageiro cadastrado
+                    </p>
                   )}
                 </div>
 
