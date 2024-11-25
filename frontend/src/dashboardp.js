@@ -363,21 +363,38 @@ function Dashboard() {
                     </button>
                   </div>
                 )}
-                {/* Notificação de remoção */}
-                {showNotificacao && (
+                {/* Notificação de remoção de passageiro */}
+                {notificacaoRemocao && (
                   <div
                     style={{
                       position: "fixed",
                       top: "20px",
                       right: "20px",
-                      backgroundColor: "#ff4d4d", // Vermelho para destacar
+                      backgroundColor: "#f28c8c", // Vermelho claro
                       color: "#fff",
                       padding: "10px 15px",
                       borderRadius: "8px",
+                      fontWeight: "bold",
                       zIndex: 1000,
+                      display: "flex",
+                      alignItems: "center",
                     }}
                   >
-                    <span>{notificacaoRemocao}</span>
+                    <span style={{ marginRight: "10px" }}>
+                      ❌ {mensagemMotorista}
+                    </span>
+                    <button
+                      onClick={() => setNotificacaoRemocao(false)}
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        color: "#fff",
+                        fontSize: "16px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ✖
+                    </button>
                   </div>
                 )}
                 <button

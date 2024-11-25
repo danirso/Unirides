@@ -244,6 +244,13 @@ app.get("/api/caronas", async (req, res) => {
   }
 });
 
+// Helper function to find a socket by passageiroId
+function obterSocketIdPorPassageiro(passageiroId) {
+  const sockets = Array.from(io.sockets.sockets.values());
+  const socket = sockets.find((s) => s.passageiroId === passageiroId);
+  return socket ? socket.id : null;
+}
+
 // Rota para remover um passageiro de uma carona
 app.delete(
   "/api/caronas/:caronaId/passageiros/:passageiroId",
@@ -251,6 +258,7 @@ app.delete(
     const { caronaId, passageiroId } = req.params;
 
     try {
+      // Buscar o registro do passageiro na carona
       const passageiroRemovido = await PassageirosCaronas.findOne({
         where: { id_carona: caronaId, id_passageiro: passageiroId },
       });
@@ -261,6 +269,18 @@ app.delete(
           .json({ error: "Passageiro não encontrado na carona." });
       }
 
+      // Notificar o passageiro via socket.io
+      const passageiroSocketId = obterSocketIdPorPassageiro(passageiroId); // Função para buscar o ID do socket
+      if (passageiroSocketId) {
+        io.to(passageiroSocketId).emit("passageiroRemovido", {
+          mensagem: `Você foi removido da carona ${caronaId}`,
+        });
+        console.log(
+          `Notificação enviada para passageiro ${passageiroId}: Você foi removido da carona ${caronaId}`
+        );
+      }
+
+      // Remover o passageiro da carona
       await passageiroRemovido.destroy();
 
       res.status(200).json({ message: "Passageiro removido com sucesso." });
@@ -357,7 +377,7 @@ app.get("/api/detalhes/:id/caronas", async (req, res) => {
         {
           model: Usuario,
           as: "passageiros",
-          attributes: ["id","nome"],
+          attributes: ["id", "nome"],
           include: [
             {
               model: Avaliacoes,
