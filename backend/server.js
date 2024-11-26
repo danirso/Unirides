@@ -2,13 +2,15 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 3000;
-const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
+const { Carona, Code, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
 const { Op, where, Model,Sequelize } = require("sequelize");
 const http = require('http');
 const cors = require('cors');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto');
 const router = express.Router();
+require('dotenv').config({ path: './backend/.env' });
+const bodyParser = require('body-parser');
 
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
@@ -615,20 +617,146 @@ app.post("/login", async (req, res) => {
   }
 });
 
-const recuperarSenhaRoutes = require('./routes/recuperarSenha');
-const transporter =nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth:{
-    user: process.env.SMTP_USER, 
-    pass: process.env.SMTP_PASS,
+app.use(cors());
+app.use(bodyParser.json());
+
+// Função para gerar código de recuperação aleatório
+const gerarCodigoRecuperacao = () => {
+  return Math.floor(100000 + Math.random() * 900000); // Gera um código de 6 dígitos
+};
+
+// Função para enviar o código por e-mail
+const enviarEmail = (email, codigo) => {
+  const transporter = nodemailer.createTransport({
+    host: process.env.MAILGUN_SMTP_HOST, // Usar a variável do .env
+    port: process.env.MAILGUN_SMTP_PORT, // Usar a variável do .env
+    secure: false, // Porta 587 não precisa de secure: true
+    auth: {
+      user: process.env.MAILGUN_SMTP_USER, // Usar a variável do .env
+      pass: process.env.MAILGUN_SMTP_PASS, // Usar a variável do .env
+    },
+  });
+
+  const mailOptions = {
+    from: `Sistema de Caronas <${process.env.MAILGUN_SMTP_USER}>`,
+    to: email, // E-mail do destinatário
+    subject: 'Código de Recuperação de Senha',
+    text: `Seu código de verificação é: ${codigo}\n\nEste código expira em 10 minutos.`,
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+// Rota para solicitar a recuperação de senha (passo 1)
+app.post('/recuperar-senha', async (req, res) => {
+  try {
+      const { email } = req.body;
+
+      // Adicione logs aqui para depurar
+      console.log("Recebido email:", email);
+      
+      if (!email) {
+          console.log("Erro: email não fornecido");
+          return res.status(400).json({ message: "Email é obrigatório." });
+      }
+
+      // Verifique se o email existe no banco
+      const user = await Usuario.findOne({ where: { email } });
+      console.log("Usuário encontrado:", user);
+
+      if (!user) {
+          console.log("Erro: email não encontrado no banco");
+          return res.status(404).json({ message: "Email não encontrado." });
+      }
+
+      // Gere o código de verificação
+      const verificationCode = gerarCodigoRecuperacao();
+      console.log("Código gerado:", verificationCode);
+
+      // Salve o código no banco ou memória
+      await Code.create({
+        id_usuario: user.id,
+        code: verificationCode,
+        expiryDate: new Date(Date.now() + 10 * 60 * 1000),  // Expira em 10 minutos
+      });
+      
+      // Enviar email (adicione sua lógica aqui)
+      await enviarEmail(email, verificationCode);
+
+      return res.status(200).json({ message: "Código enviado com sucesso!" });
+  } catch (error) {
+      console.error("Erro ao processar a recuperação de senha:", error);
+      res.status(500).json({ message: "Erro interno do servidor." });
   }
-})
+});
 
-// Usar as rotas de recuperação de senha
-app.use('/recuperar-senha', recuperarSenhaRoutes);
 
+// Rota para validar o código de recuperação (passo 2)
+app.post('/verificar-codigo', async (req, res) => {
+  const { email, codigo } = req.body;
+
+  try {
+    const usuario = await Usuario.findOne({ where: { email } });
+
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuário não encontrado.' });
+    }
+
+    // Verifica se o código de recuperação corresponde e se não expirou
+    if (usuario.verificationCode !== codigo) {
+      return res.status(400).json({ message: 'Código inválido.' });
+    }
+
+    const agora = new Date();
+    if (agora > Usuario.verificationCodeExpiry) {
+      return res.status(400).json({ message: 'Código expirado.' });
+    }
+
+    // O código é válido, permite redefinir a senha
+    return res.status(200).json({ message: 'Código validado com sucesso!' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao validar o código.' });
+  }
+});
+
+// Rota para redefinir a senha (passo 3)
+app.post('/trocar-senha', async (req, res) => {
+  const { email, novaSenha } = req.body;
+
+  try {
+    // Validação: verificar se a senha atende aos critérios
+    const regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+    if (!regex.test(novaSenha)) {
+      return res.status(400).json({
+        message: "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, um número e um caractere especial."
+      });
+    }
+
+    // Encontrar o usuário pelo email
+    const usuario = await Usuario.findOne({ where: { email } });
+
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuário não encontrado." });
+    }
+
+    // Criptografar a nova senha
+    const hashedPassword = await bcrypt.hash(novaSenha, 10);
+
+    // Atualizar a senha e limpar os códigos de verificação
+    usuario.senha = hashedPassword;
+    usuario.verificationCode = null;  // Limpar o código de verificação
+    usuario.verificationCodeExpiry = null;  // Limpar a expiração
+    await usuario.save();
+
+    return res.status(200).json({ message: "Senha redefinida com sucesso!" });
+
+  } catch (error) {
+    console.error("Erro ao redefinir a senha:", error);
+    return res.status(500).json({ message: "Erro ao redefinir a senha." });
+  }
+});
 
 app.get("/api/historico/:userId/passageiro", async (req, res) => {
   const { userId } = req.params;

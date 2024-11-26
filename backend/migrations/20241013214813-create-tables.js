@@ -2,45 +2,56 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Criar tabela Usuarios
-    await queryInterface.createTable('Usuarios', {
-      id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-      },
-      nome: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      ra: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      celular: {
-        type: Sequelize.STRING
-      },
-      email: {
-        type: Sequelize.STRING
-      },
-      senha: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      role: {
-        type: Sequelize.TINYINT,
-        allowNull: false,
-        defaultValue: 0 // 0: passageiro, 1: motorista
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
-      }
-    });
+   // Criar tabela Usuarios
+await queryInterface.createTable('Usuarios', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  nome: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  ra: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  celular: {
+    type: Sequelize.STRING,
+  },
+  email: {
+    type: Sequelize.STRING,
+    allowNull: false, // Tornar obrigatório para evitar problemas futuros
+    unique: true,     // Garante que o email seja único no sistema
+  },
+  senha: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  role: {
+    type: Sequelize.TINYINT,
+    allowNull: false,
+    defaultValue: 0, // 0: passageiro, 1: motorista
+  },
+  verificationCode: {
+    type: Sequelize.STRING,
+    allowNull: true, // Pode ser nulo, só será usado em caso de recuperação de senha
+  },
+  verificationCodeExpiry: {
+    type: Sequelize.DATE,
+    allowNull: true, // Pode ser nulo, só será usado em caso de recuperação de senha
+  },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+  updatedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  },
+});
+
 
     // Criar tabela CarInfo
     await queryInterface.createTable('CarInfo', {
@@ -251,45 +262,52 @@ module.exports = {
       }
     });
 
+    // Criar tabela Code
+    await queryInterface.createTable('Codes', {
+      id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
+      id_usuario: {  // Alteração: Referência ao 'id' do usuário
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Usuarios', // Referência à tabela de Usuários
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      code: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+      },
+      expiryDate: {
+        type: Sequelize.DATE,
+        allowNull: false
+      }
+    });
+    
 
-// Criar tabela CodigosRecuperacao
-await queryInterface.createTable('CodigosRecuperacao', {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
   },
-  email: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  codigo: {
-    type: Sequelize.INTEGER,
-    allowNull: false
-  },
-  expiracao: {
-    type: Sequelize.DATE,
-    allowNull: false
-  },
-  createdAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW
-  }
-});
-},
+
 
   down: async (queryInterface, Sequelize) => {
     // Deletar as tabelas na ordem inversa de criação
     await queryInterface.dropTable('MensagemCaronas');
     await queryInterface.dropTable('Avaliacoes');
+    await queryInterface.dropTable('Codes');
     await queryInterface.dropTable('PassageirosCaronas');
     await queryInterface.dropTable('Caronas');
     await queryInterface.dropTable('CarInfo');
     await queryInterface.dropTable('Usuarios');
-    await queryInterface.dropTable('CodigosRecuperacao');
   }
 };
