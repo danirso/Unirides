@@ -694,22 +694,39 @@ app.post('/recuperar-senha', async (req, res) => {
 
 // Rota para validar o código de recuperação (passo 2)
 app.post('/verificar-codigo', async (req, res) => {
-  const { email, codigo } = req.body;
+  const { email, token } = req.body;
+
+  if (!email || !token) {
+    console.log('Email:', email);  // Verifique se o email está correto
+    console.log('Token:', token);  // Verifique se o token está correto
+    return res.status(400).json({ message: 'Email e token são obrigatórios.' });
+
+  }
 
   try {
-    const usuario = await Usuario.findOne({ where: { email } });
+    const user = await Usuario.findOne({ where: { email } });
 
-    if (!usuario) {
+    if (!user) {
       return res.status(404).json({ message: 'Usuário não encontrado.' });
     }
 
-    // Verifica se o código de recuperação corresponde e se não expirou
-    if (usuario.verificationCode !== codigo) {
-      return res.status(400).json({ message: 'Código inválido.' });
+    // Encontre o código de verificação na tabela Code
+    const codeEntry = await Code.findOne({
+      where: { id_usuario: user.id },
+      order: [['expiryDate', 'DESC']],  // Ordena para pegar o código mais recente
+    });
+
+    if (!codeEntry) {
+      return res.status(404).json({ message: 'Código de verificação não encontrado.' });
     }
 
+    // Verifica se o código corresponde e se não expirou
+    if (codeEntry.code !== token) {
+      return res.status(400).json({ message: 'Código inválido.' });
+    } 
+
     const agora = new Date();
-    if (agora > Usuario.verificationCodeExpiry) {
+    if (agora > codeEntry.expiryDate) {
       return res.status(400).json({ message: 'Código expirado.' });
     }
 
