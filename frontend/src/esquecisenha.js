@@ -6,14 +6,25 @@ function EsqueciSenha() {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
     setSuccessMessage('');
     setErrorMessage('');
 
+    if (!isValidEmail(email)) {
+      setErrorMessage('Por favor, insira um email válido.');
+      return;
+  }
+
     try {
+      setIsLoading(true);
       // Fazendo a requisição para o backend com fetch
       const response = await fetch('http://localhost:3000/recuperar-senha', {
           method: 'POST',
@@ -23,6 +34,7 @@ function EsqueciSenha() {
           body: JSON.stringify({ email }),
       });
   
+      setIsLoading(false);
       // Verifica se a requisição foi bem-sucedida
       if (response.ok) {
           const data = await response.json();
@@ -36,7 +48,9 @@ function EsqueciSenha() {
   } catch (error) {
       // Erros de conexão ou outros imprevistos
       setErrorMessage('Erro de conexão. Tente novamente.');
-  }
+  } finally {
+  setIsLoading(false); // Retorna o botão ao estado original
+}
 };
 
   return (
@@ -93,6 +107,7 @@ function EsqueciSenha() {
             className="form-control mb-3"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
             style={{
               padding: "15px",
               fontSize: "16px",
@@ -116,22 +131,30 @@ function EsqueciSenha() {
           <button
             type="submit"
             style={{
-              width: "100%",
-              backgroundColor: "#8fdcbc",
-              color: "#fff",
               padding: "12px",
-              fontWeight: "bold",
+              fontSize: "16px",
               borderRadius: "8px",
+              backgroundColor: isLoading ? "#6c757d" : "#007bff", // Cor desativada quando carregando
               border: "none",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
+              color: "#fff",
+              cursor: isLoading ? "not-allowed" : "pointer", // Cursor bloqueado quando carregando
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+              width: "100%", // Garante que o botão ocupe a largura total do contêiner
+              marginBottom: "10px",
+              transition: "background-color 0.3s ease",
             }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#7bbda1")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#8fdcbc")}
+            disabled={isLoading} // Desativa o botão enquanto isLoading estiver true
+
+            onMouseOver={(e) => {
+              if (!isLoading) e.target.style.backgroundColor = "#43A047"; // Cor ao passar o mouse
+            }}
+            onMouseOut={(e) => {
+              if (!isLoading) e.target.style.backgroundColor = "#4CAF50"; // Cor original ao sair
+            }}
           >
-            Enviar Código
-          </button>
-        </form>
+            {isLoading ? "Enviando..." : "Enviar Email"} {/* Texto dinâmico do botão */}
+            </button>
+          </form>
         <div style={{ textAlign: "center", marginTop: "15px" }}>
           <button
             className="btn w-100"

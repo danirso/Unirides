@@ -628,23 +628,25 @@ const gerarCodigoRecuperacao = () => {
 // Função para enviar o código por e-mail
 const enviarEmail = (email, codigo) => {
   const transporter = nodemailer.createTransport({
-    host: process.env.MAILGUN_SMTP_HOST, // Usar a variável do .env
-    port: process.env.MAILGUN_SMTP_PORT, // Usar a variável do .env
-    secure: false, // Porta 587 não precisa de secure: true
-    auth: {
-      user: process.env.MAILGUN_SMTP_USER, // Usar a variável do .env
-      pass: process.env.MAILGUN_SMTP_PASS, // Usar a variável do .env
-    },
-  });
+      host: 'smtp.gmail.com',  // Servidor SMTP do Gmail
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'sistemadecaronasunirides@gmail.com', 
+        pass: 'lygh vlzi suze tiqv', 
+      },
+    });
 
-  const mailOptions = {
-    from: `Sistema de Caronas <${process.env.MAILGUN_SMTP_USER}>`,
-    to: email, // E-mail do destinatário
-    subject: 'Código de Recuperação de Senha',
-    text: `Seu código de verificação é: ${codigo}\n\nEste código expira em 10 minutos.`,
-  };
-
-  return transporter.sendMail(mailOptions);
+return transporter.sendMail({
+  from: `Sistema de Caronas <${process.env.GMAIL_USER}>`,  // Seu e-mail como remetente
+  to: email,  // E-mail do destinatário
+  subject: 'Código de Recuperação de Senha',  // Assunto do e-mail
+  text: `Seu código de verificação é: ${codigo}\n\nEste código expira em 10 minutos.`,  // Corpo do e-mail
+}).then(() => {
+  console.log('E-mail enviado com sucesso!');
+}).catch((error) => {
+  console.error('Erro ao enviar e-mail:', error);
+});
 };
 
 // Rota para solicitar a recuperação de senha (passo 1)
