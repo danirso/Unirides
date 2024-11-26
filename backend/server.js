@@ -9,7 +9,6 @@ const cors = require('cors');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto');
 const router = express.Router();
-require('dotenv').config({ path: './backend/.env' });
 const bodyParser = require('body-parser');
 
 const server = http.createServer(app);

@@ -11,8 +11,6 @@ function EsqueciSenha() {
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-
-
   const handleSendEmail = async (e) => {
     e.preventDefault();
     setSuccessMessage('');
@@ -38,8 +36,8 @@ function EsqueciSenha() {
       // Verifica se a requisição foi bem-sucedida
       if (response.ok) {
           const data = await response.json();
-          setSuccessMessage(data.message);
-          navigate('/verificar-codigo'); // Redireciona para a página de verificação
+          setSuccessMessage('E-mail enviado com sucesso! Verifique sua caixa de entrada.');
+          setTimeout(() => navigate('/verificar-codigo'), 5000);
       } else {
           // Caso a resposta do servidor não seja de sucesso, exibe a mensagem de erro
           const errorData = await response.json();
@@ -118,16 +116,7 @@ function EsqueciSenha() {
               marginBottom: "10px",
             }}
           />
-          {successMessage && (
-            <div style={{ color: "green", marginBottom: "15px", fontWeight: "500" }}>
-              {successMessage}
-            </div>
-          )}
-          {errorMessage && (
-            <div style={{ color: "red", marginBottom: "15px", fontWeight: "500" }}>
-              {errorMessage}
-            </div>
-          )}
+          
           <button
             type="submit"
             style={{
@@ -154,6 +143,21 @@ function EsqueciSenha() {
           >
             {isLoading ? "Enviando..." : "Enviar Email"} {/* Texto dinâmico do botão */}
             </button>
+
+            {/* Mensagem de sucesso */}
+            {successMessage && (
+              <div style={{ color: "green", marginBottom: "15px", fontWeight: "500" }}>
+                {successMessage}
+              </div>
+            )}
+            
+            {/* Mensagem de erro */}
+            {errorMessage && (
+              <div style={{ color: "red", marginBottom: "15px", fontWeight: "500" }}>
+                {errorMessage}
+              </div>
+            )}
+
           </form>
         <div style={{ textAlign: "center", marginTop: "15px" }}>
           <button
