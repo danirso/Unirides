@@ -1,7 +1,8 @@
-import React, { useState } from "react";  // Importando useState
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";  // Importando Axios
 
-const RecuperacaoSenha = ({ setShowRecovery, setShowCodeVerification }) => {
+function EsqueciSenha() {  
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -9,37 +10,34 @@ const RecuperacaoSenha = ({ setShowRecovery, setShowCodeVerification }) => {
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
-
-    // Limpa mensagens anteriores
     setSuccessMessage('');
     setErrorMessage('');
 
     try {
-      const response = await fetch('/recuperar-senha', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
+      // Fazendo a requisição para o backend com fetch
+      const response = await fetch('http://localhost:3000/recuperar-senha', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
       });
-
-      const data = await response.json();
-
+  
+      // Verifica se a requisição foi bem-sucedida
       if (response.ok) {
-        setSuccessMessage('Código enviado para o e-mail!');
-        setShowRecovery(false);  // Para avançar para a próxima etapa
-        setShowCodeVerification(true);
+          const data = await response.json();
+          setSuccessMessage(data.message);
+          navigate('/verificar-codigo'); // Redireciona para a página de verificação
       } else {
-        if (data.error === 'E-mail não encontrado.') {
-          setErrorMessage('E-mail não encontrado! Verifique novamente.');
-        } else {
-          setErrorMessage('Ocorreu um erro. Tente novamente mais tarde.');
-        }
+          // Caso a resposta do servidor não seja de sucesso, exibe a mensagem de erro
+          const errorData = await response.json();
+          setErrorMessage(errorData.message || 'Ocorreu um erro. Tente novamente mais tarde.');
       }
-    } catch (error) {
+  } catch (error) {
+      // Erros de conexão ou outros imprevistos
       setErrorMessage('Erro de conexão. Tente novamente.');
-    }
-  };
+  }
+};
 
   return (
     <div
@@ -69,7 +67,7 @@ const RecuperacaoSenha = ({ setShowRecovery, setShowCodeVerification }) => {
       >
         <div style={{ textAlign: "center" }}>
           <img
-            src={`${process.env.PUBLIC_URL}/logo.png`}
+            src={`${process.env.PUBLIC_URL}/logo.png`}  // Corrigido o template string
             alt="UNIRIDES"
             style={{
               position: "absolute",
@@ -82,11 +80,11 @@ const RecuperacaoSenha = ({ setShowRecovery, setShowCodeVerification }) => {
             }}
           />
           <h2 className="text-center mb-4" style={{ color: "#f7f9fc" }}>
-          Recuperar senha
-        </h2>
-        <h6 className="text-center mb-3" style={{ color: "#f7f9fc" }}>
-          Insira seu email para receber seu código de validação!
-        </h6>
+            Recuperar senha
+          </h2>
+          <h6 className="text-center mb-3" style={{ color: "#f7f9fc" }}>
+            Insira seu email para receber seu código de validação!
+          </h6>
         </div>
         <form onSubmit={handleSendEmail}>
           <input
@@ -157,6 +155,6 @@ const RecuperacaoSenha = ({ setShowRecovery, setShowCodeVerification }) => {
       </div>
     </div>
   );
-};
+}
 
-export default RecuperacaoSenha;
+export default EsqueciSenha;

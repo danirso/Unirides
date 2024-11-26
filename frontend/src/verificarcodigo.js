@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const VerificacaoCodigo = ({ setShowCodeVerification, errorMessage }) => {
-  const [code, setCode] = useState(""); // Para armazenar o código digitado
-  const [successMessage, setSuccessMessage] = useState(""); // Mensagem de sucesso
+function Verificarcodigo(){
+  const [token, setToken] = useState("");  // Para armazenar o token digitado
+  const [successMessage, setSuccessMessage] = useState("");  // Mensagem de sucesso
   const [errorMessagem, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-
   const handleVerifyCode = async (e) => {
     e.preventDefault();
-    // Limpa mensagens anteriores
-    setSuccessMessage('');
+    setSuccessMessage('');  // Limpa mensagens anteriores
     
     try {
       const response = await fetch('/verificar-codigo', {
@@ -19,20 +17,19 @@ const VerificacaoCodigo = ({ setShowCodeVerification, errorMessage }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ token }),  // Envia o token digitado pelo usuário
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         setSuccessMessage('Código verificado com sucesso!');
-        // Avançar para a próxima etapa ou fechar o modal
-        setShowCodeVerification(false);
+        navigate('/trocar-senha'); 
       } else {
-        // Caso de erro na verificação do código
-        setSuccessMessage('');
-        setErrorMessage('Código inválido! Tente novamente.');
+        setErrorMessage(data.message || 'Código inválido ou expirado.');
+
       }
     } catch (error) {
-      setSuccessMessage('');
       setErrorMessage('Erro de conexão. Tente novamente.');
     }
   };
@@ -62,18 +59,18 @@ const VerificacaoCodigo = ({ setShowCodeVerification, errorMessage }) => {
         }}
       >
         <h5 className="text-center" style={{ color: "#fff" }}>
-          Verificar Código
+          Verificar Token
         </h5>
         <form onSubmit={handleVerifyCode}>
           <input
             type="text"
-            placeholder="Digite o código enviado"
+            placeholder="Digite o codigo recebido"
             className="form-control mb-3"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
           />
           {errorMessagem && (
-            <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>
+            <div style={{ color: "red", marginBottom: "10px" }}>{errorMessagem}</div>
           )}
           {successMessage && (
             <div style={{ color: "green", marginBottom: "10px" }}>{successMessage}</div>
@@ -88,7 +85,7 @@ const VerificacaoCodigo = ({ setShowCodeVerification, errorMessage }) => {
               borderRadius: "8px",
             }}
           >
-            Verificar Código
+            Verificar Token
           </button>
         </form>
         <button
@@ -109,4 +106,4 @@ const VerificacaoCodigo = ({ setShowCodeVerification, errorMessage }) => {
   );
 };
 
-export default VerificacaoCodigo;
+export default Verificarcodigo;

@@ -1,6 +1,6 @@
 import React from 'react';
 import Login from './Login';
-import Esquecisenha from './esquecisenha'; 
+import EsqueciSenha from './esquecisenha'; 
 import VerificacaoCodigo from './verificarcodigo'; 
 import RedefinicaoSenha from './redefinirsenha'; 
 import Signup from './Signup';
@@ -20,7 +20,7 @@ function App() {
         <Routes>
           <Route path='/' element={<LandPage />}></Route>
           <Route path='/login' element={<Login />}></Route>
-          <Route path="/recuperar-senha" element={<Esquecisenha />}></Route> 
+          <Route path="/recuperar-senha" element={<EsqueciSenha />}></Route> 
           <Route path="/verificar-codigo" element={<VerificacaoCodigo />}></Route>
           <Route path="/trocar-senha" element={<RedefinicaoSenha />}></Route>        
           <Route path='/signup' element={<Signup />}></Route>
