@@ -1,7 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Verificarcodigo(){
+  const location = useLocation();
+
+  const email = location.state?.email;  // Recupera o email do state
+
+  console.log("Email recebido:", email);
+
   const [token, setToken] = useState("");  // Para armazenar o token digitado
   const [successMessage, setSuccessMessage] = useState("");  // Mensagem de sucesso
   const [errorMessagem, setErrorMessage] = useState("");
@@ -17,7 +23,8 @@ function Verificarcodigo(){
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token }),  // Envia o token digitado pelo usuário
+        
+        body: JSON.stringify({ email, token }),  // Envia o token digitado pelo usuário
       });
 
       const data = await response.json();

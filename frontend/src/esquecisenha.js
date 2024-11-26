@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";  // Importando Axios
 
 function EsqueciSenha() {  
-  const [email, setEmail] = useState("");
+  const [emaillocal, setEmailLocal] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [email, setEmail] = useState(""); 
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -16,7 +16,7 @@ function EsqueciSenha() {
     setSuccessMessage('');
     setErrorMessage('');
 
-    if (!isValidEmail(email)) {
+    if (!isValidEmail(emaillocal)) {
       setErrorMessage('Por favor, insira um email válido.');
       return;
   }
@@ -29,7 +29,7 @@ function EsqueciSenha() {
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email: emaillocal }),
       });
   
       setIsLoading(false);
@@ -37,7 +37,8 @@ function EsqueciSenha() {
       if (response.ok) {
           const data = await response.json();
           setSuccessMessage('E-mail enviado com sucesso! Verifique sua caixa de entrada.');
-          setTimeout(() => navigate('/verificar-codigo'), 5000);
+          setEmail(emaillocal);  // Armazenando o email no componente pai
+          setTimeout(() => navigate('/verificar-codigo',  { state: { email: emaillocal }}), 5000);
       } else {
           // Caso a resposta do servidor não seja de sucesso, exibe a mensagem de erro
           const errorData = await response.json();
@@ -103,8 +104,8 @@ function EsqueciSenha() {
             type="email"
             placeholder="Digite seu email"
             className="form-control mb-3"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={emaillocal}
+            onChange={(e) => setEmailLocal(e.target.value)}
             required
             style={{
               padding: "15px",
