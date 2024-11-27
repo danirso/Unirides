@@ -38,7 +38,7 @@ function EsqueciSenha() {
           const data = await response.json();
           setSuccessMessage('E-mail enviado com sucesso! Verifique sua caixa de entrada.');
           setEmail(emaillocal);  // Armazenando o email no componente pai
-          setTimeout(() => navigate('/verificar-codigo',  { state: { email: emaillocal }}), 5000);
+          setTimeout(() => navigate('/verificar-codigo',  { state: { email: emaillocal }}), 4000);
       } else {
           // Caso a resposta do servidor não seja de sucesso, exibe a mensagem de erro
           const errorData = await response.json();
