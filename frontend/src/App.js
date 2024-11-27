@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from "react";
 import Login from './Login';
+import EsqueciSenha from './esquecisenha'; 
+import VerificacaoCodigo from './verificarcodigo'; 
+import RedefinicaoSenha from './redefinirsenha'; 
 import Signup from './Signup';
 import LandPage from './landPage';
 import Dashboard from './dashboardp';  // Dashboard para passageiro
@@ -12,11 +15,18 @@ import Detalhescaronap from './Detalhescaronap';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
+
+  const [email, setEmail] = useState("");  // Estado para armazenar o email
+
+
     return (
       <BrowserRouter> 
         <Routes>
           <Route path='/' element={<LandPage />}></Route>
           <Route path='/login' element={<Login />}></Route>
+          <Route path="/recuperar-senha" element={<EsqueciSenha setEmail={setEmail}/>}></Route> 
+          <Route path="/verificar-codigo" element={<VerificacaoCodigo email={email}/>}></Route>
+          <Route path="/trocar-senha" element={<RedefinicaoSenha />}></Route>        
           <Route path='/signup' element={<Signup />}></Route>
           <Route path='/passageiro' element={<Dashboard />}></Route>
           <Route path='/motorista' element={<DashboardM />}></Route>  {/* Rota para DashboardM */}

@@ -30,7 +30,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TINYINT,
       allowNull: false,
       defaultValue: 0 // 0 = passageiro, 1 = motorista
-    }
+    },
+    verificationCode: {
+      type: DataTypes.STRING,
+      allowNull: true, // O código é opcional até ser gerado
+    },
+    // Adicionando o campo para controlar a expiração do código
+    verificationCodeExpiry: {
+      type: DataTypes.DATE,
+      allowNull: true, // A expiração será definida quando o código for gerado
+    },
   }, {
     tableName: 'Usuarios',
     timestamps: true

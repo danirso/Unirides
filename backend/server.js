@@ -2,10 +2,15 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 3000;
-const { Carona, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
+const { Carona, Code, Usuario, CarInfo, PassageirosCaronas,Avaliacoes,MensagemCarona } = require("./models");
 const { Op, where, Model,Sequelize } = require("sequelize");
 const http = require('http');
 const cors = require('cors');
+const nodemailer = require("nodemailer");
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const router = express.Router();
+const bodyParser = require('body-parser');
 
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
@@ -195,6 +200,7 @@ app.use(express.json());
 const usuarioRoutes = require("./routes/usuario");
 
 app.use("/api/usuario", usuarioRoutes);
+
 
 app.get("/api/caronas", async (req, res) => {
   try {
@@ -608,6 +614,163 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Erro ao realizar login:", error);
     res.status(500).json({ error: "Erro interno no servidor!" });
+  }
+});
+
+app.use(cors());
+app.use(bodyParser.json());
+
+// Função para gerar código de recuperação aleatório
+const gerarCodigoRecuperacao = () => {
+  return Math.floor(100000 + Math.random() * 900000); // Gera um código de 6 dígitos
+};
+
+// Função para enviar o código por e-mail
+const enviarEmail = (email, codigo) => {
+  const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',  // Servidor SMTP do Gmail
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'sistemadecaronasunirides@gmail.com', 
+        pass: 'lygh vlzi suze tiqv', 
+      },
+    });
+
+return transporter.sendMail({
+  from: `Sistema de Caronas <${process.env.GMAIL_USER}>`,  // Seu e-mail como remetente
+  to: email,  // E-mail do destinatário
+  subject: 'Código de Recuperação de Senha',  // Assunto do e-mail
+  text: `Seu código de verificação é: ${codigo}\n\nEste código expira em 10 minutos.`,  // Corpo do e-mail
+}).then(() => {
+  console.log('E-mail enviado com sucesso!');
+}).catch((error) => {
+  console.error('Erro ao enviar e-mail:', error);
+});
+};
+
+// Rota para solicitar a recuperação de senha (passo 1)
+app.post('/recuperar-senha', async (req, res) => {
+  try {
+      const { email } = req.body;
+
+      // Adicione logs aqui para depurar
+      console.log("Recebido email:", email);
+      
+      if (!email) {
+          console.log("Erro: email não fornecido");
+          return res.status(400).json({ message: "Email é obrigatório." });
+      }
+
+      // Verifique se o email existe no banco
+      const user = await Usuario.findOne({ where: { email } });
+      console.log("Usuário encontrado:", user);
+
+      if (!user) {
+          console.log("Erro: email não encontrado no banco");
+          return res.status(404).json({ message: "Email não encontrado." });
+      }
+
+      // Gere o código de verificação
+      const verificationCode = gerarCodigoRecuperacao();
+      console.log("Código gerado:", verificationCode);
+
+      // Salve o código no banco ou memória
+      await Code.create({
+        id_usuario: user.id,
+        code: verificationCode,
+        expiryDate: new Date(Date.now() + 10 * 60 * 1000),  // Expira em 10 minutos
+      });
+      
+      // Enviar email (adicione sua lógica aqui)
+      await enviarEmail(email, verificationCode);
+
+      return res.status(200).json({ message: "Código enviado com sucesso!" });
+  } catch (error) {
+      console.error("Erro ao processar a recuperação de senha:", error);
+      res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+
+// Rota para validar o código de recuperação (passo 2)
+app.post('/verificar-codigo', async (req, res) => {
+  const { email, token } = req.body;
+
+  if (!email || !token) {
+    console.log('Email:', email);  // Verifique se o email está correto
+    console.log('Token:', token);  // Verifique se o token está correto
+    return res.status(400).json({ message: 'Email e token são obrigatórios.' });
+
+  }
+
+  try {
+    const user = await Usuario.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado.' });
+    }
+
+    // Encontre o código de verificação na tabela Code
+    const codeEntry = await Code.findOne({
+      where: { id_usuario: user.id },
+      order: [['expiryDate', 'DESC']],  // Ordena para pegar o código mais recente
+    });
+
+    if (!codeEntry) {
+      return res.status(404).json({ message: 'Código de verificação não encontrado.' });
+    }
+
+    // Verifica se o código corresponde e se não expirou
+    if (codeEntry.code !== token) {
+      return res.status(400).json({ message: 'Código inválido.' });
+    } 
+
+    const agora = new Date();
+    if (agora > codeEntry.expiryDate) {
+      return res.status(400).json({ message: 'Código expirado.' });
+    }
+
+    // O código é válido, permite redefinir a senha
+    return res.status(200).json({ message: 'Código validado com sucesso!' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao validar o código.' });
+  }
+});
+
+// Rota para redefinir a senha (passo 3)
+app.post('/trocar-senha', async (req, res) => {
+  const { novaSenha, email } = req.body;
+
+  try {
+    // Validação: verificar se a senha atende aos critérios
+    const regex = /^[A-Za-z\d@$!%*?&]{8,20}$/;
+    if (!regex.test(novaSenha)) {
+      return res.status(400).json({
+        message: "A senha deve ter pelo menos 8 caracteres"
+      });
+    }
+
+    // Encontrar o usuário pelo email
+    const usuario = await Usuario.findOne({ where: { email } });
+
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuário não encontrado." });
+    }
+
+    // Atualizar a senha e limpar os códigos de verificação
+    usuario.senha = novaSenha;
+    usuario.verificationCode = null;  // Limpar o código de verificação
+    usuario.verificationCodeExpiry = null;  // Limpar a expiração
+    await usuario.save();
+
+    return res.status(200).json({ message: "Senha redefinida com sucesso!" });
+
+  } catch (error) {
+    console.error("Erro ao redefinir a senha:", error);
+    return res.status(500).json({ message: "Erro ao redefinir a senha." });
   }
 });
 
