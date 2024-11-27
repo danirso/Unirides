@@ -8,6 +8,7 @@ const http = require('http');
 const cors = require('cors');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 const bodyParser = require('body-parser');
 
@@ -741,14 +742,14 @@ app.post('/verificar-codigo', async (req, res) => {
 
 // Rota para redefinir a senha (passo 3)
 app.post('/trocar-senha', async (req, res) => {
-  const { email, novaSenha } = req.body;
+  const { novaSenha, email } = req.body;
 
   try {
     // Validação: verificar se a senha atende aos critérios
-    const regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+    const regex = /^[A-Za-z\d@$!%*?&]{8,20}$/;
     if (!regex.test(novaSenha)) {
       return res.status(400).json({
-        message: "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, um número e um caractere especial."
+        message: "A senha deve ter pelo menos 8 caracteres"
       });
     }
 
@@ -759,11 +760,8 @@ app.post('/trocar-senha', async (req, res) => {
       return res.status(404).json({ message: "Usuário não encontrado." });
     }
 
-    // Criptografar a nova senha
-    const hashedPassword = await bcrypt.hash(novaSenha, 10);
-
     // Atualizar a senha e limpar os códigos de verificação
-    usuario.senha = hashedPassword;
+    usuario.senha = novaSenha;
     usuario.verificationCode = null;  // Limpar o código de verificação
     usuario.verificationCodeExpiry = null;  // Limpar a expiração
     await usuario.save();
