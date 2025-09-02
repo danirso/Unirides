@@ -59,6 +59,10 @@ function Signup() {
     }
   };
 
+  const handleBackTolandPage = () => {
+    navigate("/");
+  };
+
   // Estilo dos inputs
   const inputStyle = {
     padding: "12px",
@@ -90,8 +94,23 @@ function Signup() {
         minHeight: "100vh",
         background: "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
         padding: "20px",
+        position: "relative", // Necessário para posicionar o botão
       }}
     >
+      <button
+        className="btn me-2"
+        onClick={handleBackTolandPage}
+        style={{
+          backgroundColor: "#8fdcbc",
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: 10,
+        }}
+      >
+        Voltar
+      </button>
+
       <div
         className="p-4 rounded shadow-lg"
         style={{

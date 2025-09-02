@@ -12,6 +12,26 @@
 - 💬 Sistema de chat em tempo real entre motoristas e passageiros.
 - 📋 Visualização de detalhes de caronas e gerenciamento de participantes.
 
+## Screenshots da Aplicação
+
+### Tela de Cadastro
+![Tela de Cadastro](screenshots/cadastro.png)
+
+### Carrossel da Landing Page
+![Carrossel da Landing Page](screenshots/carrosel.png)
+
+### Tela de Chat
+![Tela de Chat](screenshots/chat.png)
+
+### Tela Principal do Motorista
+![Tela Principal do Motorista](screenshots/land_motorista.png)
+
+### Tela Principal do Passageiro
+![Tela Principal do Passageiro](screenshots/land_pass.png)
+
+### Tela de Login
+![Tela de Login](screenshots/login.png)
+
 ## Tecnologias Utilizadas
 
 - **🐳 Docker**: Usado para containerizar e facilitar a execução do projeto, garantindo consistência no ambiente de desenvolvimento.
@@ -30,9 +50,8 @@ Certifique-se de ter o Docker instalado na máquina antes de iniciar.
 
 1️⃣ **Clone o repositório do GitHub:**
    ```bash
-   git clone https://github.com/danirso/Unirides.git
+   git clone [https://github.com/danirso/Unirides.git](https://github.com/danirso/Unirides.git)
    ```
-
 2️⃣ **Acesse o diretório do projeto:**
    ```bash
    cd Unirides
@@ -40,7 +59,7 @@ Certifique-se de ter o Docker instalado na máquina antes de iniciar.
 
 3️⃣ **Inicie o projeto usando o Docker Compose:**
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
 
 4️⃣ **Aguarde o Docker configurar os contêineres.** Quando a mensagem indicando que os serviços estão rodando aparecer, você poderá acessar a aplicação no navegador:

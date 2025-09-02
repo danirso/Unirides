@@ -52,6 +52,11 @@ function EsqueciSenha() {
 }
 };
 
+  const handleBackTolandPage = () => {
+    navigate("/");
+  };
+
+
   return (
     <div
       style={{
@@ -68,6 +73,20 @@ function EsqueciSenha() {
         fontFamily: "Poppins, sans-serif",
       }}
     >
+      <button
+        className="btn me-2"
+        onClick={handleBackTolandPage}
+        style={{
+          backgroundColor: "#8fdcbc",
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: 10,
+        }}
+      >
+        Voltar
+      </button>
+
       <div
         style={{
           backgroundColor: "#343a40",
@@ -76,6 +95,7 @@ function EsqueciSenha() {
           width: "500px",
           boxShadow: "0 15px 30px rgba(0, 0, 0, 0.1)",
           animation: "fadeIn 1s ease-in-out",
+          position: "relative",
         }}
       >
         <div style={{ textAlign: "center" }}>
@@ -83,13 +103,9 @@ function EsqueciSenha() {
             src={`${process.env.PUBLIC_URL}/logo.png`}  // Corrigido o template string
             alt="UNIRIDES"
             style={{
-              position: "absolute",
-              top: "30px",
-              left: "50%",
-              transform: "translateX(-50%)",
               width: "140px",
               zIndex: 10,
-              paddingTop: "20px",
+              marginBottom: "20px",
             }}
           />
           <h2 className="text-center mb-4" style={{ color: "#f7f9fc" }}>

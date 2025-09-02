@@ -144,88 +144,96 @@ function LandPage() {
         </div>
 
         {/* Botão entrar de forma intuitiva */}
-        <div style={{ position: "relative" }}>
-          <button
-            onClick={handleDropdownToggle}
-            style={{
-              background: "none",
-              color: "#8fdcbc",
-              padding: "0.5rem 1rem",
-              border: "none",
-              fontSize: "1rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              borderRadius: "8px",
-              transition: "transform 0.2s ease",
-            }}
-            onMouseEnter={(e) =>
-              (e.target.style.transform = "translateY(-2px)")
-            }
-            onMouseLeave={(e) => (e.target.style.transform = "translateY(0)")}
-          >
-            Entrar {showDropdown ? "˄" : "˅"}
-          </button>
+      <div style={{ position: "relative" }}>
+        <button
+          onClick={handleDropdownToggle}
+          style={{
+            backgroundColor: "#2E86C1",
+            color: "#fff",
+            padding: "0.5rem 1rem",
+            border: "none",
+            fontSize: "1rem",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center", // Centraliza o texto
+            borderRadius: "8px",
+            transition: "transform 0.2s ease, background-color 0.3s ease",
+            width: "100px", // Largura fixa para combinar com os links abaixo
+            height: "40px",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.backgroundColor = "#2779A9";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = "translateY(0)";
+            e.target.style.backgroundColor = "#2E86C1";
+          }}
+        >
+          Entrar {showDropdown ? "˄" : "˅"}
+        </button>
 
-          {showDropdown && (
-            <div
+        {showDropdown && (
+          <div
+            style={{
+              position: "absolute",
+              top: "2.5rem",
+              right: 0,
+              background: "#495057",
+              boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+              borderRadius: "8px",
+              overflow: "hidden",
+              zIndex: 1,
+              marginTop: "10px", // Adiciona o espaço vertical aqui
+            }}
+          >
+            <Link
+              to="/login"
               style={{
-                position: "absolute",
-                top: "2.5rem",
-                right: 0,
-                background: "#343a40",
-                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                borderRadius: "8px",
-                overflow: "hidden",
-                zIndex: 1,
+                display: "block",
+                padding: "1rem",
+                color: "#E9F5E1", // Nova cor para o link de login
+                textAlign: "center",
+                textDecoration: "none",
+                transition: "background-color 0.2s ease, transform 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#5A6268"; // Adiciona um hover ao fundo do link
+                e.target.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "transparent";
+                e.target.style.transform = "translateY(0)";
               }}
             >
-              <Link
-                to="/login"
-                style={{
-                  display: "block",
-                  padding: "1rem",
-                  color: "#8fdcbc",
-                  textAlign: "center",
-                  textDecoration: "none",
-                  transition: "transform 0.2s ease, border-bottom 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = "translateY(-2px)";
-                  e.target.style.borderBottom = "2px solid #8fdcbc";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.borderBottom = "none";
-                }}
-              >
-                Login
-              </Link>
+              Login
+            </Link>
 
-              <Link
-                to="/signup"
-                style={{
-                  display: "block",
-                  padding: "1rem",
-                  color: "#8fdcbc",
-                  textAlign: "center",
-                  textDecoration: "none",
-                  transition: "transform 0.2s ease, border-bottom 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = "translateY(-2px)";
-                  e.target.style.borderBottom = "2px solid #8fdcbc";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.borderBottom = "none";
-                }}
-              >
-                Cadastro
-              </Link>
-            </div>
-          )}
-        </div>
+            <Link
+              to="/signup"
+              style={{
+                display: "block",
+                padding: "1rem",
+                color: "#E9F5E1", // Nova cor para o link de cadastro
+                textAlign: "center",
+                textDecoration: "none",
+                transition: "background-color 0.2s ease, transform 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#5A6268";
+                e.target.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "transparent";
+                e.target.style.transform = "translateY(0)";
+              }}
+            >
+              Cadastro
+            </Link>
+          </div>
+        )}
+      </div>
       </nav>
 
       {/* Conteúdo de cada sessão */}
@@ -252,7 +260,7 @@ function LandPage() {
           amizades. Cadastre-se agora e junte-se à nossa comunidade!
         </p>
 
-      {/* Carroussel de imagens */}
+      {/* Carrossel de imagens */}
       <div id="CarroseldeImagens" class="carousel slide carousel-fade" data-ride="carousel" data-interval="4000" data-wrap="true">
         <ol class="carousel-indicators">
           <li data-target="#CarroseldeImagens" data-slide-to="0" class="active"></li>
@@ -265,21 +273,21 @@ function LandPage() {
             class="d-block w-100" 
             src="carona4.png" 
             alt="primeira imagem" 
-            style={{ height: '500px', objectFit: 'hidden' }}/>
+            style={{ objectFit: 'contain', height: 'auto', maxHeight: '500px' }}/>
           </div>
           <div class="carousel-item">
             <img 
             class="d-block w-100" 
             src="carona5.png" 
             alt="segunda imagem" 
-            style={{ height: '500px', objectFit: 'hidden' }}/>
+            style={{ objectFit: 'contain', height: 'auto', maxHeight: '500px' }}/>
           </div>
           <div class="carousel-item">
             <img 
             class="d-block w-100" 
             src="carona6.png" 
             alt="terceira imagem" 
-            style={{ height: '500px', objectFit: 'hidden' }}/>
+            style={{ objectFit: 'contain', height: 'auto', maxHeight: '500px' }}/>
           </div>
         </div>
         <a class="carousel-control-prev" href="#CarroseldeImagens" role="button" data-slide="prev">
