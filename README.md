@@ -14,14 +14,14 @@
 
 ## Screenshots da Aplicação
 
+### Home Page
+![Carrossel da Landing Page](screenshots/carrosel.png)
+
 ### Tela de Cadastro
 ![Tela de Cadastro](screenshots/cadastro.png)
 
-### Carrossel da Landing Page
-![Carrossel da Landing Page](screenshots/carrosel.png)
-
-### Tela de Chat
-![Tela de Chat](screenshots/chat.png)
+### Tela de Login
+![Tela de Login](screenshots/login.png)
 
 ### Tela Principal do Motorista
 ![Tela Principal do Motorista](screenshots/land_motorista.png)
@@ -29,8 +29,8 @@
 ### Tela Principal do Passageiro
 ![Tela Principal do Passageiro](screenshots/land_pass.png)
 
-### Tela de Login
-![Tela de Login](screenshots/login.png)
+### Tela de Chat
+![Tela de Chat](screenshots/chat.png)
 
 ## Tecnologias Utilizadas
 
